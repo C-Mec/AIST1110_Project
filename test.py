@@ -8,3 +8,5 @@ class question:
         for i in range(len(self.answer)):
             print(f"{i+1}. {self.answer[i]}")
 
+
+
