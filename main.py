@@ -9,27 +9,30 @@ warnings.filterwarnings(
 )
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
-import object
 import pygame
+import object
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
-running = True
 
+jeopardy_grid = object.Grid_Surface(1000, 600)
+
+running = True
 while running:
     # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
+        
+        # pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("#00008B")
+    screen.fill("#121314")
 
     # RENDER YOUR GAME HERE
-    game_screen = object.game_screen(1280, 720)
-    game_screen.display()
+    jeopardy_grid.draw()
+    screen.blit(jeopardy_grid.surface, (140, 60))
 
     # flip() the display to put your work on screen i.e. screen refresh
     pygame.display.flip()
