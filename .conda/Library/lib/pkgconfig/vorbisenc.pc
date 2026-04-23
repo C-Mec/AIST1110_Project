@@ -1,0 +1,14 @@
+# libvorbisenc pkg-config source file
+
+prefix=E:/Github/AIST1110_Project/.conda/Library
+exec_prefix=E:/Github/AIST1110_Project/.conda/Library/bin
+libdir=E:/Github/AIST1110_Project/.conda/Library/lib
+includedir=E:/Github/AIST1110_Project/.conda/Library/include
+
+Name: vorbisenc
+Description: vorbisenc is a library that provides a convenient API for setting up an encoding environment using libvorbis
+Version: 1.3.7
+Requires.private: vorbis
+Conflicts:
+Libs: -L${libdir} -lvorbisenc
+Cflags: -I${includedir}

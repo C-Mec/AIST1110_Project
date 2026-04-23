@@ -1,0 +1,122 @@
+{
+  "name": "sdl2_image",
+  "version": "2.8.2",
+  "build": "h5ca362a_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/win-64",
+  "subdir": "win-64",
+  "fn": "sdl2_image-2.8.2-h5ca362a_1.conda",
+  "md5": "efe612d861e6df150608090eada73feb",
+  "url": "https://conda.anaconda.org/conda-forge/win-64/sdl2_image-2.8.2-h5ca362a_1.conda",
+  "sha256": "228ff6a2984b1f193bfe31f8ea527b96cfb553798b45ee3081f68be3c3b9175a",
+  "depends": [
+    "libavif16 >=1.0.4,<2.0a0",
+    "libjpeg-turbo >=3.0.0,<4.0a0",
+    "libpng >=1.6.43,<1.7.0a0",
+    "libtiff >=4.6.0,<4.8.0a0",
+    "libwebp-base >=1.4.0,<2.0a0",
+    "libzlib >=1.2.13,<2.0.0a0",
+    "sdl2 >=2.30.2,<3.0a0",
+    "ucrt >=10.0.20348.0",
+    "vc >=14.2,<15",
+    "vc14_runtime >=14.29.30139"
+  ],
+  "constrains": [],
+  "license": "Zlib",
+  "timestamp": 1716857408000,
+  "size": 118221,
+  "requested_spec": "None",
+  "package_tarball_full_path": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_image-2.8.2-h5ca362a_1.conda",
+  "extracted_package_dir": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_image-2.8.2-h5ca362a_1",
+  "files": [
+    "Library/bin/SDL2_image.dll",
+    "Library/cmake/Findlibjxl.cmake",
+    "Library/cmake/SDL2_image-shared-targets-release.cmake",
+    "Library/cmake/SDL2_image-shared-targets.cmake",
+    "Library/cmake/SDL2_imageConfig.cmake",
+    "Library/cmake/SDL2_imageConfigVersion.cmake",
+    "Library/include/SDL2/SDL_image.h",
+    "Library/lib/SDL2_image.lib",
+    "Library/lib/pkgconfig/SDL2_image.pc",
+    "Library/share/licenses/SDL2_image/LICENSE.txt"
+  ],
+  "paths_data": {
+    "paths_version": 1,
+    "paths": [
+      {
+        "_path": "Library/bin/SDL2_image.dll",
+        "path_type": "hardlink",
+        "sha256": "5944eae4c50145680f077c776a310c91b40aecacaded340b95b28447bac05ea8",
+        "size_in_bytes": 194048,
+        "sha256_in_prefix": "5944eae4c50145680f077c776a310c91b40aecacaded340b95b28447bac05ea8"
+      },
+      {
+        "_path": "Library/cmake/Findlibjxl.cmake",
+        "path_type": "hardlink",
+        "sha256": "4de9f25e25717bead575f94410f4c1a7301e20bafb1f890414bc7616fcbaaa99",
+        "size_in_bytes": 958,
+        "sha256_in_prefix": "4de9f25e25717bead575f94410f4c1a7301e20bafb1f890414bc7616fcbaaa99"
+      },
+      {
+        "_path": "Library/cmake/SDL2_image-shared-targets-release.cmake",
+        "path_type": "hardlink",
+        "sha256": "3583b5b02a7761d8da301170f1055b3e4f66f399148cfc0ab27aafca567a7c7b",
+        "size_in_bytes": 1020,
+        "sha256_in_prefix": "3583b5b02a7761d8da301170f1055b3e4f66f399148cfc0ab27aafca567a7c7b"
+      },
+      {
+        "_path": "Library/cmake/SDL2_image-shared-targets.cmake",
+        "path_type": "hardlink",
+        "sha256": "fd6ec7e53bc778566aa2025ce5b537811ef35b32c3c60da2ce087ed56c6249d0",
+        "size_in_bytes": 4240,
+        "sha256_in_prefix": "fd6ec7e53bc778566aa2025ce5b537811ef35b32c3c60da2ce087ed56c6249d0"
+      },
+      {
+        "_path": "Library/cmake/SDL2_imageConfig.cmake",
+        "path_type": "hardlink",
+        "sha256": "0645dd29f72842912d4bf2b4a0d98b904a0ae307f7d0bb13a530d4069c82927e",
+        "size_in_bytes": 2933,
+        "sha256_in_prefix": "0645dd29f72842912d4bf2b4a0d98b904a0ae307f7d0bb13a530d4069c82927e"
+      },
+      {
+        "_path": "Library/cmake/SDL2_imageConfigVersion.cmake",
+        "path_type": "hardlink",
+        "sha256": "2c86a1cf4de5bbde502ce2167f81e1022167b4434233f92c793b61d1ccba9c5b",
+        "size_in_bytes": 1904,
+        "sha256_in_prefix": "2c86a1cf4de5bbde502ce2167f81e1022167b4434233f92c793b61d1ccba9c5b"
+      },
+      {
+        "_path": "Library/include/SDL2/SDL_image.h",
+        "path_type": "hardlink",
+        "sha256": "41e8529428376479c77d5cdd085b85ef1fab3c31e81349cd6dc5adc9d83c3367",
+        "size_in_bytes": 71008,
+        "sha256_in_prefix": "41e8529428376479c77d5cdd085b85ef1fab3c31e81349cd6dc5adc9d83c3367"
+      },
+      {
+        "_path": "Library/lib/SDL2_image.lib",
+        "path_type": "hardlink",
+        "sha256": "91900af6a0d681983d7b336846c93f53911736ef03792c41d4b0fc3f7121e950",
+        "size_in_bytes": 13140,
+        "sha256_in_prefix": "91900af6a0d681983d7b336846c93f53911736ef03792c41d4b0fc3f7121e950"
+      },
+      {
+        "_path": "Library/lib/pkgconfig/SDL2_image.pc",
+        "path_type": "hardlink",
+        "sha256": "312b8e133af225c3580c56475b742abc07f13c0c4a353a431d0ca38a0298d077",
+        "size_in_bytes": 373,
+        "sha256_in_prefix": "312b8e133af225c3580c56475b742abc07f13c0c4a353a431d0ca38a0298d077"
+      },
+      {
+        "_path": "Library/share/licenses/SDL2_image/LICENSE.txt",
+        "path_type": "hardlink",
+        "sha256": "a0e8ce06504966e45088ee1cc7583cc8af9aac615d4cf56d47d847da9cb15139",
+        "size_in_bytes": 878,
+        "sha256_in_prefix": "a0e8ce06504966e45088ee1cc7583cc8af9aac615d4cf56d47d847da9cb15139"
+      }
+    ]
+  },
+  "link": {
+    "source": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_image-2.8.2-h5ca362a_1",
+    "type": 1
+  }
+}

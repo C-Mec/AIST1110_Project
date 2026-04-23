@@ -1,0 +1,10 @@
+prefix=E:/Github/AIST1110_Project/.conda/Library
+exec_prefix=E:/Github/AIST1110_Project/.conda/Library
+libdir=E:/Github/AIST1110_Project/.conda/Library/lib
+includedir=E:/Github/AIST1110_Project/.conda/Library/include
+
+Name: libturbojpeg
+Description: A SIMD-accelerated JPEG codec that provides the TurboJPEG API
+Version: 3.1.4.1
+Libs: -L${libdir} -lturbojpeg
+Cflags: -I${includedir}

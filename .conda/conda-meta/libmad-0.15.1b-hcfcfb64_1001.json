@@ -1,0 +1,67 @@
+{
+  "name": "libmad",
+  "version": "0.15.1b",
+  "build": "hcfcfb64_1001",
+  "build_number": 1001,
+  "channel": "https://conda.anaconda.org/conda-forge/win-64",
+  "subdir": "win-64",
+  "fn": "libmad-0.15.1b-hcfcfb64_1001.conda",
+  "md5": "b6689654bd79a44e67f4d6ecca3d8b5b",
+  "url": "https://conda.anaconda.org/conda-forge/win-64/libmad-0.15.1b-hcfcfb64_1001.conda",
+  "sha256": "466af4bb68679fd2c37b5811601cd80dabd7ba53b27e18a5a9ccab5138eb9aed",
+  "depends": [
+    "ucrt >=10.0.20348.0",
+    "vc >=14.2,<15",
+    "vs2015_runtime >=14.29.30139"
+  ],
+  "constrains": [],
+  "license": "GPL-2.0-only",
+  "timestamp": 1670816129000,
+  "size": 92960,
+  "requested_spec": "None",
+  "package_tarball_full_path": "C:\\Users\\user\\miniconda3\\pkgs\\libmad-0.15.1b-hcfcfb64_1001.conda",
+  "extracted_package_dir": "C:\\Users\\user\\miniconda3\\pkgs\\libmad-0.15.1b-hcfcfb64_1001",
+  "files": [
+    "Library/bin/libmad.dll",
+    "Library/include/libmad/config.h",
+    "Library/include/libmad/mad.h",
+    "Library/lib/libmad.lib"
+  ],
+  "paths_data": {
+    "paths_version": 1,
+    "paths": [
+      {
+        "_path": "Library/bin/libmad.dll",
+        "path_type": "hardlink",
+        "sha256": "5cc10d2e155932400d32fb7e41fb9d74e6b3a95b103d6f108b3adba79d659540",
+        "size_in_bytes": 106496,
+        "sha256_in_prefix": "5cc10d2e155932400d32fb7e41fb9d74e6b3a95b103d6f108b3adba79d659540"
+      },
+      {
+        "_path": "Library/include/libmad/config.h",
+        "path_type": "hardlink",
+        "sha256": "cd813b86eac08699ae8eb9d4bd2c956f248a5e2f45a1c7dacda167225b5fba9e",
+        "size_in_bytes": 3723,
+        "sha256_in_prefix": "cd813b86eac08699ae8eb9d4bd2c956f248a5e2f45a1c7dacda167225b5fba9e"
+      },
+      {
+        "_path": "Library/include/libmad/mad.h",
+        "path_type": "hardlink",
+        "sha256": "6bfe6b6ade8766f6ff047608975ce9732c793bbf12677e132f14c3248fb5167e",
+        "size_in_bytes": 26649,
+        "sha256_in_prefix": "6bfe6b6ade8766f6ff047608975ce9732c793bbf12677e132f14c3248fb5167e"
+      },
+      {
+        "_path": "Library/lib/libmad.lib",
+        "path_type": "hardlink",
+        "sha256": "4c2b19a97724971f8598ccb278fa0e13eea9cb73f72a21a3b3a3d7a06238f326",
+        "size_in_bytes": 170640,
+        "sha256_in_prefix": "4c2b19a97724971f8598ccb278fa0e13eea9cb73f72a21a3b3a3d7a06238f326"
+      }
+    ]
+  },
+  "link": {
+    "source": "C:\\Users\\user\\miniconda3\\pkgs\\libmad-0.15.1b-hcfcfb64_1001",
+    "type": 1
+  }
+}

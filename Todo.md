@@ -1,7 +1,7 @@
 ###### 0. Preparation
 0.1 ~~ Create github repository ~~
 
-###### 1. First Jeopardy Screen
+###### 1. Jeopardy Round
 1.1 Design interface
 
 1. init
@@ -22,6 +22,15 @@ Display a clue and 3 answers
 // 1a, 1b, etc. represents the side tasks
 
 1a Install pygame
+
+###### 2. Double Jeopardy Round & Interface Transitions
+2.1 Daily Double
+
+2a Multimedia Clues
+###### 3. Final Jeopardy Round
+
+###### 4. Documentation
+4.1 UML class Diagram
 
 ###### A. Future Ideas
 Just ask ai for more effects

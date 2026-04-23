@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.conda\\python.exe",
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.env.windows": {
+    "PATH": "${env:PATH};${workspaceFolder}\\.conda\\Library\\bin;${workspaceFolder}\\.conda\\DLLs;${workspaceFolder}\\.conda\\Scripts"
+  }
+}

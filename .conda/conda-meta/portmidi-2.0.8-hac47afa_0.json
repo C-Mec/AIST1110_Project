@@ -1,0 +1,115 @@
+{
+  "name": "portmidi",
+  "version": "2.0.8",
+  "build": "hac47afa_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/win-64",
+  "subdir": "win-64",
+  "fn": "portmidi-2.0.8-hac47afa_0.conda",
+  "md5": "227c6b1f46b507949a97253ad3a73a62",
+  "url": "https://conda.anaconda.org/conda-forge/win-64/portmidi-2.0.8-hac47afa_0.conda",
+  "sha256": "2c35356208cf3dd82232759af0c7ef00b0ac9cabb096a264cd0e1ec79edf0d7f",
+  "depends": [
+    "ucrt >=10.0.20348.0",
+    "vc >=14.3,<15",
+    "vc14_runtime >=14.44.35208"
+  ],
+  "constrains": [],
+  "license": "MIT",
+  "timestamp": 1764706447000,
+  "size": 45885,
+  "requested_spec": "None",
+  "package_tarball_full_path": "C:\\Users\\user\\miniconda3\\pkgs\\portmidi-2.0.8-hac47afa_0.conda",
+  "extracted_package_dir": "C:\\Users\\user\\miniconda3\\pkgs\\portmidi-2.0.8-hac47afa_0",
+  "files": [
+    "Library/bin/portmidi.dll",
+    "Library/include/pmutil.h",
+    "Library/include/portmidi.h",
+    "Library/include/porttime.h",
+    "Library/lib/cmake/PortMidi/PortMidiConfig.cmake",
+    "Library/lib/cmake/PortMidi/PortMidiConfigVersion.cmake",
+    "Library/lib/cmake/PortMidi/PortMidiTargets-release.cmake",
+    "Library/lib/cmake/PortMidi/PortMidiTargets.cmake",
+    "Library/lib/pkgconfig/portmidi.pc",
+    "Library/lib/portmidi.lib"
+  ],
+  "paths_data": {
+    "paths_version": 1,
+    "paths": [
+      {
+        "_path": "Library/bin/portmidi.dll",
+        "path_type": "hardlink",
+        "sha256": "016caba73ee4bbe7be729eaccfb2688e87177ce89c95a09544245651c61eb1ad",
+        "size_in_bytes": 32256,
+        "sha256_in_prefix": "016caba73ee4bbe7be729eaccfb2688e87177ce89c95a09544245651c61eb1ad"
+      },
+      {
+        "_path": "Library/include/pmutil.h",
+        "path_type": "hardlink",
+        "sha256": "4551cfa48de125957f83af458abb715648c1b5ebb5576759efafc8c7e931968f",
+        "size_in_bytes": 7068,
+        "sha256_in_prefix": "4551cfa48de125957f83af458abb715648c1b5ebb5576759efafc8c7e931968f"
+      },
+      {
+        "_path": "Library/include/portmidi.h",
+        "path_type": "hardlink",
+        "sha256": "0262c749a289d95e17e2dbdb746113ad52ae0999d07f9701115cc761a6846ce0",
+        "size_in_bytes": 44434,
+        "sha256_in_prefix": "0262c749a289d95e17e2dbdb746113ad52ae0999d07f9701115cc761a6846ce0"
+      },
+      {
+        "_path": "Library/include/porttime.h",
+        "path_type": "hardlink",
+        "sha256": "67aedea702f1069b71f07d5dd29b53b9d4d4bb870d5de92b4d651ee15e45d277",
+        "size_in_bytes": 2802,
+        "sha256_in_prefix": "67aedea702f1069b71f07d5dd29b53b9d4d4bb870d5de92b4d651ee15e45d277"
+      },
+      {
+        "_path": "Library/lib/cmake/PortMidi/PortMidiConfig.cmake",
+        "path_type": "hardlink",
+        "sha256": "bcca1072159a9a663b225ad6d808dcea78fd13b3ece3a304428b4c596ba52ffb",
+        "size_in_bytes": 1706,
+        "sha256_in_prefix": "bcca1072159a9a663b225ad6d808dcea78fd13b3ece3a304428b4c596ba52ffb"
+      },
+      {
+        "_path": "Library/lib/cmake/PortMidi/PortMidiConfigVersion.cmake",
+        "path_type": "hardlink",
+        "sha256": "391b1b48f87ffdf2a0266673f925b273f06729150de02577fce7791e644b0446",
+        "size_in_bytes": 2827,
+        "sha256_in_prefix": "391b1b48f87ffdf2a0266673f925b273f06729150de02577fce7791e644b0446"
+      },
+      {
+        "_path": "Library/lib/cmake/PortMidi/PortMidiTargets-release.cmake",
+        "path_type": "hardlink",
+        "sha256": "a95bee59d885942b2bcf9918288a457930985fdbcfbd4b031e9c377331074658",
+        "size_in_bytes": 934,
+        "sha256_in_prefix": "a95bee59d885942b2bcf9918288a457930985fdbcfbd4b031e9c377331074658"
+      },
+      {
+        "_path": "Library/lib/cmake/PortMidi/PortMidiTargets.cmake",
+        "path_type": "hardlink",
+        "sha256": "53ab262c75ce1a96853a33fc53e78be6c0a5cc0cfd3e0ba7fa54cfe42795ec9f",
+        "size_in_bytes": 4265,
+        "sha256_in_prefix": "53ab262c75ce1a96853a33fc53e78be6c0a5cc0cfd3e0ba7fa54cfe42795ec9f"
+      },
+      {
+        "_path": "Library/lib/pkgconfig/portmidi.pc",
+        "path_type": "hardlink",
+        "sha256": "9eeb050b4b1b787125179a9be5636b390f7ccf7b8fc66521903549b3e8086971",
+        "size_in_bytes": 266,
+        "sha256_in_prefix": "9eeb050b4b1b787125179a9be5636b390f7ccf7b8fc66521903549b3e8086971"
+      },
+      {
+        "_path": "Library/lib/portmidi.lib",
+        "path_type": "hardlink",
+        "sha256": "eb2ec98fef3e8cfad1c5bdbf1b672760ec02d604e7792222b84e3f492f346798",
+        "size_in_bytes": 15570,
+        "sha256_in_prefix": "eb2ec98fef3e8cfad1c5bdbf1b672760ec02d604e7792222b84e3f492f346798"
+      }
+    ]
+  },
+  "link": {
+    "source": "C:\\Users\\user\\miniconda3\\pkgs\\portmidi-2.0.8-hac47afa_0",
+    "type": 1
+  }
+}

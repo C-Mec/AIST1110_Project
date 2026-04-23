@@ -1,0 +1,11 @@
+prefix=E:/Github/AIST1110_Project/.conda/Library
+exec_prefix=E:/Github/AIST1110_Project/.conda/Library
+libdir=E:/Github/AIST1110_Project/.conda/Library/lib
+includedir=E:/Github/AIST1110_Project/.conda/Library/include
+
+Name: Graphite2
+Description: Font rendering engine for Complex Scripts
+Version: 3.0.1
+Libs: -LE:/Github/AIST1110_Project/.conda/Library/lib -lgraphite2
+Cflags: -IE:/Github/AIST1110_Project/.conda/Library/include
+

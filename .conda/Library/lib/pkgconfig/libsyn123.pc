@@ -1,0 +1,12 @@
+prefix=E:/Github/AIST1110_Project/.conda/Library
+exec_prefix=E:/Github/AIST1110_Project/.conda/Library
+libdir=E:/Github/AIST1110_Project/.conda/Library/lib
+includedir=E:/Github/AIST1110_Project/.conda/Library/include
+
+Name: libsyn123
+Description: A signal synthesis library accompanying mpg123
+Requires: 
+Version: 1.32.9
+Libs: -L${libdir} -lsyn123 
+Libs.private: 
+Cflags: -I${includedir} 

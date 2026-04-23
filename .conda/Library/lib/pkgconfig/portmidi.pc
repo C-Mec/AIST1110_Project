@@ -1,0 +1,11 @@
+prefix=C:/Program Files (x86)/portmidi
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: portmidi
+Description: Cross-Platform MIDI IO
+Version: 2.0.7
+Cflags: -I${includedir}
+Libs: -L${libdir} -lportmidi
+Requires.private: 

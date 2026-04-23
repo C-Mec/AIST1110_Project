@@ -1,0 +1,11 @@
+prefix=E:/Github/AIST1110_Project/.conda/Library
+exec_prefix=E:/Github/AIST1110_Project/.conda/Library
+libdir=E:/Github/AIST1110_Project/.conda/Library/lib
+includedir=E:/Github/AIST1110_Project/.conda/Library/include
+
+Name: FLAC++
+Description: Free Lossless Audio Codec Library (C++ API)
+Version: 1.5.0
+Requires: flac
+Libs: -L${libdir} -lFLAC++
+Cflags: -I${includedir}

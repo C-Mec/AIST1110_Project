@@ -1,6 +1,16 @@
+import warnings
+import os
+
+# Ignore Loading Warning in Console
+warnings.filterwarnings( 
+    "ignore",
+    message = "Your system is avx2.*",
+    category = RuntimeWarning,
+)
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
 import object
 import pygame
-# need to install pygame using pip install pygame before running this code
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))

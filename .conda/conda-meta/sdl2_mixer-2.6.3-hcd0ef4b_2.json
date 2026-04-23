@@ -1,0 +1,113 @@
+{
+  "name": "sdl2_mixer",
+  "version": "2.6.3",
+  "build": "hcd0ef4b_2",
+  "build_number": 2,
+  "channel": "https://conda.anaconda.org/conda-forge/win-64",
+  "subdir": "win-64",
+  "fn": "sdl2_mixer-2.6.3-hcd0ef4b_2.conda",
+  "md5": "c28bd243394d1f13a664feb91ba09d4a",
+  "url": "https://conda.anaconda.org/conda-forge/win-64/sdl2_mixer-2.6.3-hcd0ef4b_2.conda",
+  "sha256": "1a279c88181658a088bdff1adb697b9050bf36a5a57e4134f7fc49fca4861f24",
+  "depends": [
+    "libflac >=1.5.0,<1.6.0a0",
+    "libmad >=0.15.1b,<0.16.0a0",
+    "libogg >=1.3.5,<1.4.0a0",
+    "libvorbis >=1.3.7,<1.4.0a0",
+    "mpg123 >=1.32.9,<1.33.0a0",
+    "sdl2 >=2.32.56,<3.0a0",
+    "ucrt >=10.0.20348.0",
+    "vc >=14.3,<15",
+    "vc14_runtime >=14.44.35208"
+  ],
+  "constrains": [],
+  "license": "Zlib",
+  "timestamp": 1766614935000,
+  "size": 174596,
+  "requested_spec": "None",
+  "package_tarball_full_path": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_mixer-2.6.3-hcd0ef4b_2.conda",
+  "extracted_package_dir": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_mixer-2.6.3-hcd0ef4b_2",
+  "files": [
+    "Library/bin/SDL2_mixer.dll",
+    "Library/cmake/SDL2_mixer-shared-targets-release.cmake",
+    "Library/cmake/SDL2_mixer-shared-targets.cmake",
+    "Library/cmake/SDL2_mixerConfig.cmake",
+    "Library/cmake/SDL2_mixerConfigVersion.cmake",
+    "Library/include/SDL2/SDL_mixer.h",
+    "Library/lib/SDL2_mixer.lib",
+    "Library/lib/pkgconfig/SDL2_mixer.pc",
+    "Library/share/licenses/SDL2_mixer/LICENSE.txt"
+  ],
+  "paths_data": {
+    "paths_version": 1,
+    "paths": [
+      {
+        "_path": "Library/bin/SDL2_mixer.dll",
+        "path_type": "hardlink",
+        "sha256": "7ea468e473646a05a0dff66cf001aa264993a1cedabb75c35585fb66e5436495",
+        "size_in_bytes": 319488,
+        "sha256_in_prefix": "7ea468e473646a05a0dff66cf001aa264993a1cedabb75c35585fb66e5436495"
+      },
+      {
+        "_path": "Library/cmake/SDL2_mixer-shared-targets-release.cmake",
+        "path_type": "hardlink",
+        "sha256": "563420bdeea3349d97aae742d077385ed0aff327c03458edbab75ebf348ccac4",
+        "size_in_bytes": 1020,
+        "sha256_in_prefix": "563420bdeea3349d97aae742d077385ed0aff327c03458edbab75ebf348ccac4"
+      },
+      {
+        "_path": "Library/cmake/SDL2_mixer-shared-targets.cmake",
+        "path_type": "hardlink",
+        "sha256": "bf3e85773d77baea2942dc981b38e8c2e4409e34cf341a131f87d391ad6ea199",
+        "size_in_bytes": 4213,
+        "sha256_in_prefix": "bf3e85773d77baea2942dc981b38e8c2e4409e34cf341a131f87d391ad6ea199"
+      },
+      {
+        "_path": "Library/cmake/SDL2_mixerConfig.cmake",
+        "path_type": "hardlink",
+        "sha256": "6489395307df9e632eef29982a4a10dd4da68d78244713aae528025618f749ea",
+        "size_in_bytes": 3361,
+        "sha256_in_prefix": "6489395307df9e632eef29982a4a10dd4da68d78244713aae528025618f749ea"
+      },
+      {
+        "_path": "Library/cmake/SDL2_mixerConfigVersion.cmake",
+        "path_type": "hardlink",
+        "sha256": "e993daca7a40bf754e523bb2d00b9155a9f91c16d59e01b778b9f5de059c109b",
+        "size_in_bytes": 1904,
+        "sha256_in_prefix": "e993daca7a40bf754e523bb2d00b9155a9f91c16d59e01b778b9f5de059c109b"
+      },
+      {
+        "_path": "Library/include/SDL2/SDL_mixer.h",
+        "path_type": "hardlink",
+        "sha256": "b049cc6232040b12e16aa23838025f9f488d8d665b5e49c405f036ecba77124f",
+        "size_in_bytes": 110151,
+        "sha256_in_prefix": "b049cc6232040b12e16aa23838025f9f488d8d665b5e49c405f036ecba77124f"
+      },
+      {
+        "_path": "Library/lib/SDL2_mixer.lib",
+        "path_type": "hardlink",
+        "sha256": "645b2b95792c4dca6fe1b5b0fe1e37dfb00a31f432f203c865da85ec44aa69ff",
+        "size_in_bytes": 21464,
+        "sha256_in_prefix": "645b2b95792c4dca6fe1b5b0fe1e37dfb00a31f432f203c865da85ec44aa69ff"
+      },
+      {
+        "_path": "Library/lib/pkgconfig/SDL2_mixer.pc",
+        "path_type": "hardlink",
+        "sha256": "bc4c0aab8e4baacfcad5b1bcceec6d78fa62a1487b7f65e17705ec48322304e2",
+        "size_in_bytes": 338,
+        "sha256_in_prefix": "bc4c0aab8e4baacfcad5b1bcceec6d78fa62a1487b7f65e17705ec48322304e2"
+      },
+      {
+        "_path": "Library/share/licenses/SDL2_mixer/LICENSE.txt",
+        "path_type": "hardlink",
+        "sha256": "1852c8549e3d154687197d46abababd3e8faae035f19991b2ca850fa3a43ad57",
+        "size_in_bytes": 878,
+        "sha256_in_prefix": "1852c8549e3d154687197d46abababd3e8faae035f19991b2ca850fa3a43ad57"
+      }
+    ]
+  },
+  "link": {
+    "source": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_mixer-2.6.3-hcd0ef4b_2",
+    "type": 1
+  }
+}

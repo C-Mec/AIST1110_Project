@@ -1,0 +1,14 @@
+# sdl2_compat pkg-config source file
+
+prefix=E:/Github/AIST1110_Project/.conda/Library
+exec_prefix=${prefix}
+libdir=E:/Github/AIST1110_Project/.conda/Library/lib
+includedir=E:/Github/AIST1110_Project/.conda/Library/include
+
+Name: sdl2_compat
+Description: An SDL2 compatibility layer that uses SDL3 behind the scenes.
+Version: 2.32.56
+Provides: sdl2 = 2.32.56
+Libs: -L${libdir}  -lSDL2main -lSDL2
+#Libs.private: -lshell32
+Cflags: -I${includedir} -I${includedir}/SDL2 

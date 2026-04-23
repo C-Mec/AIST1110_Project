@@ -1,0 +1,112 @@
+{
+  "name": "sdl2_ttf",
+  "version": "2.24.0",
+  "build": "hd2a6e60_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/win-64",
+  "subdir": "win-64",
+  "fn": "sdl2_ttf-2.24.0-hd2a6e60_1.conda",
+  "md5": "b555346643f7a2f0cbc8d06fe59e1f36",
+  "url": "https://conda.anaconda.org/conda-forge/win-64/sdl2_ttf-2.24.0-hd2a6e60_1.conda",
+  "sha256": "92fe10b4f930f2e6a7e6a1f2b101d64f1cbbb31d5d66e726478367df2617d9e2",
+  "depends": [
+    "freetype >=2.13.3,<3.0a0",
+    "harfbuzz >=11.0.0,<12.0a0",
+    "sdl2 >=2.32.50,<3.0a0",
+    "ucrt >=10.0.20348.0",
+    "vc >=14.2,<15",
+    "vc14_runtime >=14.29.30139"
+  ],
+  "constrains": [],
+  "license": "Zlib",
+  "timestamp": 1743198907000,
+  "size": 49071,
+  "requested_spec": "None",
+  "package_tarball_full_path": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_ttf-2.24.0-hd2a6e60_1.conda",
+  "extracted_package_dir": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_ttf-2.24.0-hd2a6e60_1",
+  "files": [
+    "Library/bin/SDL2_ttf.dll",
+    "Library/cmake/SDL2_ttf-shared-targets-release.cmake",
+    "Library/cmake/SDL2_ttf-shared-targets.cmake",
+    "Library/cmake/SDL2_ttfConfig.cmake",
+    "Library/cmake/SDL2_ttfConfigVersion.cmake",
+    "Library/include/SDL2/SDL_ttf.h",
+    "Library/lib/SDL2_ttf.lib",
+    "Library/lib/pkgconfig/SDL2_ttf.pc",
+    "Library/share/licenses/SDL2_ttf/LICENSE.txt"
+  ],
+  "paths_data": {
+    "paths_version": 1,
+    "paths": [
+      {
+        "_path": "Library/bin/SDL2_ttf.dll",
+        "path_type": "hardlink",
+        "sha256": "055d6edcb77f95704ddd026d288d18a218af1e4bfc77c4df946e360d6af94f6d",
+        "size_in_bytes": 66560,
+        "sha256_in_prefix": "055d6edcb77f95704ddd026d288d18a218af1e4bfc77c4df946e360d6af94f6d"
+      },
+      {
+        "_path": "Library/cmake/SDL2_ttf-shared-targets-release.cmake",
+        "path_type": "hardlink",
+        "sha256": "d87e36df23710aa3d022f354ceb6df018d23bfad053071251fa5e5b90496bd68",
+        "size_in_bytes": 992,
+        "sha256_in_prefix": "d87e36df23710aa3d022f354ceb6df018d23bfad053071251fa5e5b90496bd68"
+      },
+      {
+        "_path": "Library/cmake/SDL2_ttf-shared-targets.cmake",
+        "path_type": "hardlink",
+        "sha256": "2ab2dd5b5cc2eec4eb830fb70ea7db7c798a6e7b36ad1fc933d30e180d0e1c4c",
+        "size_in_bytes": 4196,
+        "sha256_in_prefix": "2ab2dd5b5cc2eec4eb830fb70ea7db7c798a6e7b36ad1fc933d30e180d0e1c4c"
+      },
+      {
+        "_path": "Library/cmake/SDL2_ttfConfig.cmake",
+        "path_type": "hardlink",
+        "sha256": "b6164be448e86e5b606927b6c8a26755589d1511e120fbffb4c9c4c7d559e064",
+        "size_in_bytes": 1618,
+        "sha256_in_prefix": "b6164be448e86e5b606927b6c8a26755589d1511e120fbffb4c9c4c7d559e064"
+      },
+      {
+        "_path": "Library/cmake/SDL2_ttfConfigVersion.cmake",
+        "path_type": "hardlink",
+        "sha256": "0ed134c5981887a80cdbc5247649655025b7359b0dd9da7ae81565be5434aa1a",
+        "size_in_bytes": 1905,
+        "sha256_in_prefix": "0ed134c5981887a80cdbc5247649655025b7359b0dd9da7ae81565be5434aa1a"
+      },
+      {
+        "_path": "Library/include/SDL2/SDL_ttf.h",
+        "path_type": "hardlink",
+        "sha256": "0b83c6f2ec988e75c2fae73f020ccd4d52b8e0b40e9124b82d35e21406c0b526",
+        "size_in_bytes": 88154,
+        "sha256_in_prefix": "0b83c6f2ec988e75c2fae73f020ccd4d52b8e0b40e9124b82d35e21406c0b526"
+      },
+      {
+        "_path": "Library/lib/SDL2_ttf.lib",
+        "path_type": "hardlink",
+        "sha256": "ed1de2a28048373a7d1eec8f66f38585c9b053f728e3f15ec3faafad9418e251",
+        "size_in_bytes": 22118,
+        "sha256_in_prefix": "ed1de2a28048373a7d1eec8f66f38585c9b053f728e3f15ec3faafad9418e251"
+      },
+      {
+        "_path": "Library/lib/pkgconfig/SDL2_ttf.pc",
+        "prefix_placeholder": "D:/bld/sdl2_ttf_1743198325763/_h_env",
+        "file_mode": "text",
+        "path_type": "hardlink",
+        "sha256": "3e5692ba5e37605436393b363ad9a56bd8560a6f02ed97ec283175e64a90cd65",
+        "size_in_bytes": 387,
+        "sha256_in_prefix": "24b52be66403d0706f610155ac9f737f6af8c4d0a606df96bdf6cc0568b1df8f"
+      },
+      {
+        "_path": "Library/share/licenses/SDL2_ttf/LICENSE.txt",
+        "path_type": "hardlink",
+        "sha256": "7826eca0a0f7e591f38dd844e207a200aac81a59b20d8a30c3af8c6282af13e6",
+        "size_in_bytes": 878,
+        "sha256_in_prefix": "7826eca0a0f7e591f38dd844e207a200aac81a59b20d8a30c3af8c6282af13e6"
+      }
+    ]
+  },
+  "link": {
+    "source": "C:\\Users\\user\\miniconda3\\pkgs\\sdl2_ttf-2.24.0-hd2a6e60_1",
+    "type": 1
+  }
+}
