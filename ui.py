@@ -1,22 +1,52 @@
 import pygame
 
+Surface = pygame.Surface
+Rect = pygame.Rect
+Vec2 = pygame.Vector2
+
 class Color:
     white = (255, 255, 255)
     blue = (70, 130, 200)
     black = (0, 0, 0)
+    
+class Base_Surface:
+    def __init__(self, dimension: Vec2, pos: Vec2 = Vec2(0, 0)):
+        self.surface = Surface(dimension)
+        self.pos = pos
 
-class Grid_Surface:
-    def __init__(self, width, height):
-        self.surface = pygame.Surface((width, height))
+class Surface_Manager:
+    def __init__(self):
+        # A stash in which index = z-axis
+        self.layers: list[tuple[Surface, Rect]] = []
+    
+    def add_surface(self, base_surface: Base_Surface):
+        rect = base_surface.surface.get_rect()
+        rect.topleft = base_surface.pos
+        
+        self.layers.append((base_surface.surface, rect))
+    
+    def get_top_collision(self, pos: Vec2):
+        for surface, rect in reversed(self.layers):
+            if rect.collidepoint(pos):
+                pos = pos - rect.topleft
+                return (surface, pos)
+
+class Grid_Surface(Base_Surface):
+    def __init__(self, dimension: Vec2, pos: Vec2):
+        super().__init__(dimension, pos)
+        
         self.grid = []
         self.cell_rects = []   # store (rect, row, col)
         self.font = pygame.font.Font(None, 36)
         self._create_sample_questions()
-    def get_cell_at_pos(self, x, y):
-        """Return (row, col, Question) if (x,y) inside a cell, else None"""
+        
+    def get_cell_at_pos(self, pos: Vec2):
+        """Return (row, col, Question) if pos inside a cell, else None"""
+        
         for rect, row, col in self.cell_rects:
-            if rect.collidepoint(x, y):
+            if rect.collidepoint(pos):
                 return (row, col, self.questions[row][col])
+            
         return None
     
     def draw(self):
@@ -44,6 +74,7 @@ class Grid_Surface:
                 self.surface.blit(text_surf, text_rect)
                 
                 pygame.draw.rect(self.surface, Color.white, rect, 1)
+                
     def _create_sample_questions(self):
         """Create temporary 5x6 questions (later replace with ChatGPT)"""
         self.questions = []
@@ -59,16 +90,6 @@ class Grid_Surface:
                 )
                 row_q.append(q)
             self.questions.append(row_q)
-    '''
-class question_screen(Grid_Surface):
-    def __init__(self, width, height, question):
-        super().__init__(width, height)
-        self.question = question
-    
-    def draw(self):
-        print(self.question.question)
-        self.question.listAnswer()
-'''
 
 class Question:
     def __init__(self, question: str, options: list[str], answer_ind: int, value: int):
@@ -89,3 +110,14 @@ class Player:
     
     def add_score(self, points):
         self.score += points
+
+'''
+class question_screen(Grid_Surface):
+    def __init__(self, width, height, question):
+        super().__init__(width, height)
+        self.question = question
+    
+    def draw(self):
+        print(self.question.question)
+        self.question.listAnswer()
+'''

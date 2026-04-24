@@ -10,13 +10,18 @@ warnings.filterwarnings(
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import pygame
-import object
+import ui
+
+Vec2 = pygame.Vector2
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
+main_screen = pygame.display.set_mode((1280, 720))
 
-jeopardy_grid = object.Grid_Surface(1000, 600)
+manager = ui.Surface_Manager()
+
+jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60))
+manager.add_surface(jeopardy_grid)
 
 running = True
 while running:
@@ -26,12 +31,15 @@ while running:
         # pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
+        
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = event.pos
-            # Grid surface is blitted at (140, 60)
-            grid_x = mouse_x - 140
-            grid_y = mouse_y - 60
-            result = jeopardy_grid.get_cell_at_pos(grid_x, grid_y)
+            pos = Vec2(event.pos)
+            
+            surface, rpos = manager.get_top_collision(pos)
+            
+            ...
+            
+            result = jeopardy_grid.get_cell_at_pos(rpos)
             if result:
                 row, col, q = result
                 print(f"Clicked on row {row}, col {col}")
@@ -39,11 +47,11 @@ while running:
                 q.listAnswer()
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("#121314")
+    main_screen.fill("#121314")
 
     # RENDER YOUR GAME HERE
     jeopardy_grid.draw()
-    screen.blit(jeopardy_grid.surface, (140, 60))
+    main_screen.blit(jeopardy_grid.surface, jeopardy_grid.pos)
 
     # flip() the display to put your work on screen i.e. screen refresh
     pygame.display.flip()
