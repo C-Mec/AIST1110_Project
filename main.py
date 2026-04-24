@@ -26,6 +26,17 @@ while running:
         # pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = event.pos
+            # Grid surface is blitted at (140, 60)
+            grid_x = mouse_x - 140
+            grid_y = mouse_y - 60
+            result = jeopardy_grid.get_cell_at_pos(grid_x, grid_y)
+            if result:
+                row, col, q = result
+                print(f"Clicked on row {row}, col {col}")
+                print(f"Question: {q.question}")
+                q.listAnswer()
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("#121314")

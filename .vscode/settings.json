@@ -3,5 +3,7 @@
   "python.terminal.activateEnvironment": true,
   "terminal.integrated.env.windows": {
     "PATH": "${env:PATH};${workspaceFolder}\\.conda\\Library\\bin;${workspaceFolder}\\.conda\\DLLs;${workspaceFolder}\\.conda\\Scripts"
-  }
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda"
 }
