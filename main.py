@@ -16,11 +16,11 @@ Vec2 = pygame.Vector2
 
 pygame.init()
 clock = pygame.time.Clock()
+
 main_screen = pygame.display.set_mode((1280, 720))
+manager = ui.Surface_Manager(main_screen)
 
-manager = ui.Surface_Manager()
-
-jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60))
+jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5))
 manager.add_surface(jeopardy_grid)
 
 running = True
@@ -34,27 +34,15 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = Vec2(event.pos)
-            
-            surface, rpos = manager.get_top_collision(pos)
-            
-            ...
-            
-            result = jeopardy_grid.get_cell_at_pos(rpos)
-            if result:
-                row, col, q = result
-                print(f"Clicked on row {row}, col {col}")
-                print(f"Question: {q.question}")
-                q.listAnswer()
+            try:
+                surface, rpos = manager.get_top_collision(pos)
+                
+                surface.click_at(rpos)
+            except TypeError:
+                pass
 
-    # fill the screen with a color to wipe away anything from last frame
-    main_screen.fill("#121314")
-
-    # RENDER YOUR GAME HERE
-    jeopardy_grid.draw()
-    main_screen.blit(jeopardy_grid.surface, jeopardy_grid.pos)
-
-    # flip() the display to put your work on screen i.e. screen refresh
-    pygame.display.flip()
+    # Render all surfaces in manager by their z-axis order
+    manager.render()
 
     # fps
     clock.tick(60)
