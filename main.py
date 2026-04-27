@@ -20,7 +20,10 @@ clock = pygame.time.Clock()
 main_screen = pygame.display.set_mode((1280, 720))
 manager = ui.Surface_Manager(main_screen)
 
-jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5))
+# Create a human player
+current_player = ui.Player("Human")
+# Pass manager and player to Grid_Surface
+jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5), manager, current_player)
 manager.add_surface(jeopardy_grid)
 
 running = True
