@@ -10,20 +10,23 @@ warnings.filterwarnings(
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import pygame
+pygame.init()
+
+import config
 import ui
+from ui import manager
 
 Vec2 = pygame.Vector2
 
-pygame.init()
 clock = pygame.time.Clock()
 
-main_screen = pygame.display.set_mode((1280, 720))
-manager = ui.Surface_Manager(main_screen)
+main_screen = pygame.display.set_mode(config.screen_dimension)
+manager.init(main_screen)
 
 # Create a human player
 current_player = ui.Player("Human")
 # Pass manager and player to Grid_Surface
-jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5), manager, current_player)
+jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5))
 manager.add_surface(jeopardy_grid)
 
 running = True
@@ -37,12 +40,11 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = Vec2(event.pos)
-            try:
-                surface, rpos = manager.get_top_collision(pos)
-                
+
+            surface, rpos = manager.get_top_collision(pos)
+            
+            if surface is not None:
                 surface.click_at(rpos)
-            except TypeError:
-                pass
 
     # Render all surfaces in manager by their z-axis order
     manager.render()

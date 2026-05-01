@@ -1,17 +1,21 @@
 import pygame
+import config
 
 Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
+
+def intxy(vec: Vec2) -> tuple[int, int]:
+    return round(vec.x), round(vec.y)
 
 class Color:
     white = (255, 255, 255)
     blue = (70, 130, 200)
     black = (0, 0, 0)
 
-class Vecc2(pygame.Vector2):
-    # To be continued
-    pass
+class Font:
+    title = pygame.font.Font(None, 32)
+    option = pygame.font.Font(None, 28)
 
 class Question:
     def __init__(self, problem: str, options: list[str], answer_ind: int, value: int):
@@ -26,13 +30,21 @@ class Question:
             print(f"{i+1}. {self.answer[i]}")
     
     @staticmethod
-    def sample():
+    def sample(col: int, row: int, value: int):
         return Question(
-            "Sample Question?",
-            ["Option A", "Option B", "Option C"],
-            0,
-            200
+            problem=f"Category {col+1} Row {row+1}: What is the capital of France?",
+            options=["Paris", "London", "Berlin"],
+            answer_ind=0,
+            value=value
         )
+
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.score = 0
+    
+    def add_score(self, points):
+        self.score += points
     
 class Base_Surface:
     def __init__(self, dimension: Vec2, pos: Vec2 = Vec2(0, 0)):
@@ -47,7 +59,12 @@ class Base_Surface:
         pass
 
 class Surface_Manager:
-    def __init__(self, main_screen: Surface):
+    def __init__(self):
+        pass
+    
+    def init(self, main_screen: Surface):
+        '''The runtime init.'''
+        
         self.main_screen = main_screen
 
         # A stash in which index = z-axis
@@ -58,8 +75,12 @@ class Surface_Manager:
    
     def remove_surface(self, base_surface: Base_Surface) -> None:
         """Remove a surface from the manager."""
-        if base_surface in self.layers:
+        
+        # If what you are trying to remove is not here, it is not something we should just ignore
+        try:
             self.layers.remove(base_surface)
+        except Exception as err:
+            print(err)
     
     def get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
         for base_surface in reversed(self.layers):
@@ -68,7 +89,9 @@ class Surface_Manager:
 
             if rect.collidepoint(pos):
                 rpos = pos - base_surface.pos
-                return (base_surface, rpos)
+                return base_surface, rpos
+        
+        return None, None
     
     def render(self) -> None:
         # fill the screen with a color to wipe away anything from last frame
@@ -79,30 +102,31 @@ class Surface_Manager:
         
         pygame.display.flip()
 
+# The project-wise global instance of surface manager
+# Needs to be set in main.py
+manager = Surface_Manager()
+
 class Grid_Surface(Base_Surface):
-    def __init__(self, dimension: Vec2, pos: Vec2, grid_dimension: Vec2, manager, player):
+    def __init__(self, dimension: Vec2, pos: Vec2, grid_dimension: Vec2):
         super().__init__(dimension, pos)
-        self.manager = manager          # Reference to surface manager
-        self.player = player            # Reference to the human player
+        
         self.font = pygame.font.Font(None, 36)
         
         # Value stored in Vec2 are floats
-        grid_width, grid_height = grid_dimension
-        self.grid_width = round(grid_width)
-        self.grid_height = round(grid_height)
+        self.grid_width, self.grid_height = intxy(grid_dimension)
         
         width, height = self.surface.get_size()
         self.cell_width = round(width / self.grid_width)
         self.cell_height = round(height / self.grid_height)
 
-        self.grid = [[
-            () for col in range(self.grid_width) 
-        ] for row in range(self.grid_height)]
-
         self._active_popup = None       # Track currently open popup
         self._grid_init()
 
     def _grid_init(self):
+        self.grid = [[
+            [] for col in range(self.grid_width) 
+        ] for row in range(self.grid_height)]
+        
         for row in range(self.grid_height):
             for col in range(self.grid_width):
                 rect = pygame.Rect(
@@ -111,52 +135,43 @@ class Grid_Surface(Base_Surface):
                     round(self.cell_width),
                     round(self.cell_height)
                 )
+                
                 value = (row + 1) * 200
-                # Create a unique question (temporary hardcoded)
-                q = Question(
-                    problem=f"Category {col+1} Row {row+1}: What is the capital of France?",
-                    options=["Paris", "London", "Berlin"],
-                    answer_ind=0,
-                    value=value
-                )
-                self.grid[row][col] = (rect, q)
+            
+                ques = Question.sample(col, row, value)
+                used = False
+                
+                self.grid[row][col] = [rect, ques, used]
+                
     def click_at(self, pos: Vec2):
-        rect, question = self.get_cell_at_pos(pos)
-        if question is None or question.used:
+        row, col = self._get_rowcol(pos)
+        rect, question, used = self.grid[row][col]
+        print(used)
+        if used:
             print("This question has already been answered.")
             return
+        print(self.grid[row][col])
+        self.grid[row][col][2] = True
 
-        # Callback when user selects an answer
-        def on_answer(is_correct, points):
-            if is_correct:
-                self.player.add_score(points)
-                print(f"Correct! {self.player.name} gains ${points}. Total: ${self.player.score}")
-            else:
-                self.player.add_score(-points)
-                print(f"Wrong! {self.player.name} loses ${points}. Total: ${self.player.score}")
-            question.used = True
-            # Remove popup from manager
-            if self._active_popup:
-                self.manager.remove_surface(self._active_popup)
-                self._active_popup = None
-
+        print("something")
         # Create and add popup
-        popup = QuestionPopup(question, on_answer)
-        self.manager.add_surface(popup)
+        popup = Question_Surface(question)
+        manager.add_surface(popup)
+        
         self._active_popup = popup
     
-    def get_cell_at_pos(self, rpos: Vec2): # add edge checking
-        x, y = int(rpos.x), int(rpos.y)
+    def _get_rowcol(self, rpos: Vec2):
+        x, y = intxy(rpos)
+        
         col = x // self.cell_width
         row = y // self.cell_height
-        if 0 <= row < self.grid_height and 0 <= col < self.grid_width:
-            return self.grid[row][col]
-        return None, None
+        
+        return row, col
     
     def draw(self, screen: Surface):
         for row in range(self.grid_height):
             for col in range(self.grid_width):
-                rect, question = self.grid[row][col]
+                rect, question, used = self.grid[row][col]
 
                 # Draw cell background
                 pygame.draw.rect(self.surface, Color.blue, rect)
@@ -173,36 +188,28 @@ class Grid_Surface(Base_Surface):
                 self.surface.blit(text_surf, text_rect)
                 pygame.draw.rect(self.surface, Color.white, rect, 1)
 
-            screen.blit(self.surface, self.pos)
+        screen.blit(self.surface, self.pos)
 
-class Player:
-    def __init__(self, name):
-        self.name = name
-        self.score = 0
-    
-    def add_score(self, points):
-        self.score += points
-
-# ----- QuestionPopup: a modal window showing question and options -----
-class QuestionPopup(Base_Surface):
-    def __init__(self, question: Question, on_answer_callback):
+# ----- Question_Surface: a modal window showing question and options -----
+class Question_Surface(Base_Surface):
+    def __init__(self, question: Question):
         # Popup size and position (centered)
-        popup_dim = Vec2(600, 400)
-        screen = pygame.display.get_surface()
-        screen_width, screen_height = screen.get_size()
-        popup_pos = Vec2((screen_width - popup_dim.x) // 2, (screen_height - popup_dim.y) // 2)
-        super().__init__(popup_dim, popup_pos)
+        dimension = Vec2(600, 400)
+    
+        pos = Rect(Vec2(0, 0), dimension)
+        pos.center = config.screen_rect.center
+        pos = pos.topleft
+        
+        super().__init__(dimension, pos)
         
         self.question = question
-        self.on_answer_callback = on_answer_callback
-        self.font_title = pygame.font.Font(None, 32)
-        self.font_option = pygame.font.Font(None, 28)
         
         # Create three option buttons
         button_height = 50
         margin = 20
         start_y = 150
         self.option_rects = []
+        
         for i in range(3):
             rect = pygame.Rect(50, start_y + i * (button_height + margin), 500, button_height)
             self.option_rects.append(rect)
@@ -212,6 +219,7 @@ class QuestionPopup(Base_Surface):
     def draw(self, screen: Surface):
         # Clear surface with transparent background
         self.surface.fill((0, 0, 0, 0))
+        
         # Semi-transparent overlay
         overlay = pygame.Surface(self.surface.get_size(), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 180))
@@ -227,7 +235,7 @@ class QuestionPopup(Base_Surface):
         line = ""
         for w in words:
             test_line = line + w + " "
-            if self.font_title.size(test_line)[0] < 540:
+            if Font.title.size(test_line)[0] < 540:
                 line = test_line
             else:
                 lines.append(line)
@@ -236,7 +244,7 @@ class QuestionPopup(Base_Surface):
         
         y_offset = 50
         for line in lines:
-            text = self.font_title.render(line, True, Color.white)
+            text = Font.title.render(line, True, Color.white)
             self.surface.blit(text, (30, y_offset))
             y_offset += 30
         
@@ -246,27 +254,23 @@ class QuestionPopup(Base_Surface):
             pygame.draw.rect(self.surface, color, rect)
             pygame.draw.rect(self.surface, Color.white, rect, 2)
             option_text = f"{chr(65+i)}. {self.question.answer[i]}"
-            text_surf = self.font_option.render(option_text, True, Color.white)
+            text_surf = Font.option.render(option_text, True, Color.white)
             text_rect = text_surf.get_rect(center=rect.center)
             self.surface.blit(text_surf, text_rect)
         
         screen.blit(self.surface, self.pos)
 
-    def click_at(self, pos: Vec2):
+    def click_at(self, pos: Vec2, player: Player):
         for i, rect in enumerate(self.option_rects):
-            if rect.collidepoint(pos.x, pos.y):
+            if rect.collidepoint(pos):
                 self.selected = i
-                is_correct = (i == self.question.answer_index)
-                self.on_answer_callback(is_correct, self.question.value)
-                return True  # close popup after answer
-        return False
-'''
-class question_screen(Grid_Surface):
-    def __init__(self, width, height, question):
-        super().__init__(width, height)
-        self.question = question
-    
-    def draw(self):
-        print(self.question.question)
-        self.question.listAnswer()
-'''
+                
+                if self.question.answer_index == i:
+                    player.add_score(self.question.value)
+                    print(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
+                else:
+                    player.add_score(-self.question.value)
+                    print(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
+                
+                # Remove popup from manager
+                manager.remove_surface(self.surface)
