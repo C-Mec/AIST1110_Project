@@ -24,7 +24,8 @@ main_screen = pygame.display.set_mode(config.screen_dimension)
 manager.init(main_screen)
 
 # Create a human player
-current_player = ui.Player("Human")
+player = ui.Player("Human")
+
 # Pass manager and player to Grid_Surface
 jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5))
 manager.add_surface(jeopardy_grid)
@@ -43,8 +44,16 @@ while running:
 
             surface, rpos = manager.get_top_collision(pos)
             
+            click_logging = True
+            if click_logging:
+                print(f"Pos: {pos}, Surface: {surface}, Rpos: {rpos}")
+            
+            layer_logging = True
+            if layer_logging:
+                print(manager.layers)
+            
             if surface is not None:
-                surface.click_at(rpos)
+                surface.click_at(rpos, player)
 
     # Render all surfaces in manager by their z-axis order
     manager.render()

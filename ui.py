@@ -9,9 +9,13 @@ def intxy(vec: Vec2) -> tuple[int, int]:
     return round(vec.x), round(vec.y)
 
 class Color:
-    white = (255, 255, 255)
-    blue = (70, 130, 200)
-    black = (0, 0, 0)
+    border = "#FFFFFF"
+    text = "#FFFFFF"
+    background = "#4682C8"
+    black = "#000000"
+    wrong = "#50C8C8"
+    correct = "#C8C850"
+    overlay = "#000000B4"
 
 class Font:
     title = pygame.font.Font(None, 32)
@@ -48,13 +52,22 @@ class Player:
     
 class Base_Surface:
     def __init__(self, dimension: Vec2, pos: Vec2 = Vec2(0, 0)):
-        self.surface = Surface(dimension)
+        # Assume screen = main screen
+        
+        # Relative position on screen
         self.pos = pos
+        self.surface = Surface(dimension)
+        
+        self.overshade = False
+        self.dimension = dimension
+        
+        # The rect on the screen
+        self.rect = self.surface.get_rect(topleft=pos)
     
     def draw(self, screen: Surface):
         screen.blit(self.surface, self.pos)
     
-    def click_at(self, pos: Vec2):
+    def click_at(self, pos: Vec2, player: Player):
         # Has no reaction by default
         pass
 
@@ -74,22 +87,17 @@ class Surface_Manager:
         self.layers.append(base_surface)
    
     def remove_surface(self, base_surface: Base_Surface) -> None:
-        """Remove a surface from the manager."""
-        
-        # If what you are trying to remove is not here, it is not something we should just ignore
-        try:
-            self.layers.remove(base_surface)
-        except Exception as err:
-            print(err)
+        self.layers.remove(base_surface)
     
     def get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
         for base_surface in reversed(self.layers):
-            rect = base_surface.surface.get_rect()
-            rect.topleft = base_surface.pos
-
-            if rect.collidepoint(pos):
+            if base_surface.rect.collidepoint(pos):
                 rpos = pos - base_surface.pos
                 return base_surface, rpos
+            
+            # Overshade surface shades anything behind it
+            if base_surface.overshade:
+                return None, None
         
         return None, None
     
@@ -112,28 +120,32 @@ class Grid_Surface(Base_Surface):
         
         self.font = pygame.font.Font(None, 36)
         
-        # Value stored in Vec2 are floats
-        self.grid_width, self.grid_height = intxy(grid_dimension)
+        self.grid_dimension = grid_dimension
         
-        width, height = self.surface.get_size()
-        self.cell_width = round(width / self.grid_width)
-        self.cell_height = round(height / self.grid_height)
+        g_width, g_height = intxy(grid_dimension)
+        width, height = intxy(self.dimension)
+        self.cell_dimension = Vec2(
+            round(width / g_width),
+            round(height / g_height)
+        )
 
-        self._active_popup = None       # Track currently open popup
         self._grid_init()
 
     def _grid_init(self):
-        self.grid = [[
-            [] for col in range(self.grid_width) 
-        ] for row in range(self.grid_height)]
+        g_width, g_height = intxy(self.grid_dimension)
+        c_width, c_height = intxy(self.cell_dimension)
         
-        for row in range(self.grid_height):
-            for col in range(self.grid_width):
+        self.grid = [[
+            [] for col in range(g_width)
+        ] for row in range(g_height)]
+        
+        for row in range(g_height):
+            for col in range(g_width):
                 rect = pygame.Rect(
-                    round(col * self.cell_width),
-                    round(row * self.cell_height),
-                    round(self.cell_width),
-                    round(self.cell_height)
+                    round(col * c_width),
+                    round(row * c_height),
+                    round(c_width),
+                    round(c_height)
                 )
                 
                 value = (row + 1) * 200
@@ -143,50 +155,50 @@ class Grid_Surface(Base_Surface):
                 
                 self.grid[row][col] = [rect, ques, used]
                 
-    def click_at(self, pos: Vec2):
+    def click_at(self, pos: Vec2, player: Player):
         row, col = self._get_rowcol(pos)
         rect, question, used = self.grid[row][col]
-        print(used)
+        
         if used:
             print("This question has already been answered.")
             return
-        print(self.grid[row][col])
+        
         self.grid[row][col][2] = True
 
-        print("something")
         # Create and add popup
         popup = Question_Surface(question)
         manager.add_surface(popup)
-        
-        self._active_popup = popup
     
     def _get_rowcol(self, rpos: Vec2):
         x, y = intxy(rpos)
+        c_width, c_height = intxy(self.cell_dimension)
         
-        col = x // self.cell_width
-        row = y // self.cell_height
+        col = x // c_width
+        row = y // c_height
         
         return row, col
     
     def draw(self, screen: Surface):
-        for row in range(self.grid_height):
-            for col in range(self.grid_width):
+        g_width, g_height = intxy(self.grid_dimension)
+        
+        for row in range(g_height):
+            for col in range(g_width):
                 rect, question, used = self.grid[row][col]
 
                 # Draw cell background
-                pygame.draw.rect(self.surface, Color.blue, rect)
-                # Draw border
-                pygame.draw.rect(self.surface, Color.white, rect, 2)
+                pygame.draw.rect(self.surface, Color.background, rect)
 
                 # Draw dollar value
                 value = (row + 1) * 200
 
-                # What is this? I assume it works www
-                text_surf = self.font.render(str(value), True, Color.white)
-                text_rect = text_surf.get_rect(center=rect.center)
+                # Font.render returns a surface with text
+                text = self.font.render(str(value), True, Color.border)
+                text_rect = text.get_rect(center=rect.center)
 
-                self.surface.blit(text_surf, text_rect)
-                pygame.draw.rect(self.surface, Color.white, rect, 1)
+                self.surface.blit(text, text_rect)
+                
+                # Draw border
+                pygame.draw.rect(self.surface, Color.border, rect, 2)
 
         screen.blit(self.surface, self.pos)
 
@@ -195,75 +207,83 @@ class Question_Surface(Base_Surface):
     def __init__(self, question: Question):
         # Popup size and position (centered)
         dimension = Vec2(600, 400)
-    
-        pos = Rect(Vec2(0, 0), dimension)
-        pos.center = config.screen_rect.center
-        pos = pos.topleft
+        
+        rect = Surface(dimension).get_rect(center=config.screen_rect.center)
+        pos = rect.topleft
         
         super().__init__(dimension, pos)
         
+        self.overshade = True
         self.question = question
         
         # Create three option buttons
-        button_height = 50
-        margin = 20
-        start_y = 150
         self.option_rects = []
         
-        for i in range(3):
-            rect = pygame.Rect(50, start_y + i * (button_height + margin), 500, button_height)
-            self.option_rects.append(rect)
+        button_height = 50
+        margin = 20
         
-        self.selected = None
+        option_rect = pygame.Rect(50, 150, 500, button_height)
+        
+        for i in range(3):
+            self.option_rects.append(option_rect.move(0, i * (button_height + margin)))
+        
+        self.selected_option = None
 
     def draw(self, screen: Surface):
-        # Clear surface with transparent background
-        self.surface.fill((0, 0, 0, 0))
-        
         # Semi-transparent overlay
-        overlay = pygame.Surface(self.surface.get_size(), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 180))
-        self.surface.blit(overlay, (0, 0))
+        overlay = Surface(config.screen_dimension, pygame.SRCALPHA)
+        overlay.fill(Color.overlay)
+        screen.blit(overlay, Vec2(0, 0))
         
         # Border and background
-        pygame.draw.rect(self.surface, Color.white, self.surface.get_rect(), 3)
-        pygame.draw.rect(self.surface, Color.blue, self.surface.get_rect().inflate(-6, -6))
+        border_rect = Rect(Vec2(0, 0), self.dimension)
+        
+        pygame.draw.rect(self.surface, Color.border, border_rect, 3)
+        pygame.draw.rect(self.surface, Color.background, border_rect.inflate(-6, -6))
+        
+        def wrap_text(text: str, font: Font, width: int):
+            words = text.split()
+            lines = []
+            
+            start = 0
+            for end in range(len(words)):
+                line = " ".join(words[start:end+1])
+                
+                if font.size(line)[0] >= width or end == len(words) - 1:
+                    lines.append(line)
+                    start = end+1
+            
+            return lines
         
         # Wrap question text
-        words = self.question.problem.split()
-        lines = []
-        line = ""
-        for w in words:
-            test_line = line + w + " "
-            if Font.title.size(test_line)[0] < 540:
-                line = test_line
-            else:
-                lines.append(line)
-                line = w + " "
-        lines.append(line)
+        lines = wrap_text(self.question.problem, Font.title, 540)
         
-        y_offset = 50
-        for line in lines:
-            text = Font.title.render(line, True, Color.white)
-            self.surface.blit(text, (30, y_offset))
-            y_offset += 30
+        for row, line in enumerate(lines):
+            text = Font.title.render(line, True, Color.text)
+            self.surface.blit(text, (30, 50 + row * 30))
         
         # Draw option buttons
         for i, rect in enumerate(self.option_rects):
-            color = (80, 80, 200) if self.selected != i else (200, 200, 80)
+            # Right now when answered the surface is immediately removed so it 
+            #   never shows the color of correct
+            color = Color.wrong if self.selected_option != i else Color.correct
+            
             pygame.draw.rect(self.surface, color, rect)
-            pygame.draw.rect(self.surface, Color.white, rect, 2)
+            pygame.draw.rect(self.surface, Color.border, rect, 2)
+            
             option_text = f"{chr(65+i)}. {self.question.answer[i]}"
-            text_surf = Font.option.render(option_text, True, Color.white)
-            text_rect = text_surf.get_rect(center=rect.center)
-            self.surface.blit(text_surf, text_rect)
+            
+            text = Font.option.render(option_text, True, Color.text)
+            text_rect = text.get_rect(center=rect.center)
+            
+            self.surface.blit(text, text_rect)
         
         screen.blit(self.surface, self.pos)
 
     def click_at(self, pos: Vec2, player: Player):
         for i, rect in enumerate(self.option_rects):
             if rect.collidepoint(pos):
-                self.selected = i
+                self.selected_option = i
                 
                 if self.question.answer_index == i:
                     player.add_score(self.question.value)
@@ -273,4 +293,4 @@ class Question_Surface(Base_Surface):
                     print(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
                 
                 # Remove popup from manager
-                manager.remove_surface(self.surface)
+                manager.remove_surface(self)
