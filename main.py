@@ -19,6 +19,8 @@ Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
 import config
+from dotenv import load_dotenv
+load_dotenv()
 from sources.manager import manager
 from sources.datatype.player import init_players
 from sources.surfaces.surface_start import StartScreen
