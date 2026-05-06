@@ -78,13 +78,9 @@ while running:
 
             surface, rpos = manager.get_top_collision(pos)
             
-            click_logging = True
-            if click_logging:
-                print(f"Pos: {pos}, Surface: {surface}, Rpos: {rpos}")
-            
-            layer_logging = True
-            if layer_logging:
-                print(manager.layers)
+            print("-------")
+            print(f"Pos: {pos}, Surface: {surface}, Rpos: {rpos}")
+            print(manager.layers)
             
             if surface is not None:
                 surface.click_at(rpos, player)

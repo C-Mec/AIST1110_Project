@@ -6,10 +6,14 @@ Vec2 = pygame.Vector2
 
 import random
 
+import config
+
 def intxy(vec: Vec2) -> tuple[int, int]:
     return round(vec.x), round(vec.y)
 
 def font(size: int) -> pygame.font.Font:
+    # Use width for auto-scaling
+    size = round(size * (config.screen_dimension.x / 1280))
     return pygame.font.Font(None, size)
 
 class Font:

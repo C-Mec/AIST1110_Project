@@ -12,7 +12,7 @@ from sources.util import Color, Font
 from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
-from sources.surfaces.visual import BorderFlash
+from sources.surfaces.visual import notify, BorderFlash
 
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):
@@ -209,7 +209,7 @@ class Question_Surface(Base_Surface):
                     
                     if self.question.answer_index == i:
                         player.add_score(self.question.value)
-                        print(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
+                        notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
                         self.correct_option_index = i
                         
                         self.close_time = pygame.time.get_ticks() + 1000

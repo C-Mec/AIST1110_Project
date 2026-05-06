@@ -32,17 +32,8 @@ class StartScreen(Base_Surface):
         info_text = self.info_font.render("Press any key or click to start", True, Color.text)
         info_rect = info_text.get_rect(center=(self.dimension.x // 2, self.dimension.y // 2))
         self.surface.blit(info_text, info_rect)
-
-        # Apply fade alpha
-        fade_surface = self.surface.copy()
-        fade_surface.set_alpha(self.alpha)
-        screen.blit(fade_surface, self.pos)
-
-        # Handle fade progression
-        if self.fading and self.alpha > 0:
-            self.alpha -= 10  # fade speed
-            if self.alpha <= 0:
-                manager.remove_surface(self)
+        
+        screen.blit(self.surface, Vec2(0, 0))
 
     def click_at(self, pos: Vec2, player: Player):
         # Remove start screen when clicked
