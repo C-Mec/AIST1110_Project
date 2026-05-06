@@ -18,7 +18,7 @@ borders, and dollar values ($200 to $1000).
 
 ---
 
-## New Features / Additions (新增的功能)
+## New Features / Additions 
 
 1. **Added `QuestionPopup` class**  
    - A modal window that shows the question text and three clickable answer buttons.
@@ -58,3 +58,11 @@ tbh i forgot what i added
 3. **VFX**
    - players are now color coded
    - greyed out answered grid
+
+---
+# 6/5 thomas
+1. Created llm.py to handle Azure OpenAI (EUS2 endpoint) integration.
+2. Used openai SDK with a custom base_url and API key from .env.
+3. Designed a prompt to generate Jeopardy! questions: clue (statement), correct_answer (complete question phrase), and options (three question phrases).
+4. Implemented caching: generated boards are stored as JSON in cache/ to avoid repeated API calls.
+5. Added fallback hardcoded questions in case API fails.
