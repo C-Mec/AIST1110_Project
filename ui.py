@@ -176,6 +176,7 @@ class Grid_Surface(Base_Surface):
         self.players = players
         self.font = pygame.font.Font(None, 36)
         self.grid_dimension = grid_dimension
+        self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
         
         g_width, g_height = intxy(grid_dimension)
         width, height = intxy(self.dimension)
@@ -198,13 +199,12 @@ class Grid_Surface(Base_Surface):
             for col in range(g_width):
                 rect = pygame.Rect(
                     round(col * c_width),
-                    round(row * c_height),
+                    round((row + 1) * c_height),
                     round(c_width),
                     round(c_height)
                 )
                 
                 value = (row + 1) * 200
-            
                 ques = Question.sample(col, row, value)
                 used = False
                 
@@ -212,6 +212,11 @@ class Grid_Surface(Base_Surface):
                 
     def click_at(self, pos: Vec2, player: Player):
         row, col = self._get_rowcol(pos)
+        
+        if row < 0:
+            print("Category row – not clickable.")
+            return
+        
         rect, question, used = self.grid[row][col]
 
         if used:
@@ -229,13 +234,29 @@ class Grid_Surface(Base_Surface):
         c_width, c_height = intxy(self.cell_dimension)
         
         col = x // c_width
-        row = y // c_height
+        row = y // c_height - 1
         
         return row, col
     
     def draw(self, screen: Surface):
-        g_width, g_height = intxy(self.grid_dimension)
+        # Draw category row
+        c_width, c_height = intxy(self.cell_dimension)
+        for col, category in enumerate(self.categories):
+            rect = pygame.Rect(
+                round(col * c_width),
+                0,   # ✅ top row
+                round(c_width),
+                round(c_height)
+            )
+            pygame.draw.rect(self.surface, Color.background, rect)
+            pygame.draw.rect(self.surface, Color.border, rect, 2)
 
+            text = self.font.render(category, True, Color.text)
+            text_rect = text.get_rect(center=rect.center)
+            self.surface.blit(text, text_rect)
+
+        
+        g_width, g_height = intxy(self.grid_dimension)
         for row in range(g_height):
             for col in range(g_width):
                 rect, question, used = self.grid[row][col]
