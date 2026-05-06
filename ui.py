@@ -1,5 +1,6 @@
 import pygame
 import config
+import math
 
 Surface = pygame.Surface
 Rect = pygame.Rect
@@ -183,7 +184,7 @@ class Grid_Surface(Base_Surface):
         self.grid[row][col][2] = True
 
         # Create and add popup
-        popup = Question_Surface(question)
+        popup = Question_Surface(question, player)
         manager.add_surface(popup)
     
     def _get_rowcol(self, rpos: Vec2):
@@ -266,96 +267,108 @@ class StartScreen(Base_Surface):
 
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):
-    def __init__(self, question: Question):
-        # Popup size and position (centered)
-        dimension = Vec2(600, 400)
-        
-        rect = Surface(dimension).get_rect(center=config.screen_rect.center)
+    def __init__(self, question: Question, player: Player):
+        dimension = Vec2(config.screen_dimension[0] * 0.7,
+                         config.screen_dimension[1] * 0.7)  # scale to window
+        rect = Surface(dimension).get_rect(center=(config.screen_dimension[0]//2,
+                                                   config.screen_dimension[1]//2))
         pos = rect.topleft
-        
         super().__init__(dimension, pos)
-        
+
         self.overshade = True
         self.question = question
-        
-        # Create three option buttons
+        self.player = player
+
+        # Buzz button in upper third
+        self.buzz_rect = pygame.Rect(dimension.x//2 - 100, dimension.y//3, 200, 60)
+        self.buzzed = False
+
+        # Timer
+        self.timer_active = False
+        self.start_time = None
+        self.duration = 5
+
+        # Options: compute dynamically
         self.option_rects = []
-        
         button_height = 50
         margin = 20
-        
-        option_rect = pygame.Rect(50, 150, 500, button_height)
-        
-        for i in range(3):
-            self.option_rects.append(option_rect.move(0, i * (button_height + margin)))
-        
-        self.selected_option = None
+        total_height = len(self.question.answer) * (button_height + margin) - margin
+        start_y = dimension.y - total_height - 40  # 40px padding from bottom
+        for i in range(len(self.question.answer)):
+            rect = pygame.Rect(50, start_y + i * (button_height + margin),
+                               dimension.x - 100, button_height)
+            self.option_rects.append(rect)
 
     def draw(self, screen: Surface):
-        # Semi-transparent overlay
-        overlay = Surface(config.screen_dimension, pygame.SRCALPHA)
-        overlay.fill(Color.overlay)
-        screen.blit(overlay, Vec2(0, 0))
-        
-        # Border and background
-        border_rect = Rect(Vec2(0, 0), self.dimension)
-        
-        pygame.draw.rect(self.surface, Color.border, border_rect, 3)
-        pygame.draw.rect(self.surface, Color.background, border_rect.inflate(-6, -6))
-        
-        def wrap_text(text: str, font: Font, width: int):
-            words = text.split()
-            lines = []
-            
-            start = 0
-            for end in range(len(words)):
-                line = " ".join(words[start:end+1])
-                
-                if font.size(line)[0] >= width or end == len(words) - 1:
-                    lines.append(line)
-                    start = end+1
-            
-            return lines
-        
-        # Wrap question text
-        lines = wrap_text(self.question.problem, Font.title, 540)
-        
-        for row, line in enumerate(lines):
-            text = Font.title.render(line, True, Color.text)
-            self.surface.blit(text, (30, 50 + row * 30))
-        
-        # Draw option buttons
-        for i, rect in enumerate(self.option_rects):
-            # Right now when answered the surface is immediately removed so it 
-            #   never shows the color of correct
-            color = Color.wrong if self.selected_option != i else Color.correct
-            
-            pygame.draw.rect(self.surface, color, rect)
-            pygame.draw.rect(self.surface, Color.border, rect, 2)
-            
-            option_text = f"{chr(65+i)}. {self.question.answer[i]}"
-            
-            text = Font.option.render(option_text, True, Color.text)
-            text_rect = text.get_rect(center=rect.center)
-            
-            self.surface.blit(text, text_rect)
-        
+        self.surface.fill(Color.background)
+        pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 3)
+
+        # Question text at top
+        text = Font.title.render(self.question.problem, True, Color.text)
+        self.surface.blit(text, (30, 30))
+
+        if not self.buzzed:
+            pygame.draw.rect(self.surface, Color.correct, self.buzz_rect)
+            pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
+            buzz_text = Font.option.render("BUZZ!", True, Color.black)
+            self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
+        else:
+            if self.timer_active:
+                elapsed = (pygame.time.get_ticks() - self.start_time) / 1000
+                remaining = max(0, self.duration - elapsed)
+
+                # Circle depletion in degrees
+                center = (int(self.dimension.x//2), int(self.dimension.y//3))
+                radius = 50
+                pygame.draw.circle(self.surface, Color.border, center, radius, 2)
+
+                # Draw filled arc (pie slice shrinking)
+                angle = 360 * (remaining / self.duration)
+                end_angle = -90 + angle
+                pygame.draw.arc(
+                    self.surface,
+                    Color.wrong,
+                    pygame.Rect(center[0]-radius, center[1]-radius, radius*2, radius*2),
+                    math.radians(-90),
+                    math.radians(end_angle),
+                    8
+                )
+
+                # Seconds remaining in middle
+                sec_text = Font.option.render(str(int(remaining)), True, Color.text)
+                self.surface.blit(sec_text, sec_text.get_rect(center=center))
+
+                if remaining <= 0:
+                    self.player.add_score(-self.question.value)
+                    manager.remove_surface(self)
+                    return
+
+            # Options
+            for i, rect in enumerate(self.option_rects):
+                pygame.draw.rect(self.surface, Color.background, rect)
+                pygame.draw.rect(self.surface, Color.border, rect, 2)
+                option_text = f"{chr(65+i)}. {self.question.answer[i]}"
+                text = Font.option.render(option_text, True, Color.text)
+                self.surface.blit(text, text.get_rect(center=rect.center))
+
         screen.blit(self.surface, self.pos)
 
     def click_at(self, pos: Vec2, player: Player):
-        for i, rect in enumerate(self.option_rects):
-            if rect.collidepoint(pos):
-                self.selected_option = i
-                
-                if self.question.answer_index == i:
-                    player.add_score(self.question.value)
-                    print(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
-                else:
-                    player.add_score(-self.question.value)
-                    print(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
-                
-                # Remove popup from manager
-                manager.remove_surface(self)
+        if not self.buzzed and self.buzz_rect.collidepoint(pos):
+            self.buzzed = True
+            self.timer_active = True
+            self.start_time = pygame.time.get_ticks()
+        elif self.buzzed:
+            for i, rect in enumerate(self.option_rects):
+                if rect.collidepoint(pos):
+                    self.selected_option = i
+                    if self.question.answer_index == i:
+                        player.add_score(self.question.value)
+                        print(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
+                    else:
+                        player.add_score(-self.question.value)
+                        print(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
+                    manager.remove_surface(self)
                 
 class ScoreOverlay(Base_Surface):
     def __init__(self, players: list[Player]):
@@ -377,15 +390,6 @@ class ScoreOverlay(Base_Surface):
 
         # Semi-transparent background (alpha = 180)
         pygame.draw.rect(self.surface, (0, 0, 0, 180), self.surface.get_rect())
-
-        # # Border
-        # pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 2)
-
-        # # Player scores
-        # for i, player in enumerate(self.players):
-        #     text = f"{player.name}: ${player.score}"
-        #     rendered = self.font.render(text, True, Color.text)
-        #     self.surface.blit(rendered, (10, 10 + i * 35))
         
         # Player scores (right-aligned)
         for i, player in enumerate(self.players):

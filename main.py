@@ -30,6 +30,7 @@ player = ui.Player("Human")
 ai1 = ui.Player("TEMP1")
 ai2 = ui.Player("TEMP2")
 
+# Used by score overlay
 players = [player, ai1, ai2]
 
 # Create a resizable window
