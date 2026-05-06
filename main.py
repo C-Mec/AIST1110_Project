@@ -72,7 +72,7 @@ while running:
             score_overlay = ui.ScoreOverlay(players)
             manager.add_surface(score_overlay)
         
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = Vec2(event.pos)
 
             surface, rpos = manager.get_top_collision(pos)
