@@ -23,17 +23,8 @@ clock = pygame.time.Clock()
 main_screen = pygame.display.set_mode(config.screen_dimension)
 manager.init(main_screen)
 
-# Create a human player
-player = ui.Player("Human", None)
-
-# Create 2 ai players
-ai1 = ui.Player("TEMP1", None)
-ai2 = ui.Player("TEMP2", None)
-
-# Used by score overlay and other functions
-players = [player, ai1, ai2]
-
-ui.Color.assign_colors(players)
+players = ui.init_players()
+player = players[0]
 
 # Create a resizable window
 main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
@@ -105,7 +96,7 @@ while running:
             grid_w, grid_h = screen_w - 2 * buffer_w, screen_h - 2 * buffer_h
             grid_pos = Vec2(buffer_w, buffer_h)
 
-            jeopardy_grid = ui.Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 5))
+            jeopardy_grid = ui.Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 5), players)
             manager.add_surface(jeopardy_grid)
 
             score_overlay = ui.ScoreOverlay(players)
