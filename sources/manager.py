@@ -4,11 +4,18 @@ Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
+import config
+from sources.util import intxy
 from sources.datatype.player import Player
 from sources.util import Color
 
 class Base_Surface:
-    def __init__(self, dimension: Vec2, pos: Vec2 = Vec2(0, 0)):
+    def __init__(self, dimension: Vec2, pos: Vec2 = Vec2(0, 0), isProportion = False):
+        if isProportion:
+            w_ratio, h_ratio = dimension
+            screen_w, screen_h = config.screen_dimension
+            dimension = Vec2(screen_w * w_ratio, screen_h * h_ratio)
+        
         self.pos = pos
         # Use SRCALPHA so transparency works
         self.surface = Surface(dimension, pygame.SRCALPHA)

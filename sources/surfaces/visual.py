@@ -5,7 +5,7 @@ Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
 import config
-from sources.util import Color
+from sources.util import Color, Font
 from sources.manager import manager, Base_Surface
 from sources.datatype.player import Player
 
@@ -50,3 +50,6 @@ class BorderFlash(Base_Surface):
         # Apply alpha
         flash_surface.set_alpha(self.alpha)
         screen.blit(flash_surface, (0, 0))
+        
+#def notify(message: str) -> None:
+#    Font.large.
