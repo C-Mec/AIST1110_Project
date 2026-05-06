@@ -26,9 +26,19 @@ manager.init(main_screen)
 # Create a human player
 player = ui.Player("Human")
 
+# Create 2 ai players
+ai1 = ui.Player("TEMP1")
+ai2 = ui.Player("TEMP2")
+
+players = [player, ai1, ai2]
+
+
 # Pass manager and player to Grid_Surface
 jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5))
 manager.add_surface(jeopardy_grid)
+
+score_overlay = ui.ScoreOverlay(players)
+manager.add_surface(score_overlay)
 
 running = True
 while running:
