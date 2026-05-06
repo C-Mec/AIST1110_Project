@@ -64,7 +64,7 @@ while running:
 
             # Replace old grid with new resized one
             manager.layers = [s for s in manager.layers if not isinstance(s, ui.Grid_Surface)]
-            jeopardy_grid = ui.Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6))
+            jeopardy_grid = ui.Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
             manager.add_surface(jeopardy_grid)
 
             # Re-add score overlay in top-right

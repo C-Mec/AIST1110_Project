@@ -10,6 +10,15 @@ Vec2 = pygame.Vector2
 def intxy(vec: Vec2) -> tuple[int, int]:
     return round(vec.x), round(vec.y)
 
+def font(size: int) -> pygame.font:
+    return pygame.font.Font(None, size)
+
+class Font:
+    small = font(24)
+    large = font(36)
+    extralarge = font(72)
+    medium = font(28)
+
 class Color:
     border = "#FFFFFF"
     text = "#FFFFFF"
@@ -23,6 +32,7 @@ class Color:
     timer = "#50C8C8"
     
     overlay = "#000000B4"
+    transparent = "#00000000"
     
     palette = [
         "#4287F5", "#3CB371", "#DC143C", "#FFD700", "#FF69B4",
@@ -53,10 +63,6 @@ def init_players():
     Color.assign_colors(players)
 
     return players
-
-class Font:
-    title = pygame.font.Font(None, 32)
-    option = pygame.font.Font(None, 28)
 
 class Question:
     def __init__(self, problem: str, options: list[str], answer_ind: int, value: int):
@@ -93,10 +99,10 @@ class Base_Surface:
         self.pos = pos
         # Use SRCALPHA so transparency works
         self.surface = Surface(dimension, pygame.SRCALPHA)
-
+        
         self.overshade = False
         self.dimension = dimension
-        self.rect = self.surface.get_rect(topleft=pos)
+        self.rect = self.surface.get_rect(topleft=pos) # Rect on screen
 
         # Transparency and fade
         self.alpha = 255       # fully opaque by default
@@ -105,18 +111,14 @@ class Base_Surface:
 
     def draw(self, screen: Surface):
         # Apply alpha before blitting
-        if self.alpha < 255:
-            temp = self.surface.copy()
-            temp.set_alpha(self.alpha)
-            screen.blit(temp, self.pos)
-        else:
-            screen.blit(self.surface, self.pos)
+        self.surface.set_alpha(self.alpha)
+        screen.blit(self.surface, self.pos)
 
         # Handle fade progression
-        if self.fading and self.alpha > 0:
+        if self.alpha <= 0:
+            manager.remove_surface(self)
+        if self.fading:
             self.alpha -= self.fade_speed
-            if self.alpha <= 0:
-                manager.remove_surface(self)
 
     def click_at(self, pos: Vec2, player: Player):
         pass
@@ -158,7 +160,7 @@ class Surface_Manager:
     
     def render(self) -> None:
         # fill the screen with a color to wipe away anything from last frame
-        self.main_screen.fill("#121314")
+        self.main_screen.fill(Color.black)
 
         for base_surface in self.layers:
             base_surface.draw(self.main_screen)
@@ -174,7 +176,7 @@ class Grid_Surface(Base_Surface):
         super().__init__(dimension, pos)
         
         self.players = players
-        self.font = pygame.font.Font(None, 36)
+        self.font = Font.large
         self.grid_dimension = grid_dimension
         self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
         
@@ -281,12 +283,11 @@ class StartScreen(Base_Surface):
     def __init__(self):
         # Full screen overlay
         dimension = Vec2(*config.screen_dimension)
-        pos = Vec2(0, 0)
-        super().__init__(dimension, pos)
+        super().__init__(dimension)
 
         self.overshade = True  # blocks interaction until dismissed
-        self.title_font = pygame.font.Font(None, 72)
-        self.info_font = pygame.font.Font(None, 36)
+        self.title_font = Font.extralarge
+        self.info_font = Font.large
 
     def draw(self, screen: Surface):
         # Fill background
@@ -424,14 +425,14 @@ class Question_Surface(Base_Surface):
         pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 3)
 
         # Question text at top
-        text = Font.title.render(self.question.problem, True, Color.text)
+        text = Font.medium.render(self.question.problem, True, Color.text)
         self.surface.blit(text, (30, 30))
 
         if not self.buzzed:
             # Buzz button in player color
             pygame.draw.rect(self.surface, self.player.color, self.buzz_rect)
             pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
-            buzz_text = Font.option.render("BUZZ!", True, Color.black)
+            buzz_text = Font.small.render("BUZZ!", True, Color.black)
             self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
         else:
             if self.timer_active:
@@ -456,7 +457,7 @@ class Question_Surface(Base_Surface):
                 )
 
                 # Seconds remaining in middle
-                sec_text = Font.option.render(str(int(remaining)), True, Color.text)
+                sec_text = Font.small.render(str(int(remaining)), True, Color.text)
                 self.surface.blit(sec_text, sec_text.get_rect(center=center))
 
                 if remaining <= 0:
@@ -484,7 +485,7 @@ class Question_Surface(Base_Surface):
                 pygame.draw.rect(self.surface, border_color, rect, 2)
 
                 option_text = f"{chr(65+i)}. {self.question.answer[i]}"
-                text = Font.option.render(option_text, True, Color.text)
+                text = Font.small.render(option_text, True, Color.text)
                 self.surface.blit(text, text.get_rect(center=rect.center))
 
         # Resolve pending bot answer after 1s
@@ -590,7 +591,7 @@ class BorderFlash(Base_Surface):
 
         # Draw border flash
         flash_surface = Surface(config.screen_dimension, pygame.SRCALPHA)
-        flash_surface.fill((0, 0, 0, 0))  # transparent
+        flash_surface.fill(Color.transparent)
 
         rgb = self.player.color
 
@@ -607,14 +608,15 @@ class ScoreOverlay(Base_Surface):
         dimension = Vec2(180, 110)  # size of the rectangle 
         pos = Vec2(config.screen_dimension[0] - dimension.x - 10, 10)
 
+        super().__init__(dimension, pos)
+
         # Important: create with SRCALPHA so alpha values are respected
         self.surface = Surface(dimension, pygame.SRCALPHA)
         self.pos = pos
         self.rect = self.surface.get_rect(topleft=pos)
 
         self.players = players
-        self.font = pygame.font.Font(None, 28)
-        self.overshade = False
+        self.font = Font.small
 
     def draw(self, screen: Surface):
         # Clear surface each frame
