@@ -42,3 +42,19 @@ borders, and dollar values ($200 to $1000).
    - Created a `Player` instance (`current_player`).  
    - Passed `manager` and `player` to `Grid_Surface` constructor.
 
+---
+
+# 6th May Yung
+tbh i forgot what i added
+
+1. **Added `Startscreen`**
+
+2. **Added Buzzing**
+   - There is now a screen border flash
+   - There is now a timer
+   - Correct and wrong answer will be displayed by changing border color
+   - 1 second delay before killing surface
+
+3. **VFX**
+   - players are now color coded
+   - greyed out answered grid
