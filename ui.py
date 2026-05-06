@@ -297,27 +297,46 @@ class Question_Surface(Base_Surface):
                 
 class ScoreOverlay(Base_Surface):
     def __init__(self, players: list[Player]):
-        # Overlay dimensions (top-right corner box)
-        dimension = Vec2(250, 120)
-        pos = Vec2(config.screen_dimension[0] - dimension.x - 10, 10)  # 10px margin from top-right
-        
-        super().__init__(dimension, pos)
-        
+        dimension = Vec2(180, 110)  # size of the rectangle 
+        pos = Vec2(config.screen_dimension[0] - dimension.x - 10, 10)
+
+        # Important: create with SRCALPHA so alpha values are respected
+        self.surface = Surface(dimension, pygame.SRCALPHA)
+        self.pos = pos
+        self.rect = self.surface.get_rect(topleft=pos)
+
         self.players = players
         self.font = pygame.font.Font(None, 28)
-        self.overshade = False  # does not block clicks behind
+        self.overshade = False
 
     def draw(self, screen: Surface):
-        # Darkened background rectangle
-        pygame.draw.rect(self.surface, "#000000AA", self.surface.get_rect())  # semi-transparent black
+        # Clear surface each frame
+        self.surface.fill((0, 0, 0, 0))
+
+        # Semi-transparent background (alpha = 180)
+        pygame.draw.rect(self.surface, (0, 0, 0, 180), self.surface.get_rect())
+
+        # # Border
+        # pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 2)
+
+        # # Player scores
+        # for i, player in enumerate(self.players):
+        #     text = f"{player.name}: ${player.score}"
+        #     rendered = self.font.render(text, True, Color.text)
+        #     self.surface.blit(rendered, (10, 10 + i * 35))
         
-        # Draw each player's name and score
+        # Player scores (right-aligned)
         for i, player in enumerate(self.players):
             text = f"{player.name}: ${player.score}"
             rendered = self.font.render(text, True, Color.text)
-            self.surface.blit(rendered, (10, 10 + i * 35))
-        
+            text_rect = rendered.get_rect()
+            # Align right with 10px padding
+            text_rect.top = 10 + i * 35
+            text_rect.right = self.surface.get_rect().right - 10
+            self.surface.blit(rendered, text_rect)
+
         # Blit overlay onto main screen
         screen.blit(self.surface, self.pos)
+
 
         
