@@ -9,7 +9,7 @@ import random
 def intxy(vec: Vec2) -> tuple[int, int]:
     return round(vec.x), round(vec.y)
 
-def font(size: int) -> pygame.font:
+def font(size: int) -> pygame.font.Font:
     return pygame.font.Font(None, size)
 
 class Font:
