@@ -49,27 +49,44 @@ class Player:
     
     def add_score(self, points):
         self.score += points
-    
+
 class Base_Surface:
     def __init__(self, dimension: Vec2, pos: Vec2 = Vec2(0, 0)):
-        # Assume screen = main screen
-        
-        # Relative position on screen
         self.pos = pos
-        self.surface = Surface(dimension)
-        
+        # Use SRCALPHA so transparency works
+        self.surface = Surface(dimension, pygame.SRCALPHA)
+
         self.overshade = False
         self.dimension = dimension
-        
-        # The rect on the screen
         self.rect = self.surface.get_rect(topleft=pos)
-    
+
+        # Transparency and fade
+        self.alpha = 255       # fully opaque by default
+        self.fading = False    # fade disabled by default
+        self.fade_speed = 10   # how fast alpha decreases per frame
+
     def draw(self, screen: Surface):
-        screen.blit(self.surface, self.pos)
-    
+        # Apply alpha before blitting
+        if self.alpha < 255:
+            temp = self.surface.copy()
+            temp.set_alpha(self.alpha)
+            screen.blit(temp, self.pos)
+        else:
+            screen.blit(self.surface, self.pos)
+
+        # Handle fade progression
+        if self.fading and self.alpha > 0:
+            self.alpha -= self.fade_speed
+            if self.alpha <= 0:
+                manager.remove_surface(self)
+
     def click_at(self, pos: Vec2, player: Player):
-        # Has no reaction by default
         pass
+
+    def start_fade(self, speed: int = 10):
+        """Begin fading out this surface."""
+        self.fading = True
+        self.fade_speed = speed
 
 class Surface_Manager:
     def __init__(self):
@@ -201,6 +218,51 @@ class Grid_Surface(Base_Surface):
                 pygame.draw.rect(self.surface, Color.border, rect, 2)
 
         screen.blit(self.surface, self.pos)
+
+class StartScreen(Base_Surface):
+    def __init__(self):
+        # Full screen overlay
+        dimension = Vec2(*config.screen_dimension)
+        pos = Vec2(0, 0)
+        super().__init__(dimension, pos)
+
+        self.overshade = True  # blocks interaction until dismissed
+        self.title_font = pygame.font.Font(None, 72)
+        self.info_font = pygame.font.Font(None, 36)
+
+    def draw(self, screen: Surface):
+        # Fill background
+        self.surface.fill(Color.background)
+
+        # Title
+        title_text = self.title_font.render("JEOPARDY!", True, Color.text)
+        title_rect = title_text.get_rect(center=(self.dimension.x // 2, self.dimension.y // 3))
+        self.surface.blit(title_text, title_rect)
+
+        # Info
+        info_text = self.info_font.render("Press any key or click to start", True, Color.text)
+        info_rect = info_text.get_rect(center=(self.dimension.x // 2, self.dimension.y // 2))
+        self.surface.blit(info_text, info_rect)
+
+        # Apply fade alpha
+        fade_surface = self.surface.copy()
+        fade_surface.set_alpha(self.alpha)
+        screen.blit(fade_surface, self.pos)
+
+        # Handle fade progression
+        if self.fading and self.alpha > 0:
+            self.alpha -= 10  # fade speed
+            if self.alpha <= 0:
+                manager.remove_surface(self)
+
+    def click_at(self, pos: Vec2, player: Player):
+        # Remove start screen when clicked
+        manager.remove_surface(self)
+
+    def handle_key(self, event):
+        # Remove start screen when any key pressed
+        manager.remove_surface(self)
+
 
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):

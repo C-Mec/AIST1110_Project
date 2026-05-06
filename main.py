@@ -36,13 +36,13 @@ players = [player, ai1, ai2]
 main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
 manager.init(main_screen)
 
-# Pass manager and player to Grid_Surface
-jeopardy_grid = ui.Grid_Surface(Vec2(1000, 600), Vec2(140, 60), Vec2(6, 5))
-manager.add_surface(jeopardy_grid)
+# Add start screen before grid
+start_screen = ui.StartScreen()
+manager.add_surface(start_screen)
 
-score_overlay = ui.ScoreOverlay(players)
-manager.add_surface(score_overlay)
-
+# Grid and overlay will be added only after start screen fades out
+jeopardy_grid = None
+score_overlay = None
 
 running = True
 while running:
@@ -93,6 +93,20 @@ while running:
             
             if surface is not None:
                 surface.click_at(rpos, player)
+                
+    if not any(isinstance(s, ui.StartScreen) for s in manager.layers):
+        if jeopardy_grid is None:
+            # Compute grid with buffer
+            screen_w, screen_h = config.screen_dimension
+            buffer_w, buffer_h = screen_w // 12, screen_h // 12
+            grid_w, grid_h = screen_w - 2 * buffer_w, screen_h - 2 * buffer_h
+            grid_pos = Vec2(buffer_w, buffer_h)
+
+            jeopardy_grid = ui.Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 5))
+            manager.add_surface(jeopardy_grid)
+
+            score_overlay = ui.ScoreOverlay(players)
+            manager.add_surface(score_overlay)
 
     # Render all surfaces in manager by their z-axis order
     manager.render()
