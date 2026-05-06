@@ -1,6 +1,7 @@
 import pygame
 import config
 import math
+import random
 
 Surface = pygame.Surface
 Rect = pygame.Rect
@@ -14,10 +15,29 @@ class Color:
     text = "#FFFFFF"
     background = "#4682C8"
     black = "#000000"
-    wrong = "#50C8C8"
-    correct = "#C8C850"
+    greyed = "#808080"
+    
+    correct = "#3CB371"  # green
+    wrong = "#DC143C"  # red
+    
+    timer = "#50C8C8"
+    
     overlay = "#000000B4"
-
+    
+    palette = [
+        "#4287F5", "#3CB371", "#DC143C", "#FFD700", "#FF69B4",
+        "#8A2BE2", "#FF8C00", "#00CED1", "#ADFF2F", "#FF4500",
+        "#7FFF00", "#FF1493", "#20B2AA", "#FF6347", "#9370DB",
+        "#40E0D0", "#FFB6C1", "#6A5ACD", "#00FA9A", "#FF00FF"
+    ]
+    
+    @staticmethod
+    def assign_colors(players):
+        """Randomly assign distinct colors from palette to players."""
+        chosen = random.sample(Color.palette, len(players))
+        for player, color in zip(players, chosen):
+            player.color = color
+    
 class Font:
     title = pygame.font.Font(None, 32)
     option = pygame.font.Font(None, 28)
@@ -44,12 +64,13 @@ class Question:
         )
 
 class Player:
-    def __init__(self, name):
+    def __init__(self, name: str, color: tuple[int, int, int]):
         self.name = name
         self.score = 0
-    
-    def add_score(self, points):
-        self.score += points
+        self.color = color  # RGB tuple
+
+    def add_score(self, amount: int):
+        self.score += amount
 
 class Base_Surface:
     def __init__(self, dimension: Vec2, pos: Vec2 = Vec2(0, 0)):
@@ -176,17 +197,17 @@ class Grid_Surface(Base_Surface):
     def click_at(self, pos: Vec2, player: Player):
         row, col = self._get_rowcol(pos)
         rect, question, used = self.grid[row][col]
-        
+
         if used:
             print("This question has already been answered.")
             return
-        
+
+        # Mark cell as used → will render grey next draw
         self.grid[row][col][2] = True
 
-        # Create and add popup
         popup = Question_Surface(question, player)
         manager.add_surface(popup)
-    
+
     def _get_rowcol(self, rpos: Vec2):
         x, y = intxy(rpos)
         c_width, c_height = intxy(self.cell_dimension)
@@ -198,27 +219,26 @@ class Grid_Surface(Base_Surface):
     
     def draw(self, screen: Surface):
         g_width, g_height = intxy(self.grid_dimension)
-        
+
         for row in range(g_height):
             for col in range(g_width):
                 rect, question, used = self.grid[row][col]
 
-                # Draw cell background
-                pygame.draw.rect(self.surface, Color.background, rect)
+                # Fill background: grey if used, normal otherwise
+                fill_color = Color.greyed if used else Color.background
+                pygame.draw.rect(self.surface, fill_color, rect)
 
-                # Draw dollar value
-                value = (row + 1) * 200
+                if not used:
+                    value = (row + 1) * 200
+                    text = self.font.render(str(value), True, Color.text)
+                    text_rect = text.get_rect(center=rect.center)
+                    self.surface.blit(text, text_rect)
 
-                # Font.render returns a surface with text
-                text = self.font.render(str(value), True, Color.border)
-                text_rect = text.get_rect(center=rect.center)
-
-                self.surface.blit(text, text_rect)
-                
                 # Draw border
                 pygame.draw.rect(self.surface, Color.border, rect, 2)
 
         screen.blit(self.surface, self.pos)
+
 
 class StartScreen(Base_Surface):
     def __init__(self):
@@ -275,6 +295,11 @@ class Question_Surface(Base_Surface):
         pos = rect.topleft
         super().__init__(dimension, pos)
 
+        self.option_border_color = Color.border
+        self.selected_option = None
+        self.correct_option_index = None
+        self.close_time = None
+
         self.overshade = True
         self.question = question
         self.player = player
@@ -308,7 +333,8 @@ class Question_Surface(Base_Surface):
         self.surface.blit(text, (30, 30))
 
         if not self.buzzed:
-            pygame.draw.rect(self.surface, Color.correct, self.buzz_rect)
+            # Buzz button in player color
+            pygame.draw.rect(self.surface, self.player.color, self.buzz_rect)
             pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
             buzz_text = Font.option.render("BUZZ!", True, Color.black)
             self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
@@ -327,7 +353,7 @@ class Question_Surface(Base_Surface):
                 end_angle = -90 + angle
                 pygame.draw.arc(
                     self.surface,
-                    Color.wrong,
+                    Color.timer,
                     pygame.Rect(center[0]-radius, center[1]-radius, radius*2, radius*2),
                     math.radians(-90),
                     math.radians(end_angle),
@@ -346,10 +372,23 @@ class Question_Surface(Base_Surface):
             # Options
             for i, rect in enumerate(self.option_rects):
                 pygame.draw.rect(self.surface, Color.background, rect)
-                pygame.draw.rect(self.surface, Color.border, rect, 2)
+
+                if self.selected_option == i:
+                    border_color = self.option_border_color
+                elif self.correct_option_index == i:
+                    border_color = Color.correct
+                else:
+                    border_color = Color.border
+
+                pygame.draw.rect(self.surface, border_color, rect, 2)
+
                 option_text = f"{chr(65+i)}. {self.question.answer[i]}"
-                text = Font.option.render(option_text, True, Color.text)
+                text = Font.option.render(option_text, True, (Color.text))
                 self.surface.blit(text, text.get_rect(center=rect.center))
+
+        # Kill surface after 1s delay
+        if self.close_time and pygame.time.get_ticks() >= self.close_time:
+            manager.remove_surface(self)
 
         screen.blit(self.surface, self.pos)
 
@@ -358,18 +397,71 @@ class Question_Surface(Base_Surface):
             self.buzzed = True
             self.timer_active = True
             self.start_time = pygame.time.get_ticks()
-        elif self.buzzed:
+            
+            # Screen flash in player color
+            manager.add_surface(BorderFlash(self.player))
+        elif self.buzzed and self.selected_option is None:  # prevent multiple scoring
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(pos):
                     self.selected_option = i
+                    self.timer_active = False
+                    
                     if self.question.answer_index == i:
                         player.add_score(self.question.value)
                         print(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
+                        self.option_border_color = Color.correct
                     else:
                         player.add_score(-self.question.value)
                         print(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
-                    manager.remove_surface(self)
-                
+                        self.option_border_color = Color.wrong
+                        self.correct_option_index = self.question.answer_index
+
+                    # schedule surface removal after 1s
+                    self.close_time = pygame.time.get_ticks() + 1000
+
+
+class BorderFlash(Base_Surface):
+    def __init__(self, player: Player, duration: int = 500):
+        dimension = Vec2(*config.screen_dimension)
+        pos = Vec2(0, 0)
+        super().__init__(dimension, pos)
+
+        self.overshade = False
+        self.player = player
+        self.start_time = pygame.time.get_ticks()
+        self.duration = duration  # ms
+        self.alpha = 0
+
+    def draw(self, screen: Surface):
+        elapsed = pygame.time.get_ticks() - self.start_time
+
+        # Fade in/out logic
+        cutoff = self.duration // 5
+        if elapsed < cutoff:
+            # Fade in
+            self.alpha = int(255 * (elapsed / cutoff))
+        elif elapsed < self.duration:
+            # Fade out
+            self.alpha = int(255 * (1 - (elapsed - cutoff) / cutoff))
+        else:
+            # End effect
+            manager.remove_surface(self)
+            return
+
+        # Draw border flash
+        flash_surface = Surface(config.screen_dimension, pygame.SRCALPHA)
+        flash_surface.fill((0, 0, 0, 0))  # transparent
+
+        rgb = self.player.color
+
+        # Draw thick border rectangle
+        border_rect = flash_surface.get_rect()
+        pygame.draw.rect(flash_surface, rgb, border_rect, 40)
+
+        # Apply alpha
+        flash_surface.set_alpha(self.alpha)
+        screen.blit(flash_surface, (0, 0))
+
 class ScoreOverlay(Base_Surface):
     def __init__(self, players: list[Player]):
         dimension = Vec2(180, 110)  # size of the rectangle 
@@ -394,12 +486,13 @@ class ScoreOverlay(Base_Surface):
         # Player scores (right-aligned)
         for i, player in enumerate(self.players):
             text = f"{player.name}: ${player.score}"
-            rendered = self.font.render(text, True, Color.text)
+            # Convert hex to RGB before rendering
+            rendered = self.font.render(text, True, player.color)
             text_rect = rendered.get_rect()
-            # Align right with 10px padding
             text_rect.top = 10 + i * 35
             text_rect.right = self.surface.get_rect().right - 10
             self.surface.blit(rendered, text_rect)
+
 
         # Blit overlay onto main screen
         screen.blit(self.surface, self.pos)

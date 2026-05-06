@@ -24,14 +24,16 @@ main_screen = pygame.display.set_mode(config.screen_dimension)
 manager.init(main_screen)
 
 # Create a human player
-player = ui.Player("Human")
+player = ui.Player("Human", None)
 
 # Create 2 ai players
-ai1 = ui.Player("TEMP1")
-ai2 = ui.Player("TEMP2")
+ai1 = ui.Player("TEMP1", None)
+ai2 = ui.Player("TEMP2", None)
 
-# Used by score overlay
+# Used by score overlay and other functions
 players = [player, ai1, ai2]
+
+ui.Color.assign_colors(players)
 
 # Create a resizable window
 main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
