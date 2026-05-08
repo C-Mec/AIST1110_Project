@@ -53,7 +53,7 @@ class BorderFlash(Base_Surface):
         flash_surface.set_alpha(self.alpha)
         screen.blit(flash_surface, (0, 0))
 
-class Cutsence_Surface(Base_Surface):
+class Cutscene_Surface(Base_Surface):
     def __init__(self, message: str):
         super().__init__(None)
         
@@ -141,4 +141,4 @@ class Transition_Surface(Base_Surface):
             self.fade(128)
 
 def notify(message: str) -> None:
-    manager.add_surface(Cutsence_Surface(message))
+    manager.add_surface(Cutscene_Surface(message))

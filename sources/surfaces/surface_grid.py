@@ -1,4 +1,5 @@
 import pygame
+import random
 
 Surface = pygame.Surface
 Rect = pygame.Rect
@@ -9,6 +10,7 @@ from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.surface_question import Question_Surface
+from sources.surfaces.visual import Cutscene_Surface, Transition_Surface
 
 from sources.llm.llm import LLMQuestionGenerator
 
@@ -17,9 +19,12 @@ class Grid_Surface(Base_Surface):
         super().__init__(dimension, pos)
         
         self.players = players
+        self.bot_wait_until = None
+        self.turn_index = 0
+        
         self.font = Font.large
         self.grid_dimension = grid_dimension
-        self.categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]
+        self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
         
         g_width, g_height = intxy(grid_dimension)
         width, height = intxy(self.dimension)
@@ -42,6 +47,12 @@ class Grid_Surface(Base_Surface):
         # Generate questions via LLM, returns board_data[question_row][category_col]
         board_data = self.question_gen.generate_board(self.categories, rows=num_rows)
         
+        while len(board_data) < num_rows:
+            board_data.append([{"clue":"Placeholder","options":["A"],"correct_answer":"A"} for _ in range(num_cols)])
+        for r in range(num_rows):
+            while len(board_data[r]) < num_cols:
+                board_data[r].append({"clue":"Placeholder","options":["A"],"correct_answer":"A"})
+        
         # Initialize grid: [row][col] where row=0 is category row (empty for questions)
         self.grid = [[None for _ in range(g_width)] for _ in range(g_height)]
         
@@ -63,8 +74,99 @@ class Grid_Surface(Base_Surface):
                     value=value
                 )
                 self.grid[row + 1][col] = [rect, q, False, None]   # store rectangle, question, used flag, flash
-                    
+    
+    def advance_turn(self):
+        if any(isinstance(s, Transition_Surface) for s in manager.layers):
+            return
+
+        self.turn_index = (self.turn_index + 1) % len(self.players)
+
+        if self.players[self.turn_index].is_bot:
+            delay_ms = int(random.uniform(750, 1750))
+            self.bot_wait_until = pygame.time.get_ticks() + delay_ms
+    
+    def advance_turn(self):
+        if any(isinstance(s, Transition_Surface) for s in manager.layers):
+            return
+
+        self.turn_index = (self.turn_index + 1) % len(self.players)
+
+        if self.players[self.turn_index].is_bot:
+            delay_ms = int(random.uniform(750, 1750))
+            self.bot_wait_until = pygame.time.get_ticks() + delay_ms
+
+    def call_lowest_player(self):
+        # Find player with least money
+        lowest = min(self.players, key=lambda p: p.score)
+        self.turn_index = self.players.index(lowest)
+
+        # If it's a bot, schedule delay
+        if lowest.is_bot:
+            delay_ms = int(random.uniform(750, 1750))
+            self.bot_wait_until = pygame.time.get_ticks() + delay_ms
+
+        print(f"Double Jeopardy → {lowest.name} starts with ${lowest.score}")
+
+    
+    def update(self):
+        # print("updated")
+
+        # --- Round reset check ---
+        g_width, g_height = intxy(self.grid_dimension)
+        all_used = all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
+        if all_used:
+            if self.multiplier == 1:
+                manager.add_surface(Transition_Surface("DOUBLE JEOPARDY!", mode="double"))
+                self.multiplier = 2
+                for row in range(1, g_height):
+                    for col in range(g_width):
+                        rect, q, used, flash = self.grid[row][col]
+                        self.grid[row][col][2] = False
+                        q.value = row * 200 * self.multiplier
+            elif self.multiplier == 2:
+                manager.add_surface(Transition_Surface("FINAL JEOPARDY!", mode="final"))
+                for row in range(1, g_height):
+                    for col in range(g_width):
+                        self.grid[row][col][2] = False
+
+        # --- Bot delayed selection ---
+        elif self.bot_wait_until and pygame.time.get_ticks() >= self.bot_wait_until:
+            current_player = self.players[self.turn_index]
+            if current_player.is_bot:
+                g_width, g_height = intxy(self.grid_dimension)
+                available = [
+                    (r, c)
+                    for r in range(1, g_height)
+                    for c in range(g_width)
+                    if not self.grid[r][c][2]
+                ]
+                if available:
+                    row, col = random.choice(available)
+                    rect, question, used, flash = self.grid[row][col]
+                    self.grid[row][col][3] = {
+                        "color": current_player.color,
+                        "start": pygame.time.get_ticks(),
+                        "count": 0,
+                        "player": current_player
+                    }
+                    self.grid[row][col][2] = True
+            self.bot_wait_until = None
+
+    def is_flashing(self) -> bool:
+        g_width, g_height = intxy(self.grid_dimension)
+        return any(self.grid[r][c][3] for r in range(1, g_height) for c in range(g_width))
+    
     def click_at(self, pos: Vec2, player: Player):
+        # Block if it's not this player's turn
+        if self.players[self.turn_index] != player:
+            print("Not your turn!")
+            return
+
+        # Block if a question surface is already active
+        if any(isinstance(s, Question_Surface) for s in manager.layers) or self.is_flashing():
+            print("Question already active!")
+            return
+        
         row, col = self._get_rowcol(pos)
         
         if row < 0:

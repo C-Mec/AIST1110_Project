@@ -26,7 +26,8 @@ from sources.datatype.player import init_players
 from sources.surfaces.surface_start import StartScreen
 from sources.surfaces.surface_grid import Grid_Surface
 from sources.surfaces.overlay import ScoreOverlay
-from sources.surfaces.visual import Transition_Surface
+from sources.surfaces.surface_question import Question_Surface
+from sources.surfaces.visual import Cutscene_Surface, Transition_Surface
 
 # Create a resizable window
 main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
@@ -73,7 +74,7 @@ while running:
 
             # Re-add score overlay in top-right
             manager.layers = [s for s in manager.layers if not isinstance(s, ScoreOverlay)]
-            score_overlay = ScoreOverlay(players)
+            score_overlay = ScoreOverlay(players, jeopardy_grid)
             manager.add_surface(score_overlay)
         
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -96,13 +97,25 @@ while running:
             grid_w, grid_h = screen_w - 2 * buffer_w, screen_h - 2 * buffer_h
             grid_pos = Vec2(buffer_w, buffer_h)
 
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(2, 2), players)
+            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
             manager.add_surface(jeopardy_grid)
 
-            score_overlay = ScoreOverlay(players)
+            score_overlay = ScoreOverlay(players, jeopardy_grid)
             manager.add_surface(score_overlay)
             
             manager.add_surface(Transition_Surface("JEOPARDY!", mode="jeopardy"))
+    
+    if (
+        jeopardy_grid
+        and not any(isinstance(s, Question_Surface) for s in manager.layers)
+        and not any(isinstance(s, Cutscene_Surface) for s in manager.layers)
+        and not any(isinstance(s, Transition_Surface) for s in manager.layers)
+        and not jeopardy_grid.is_flashing()
+    ):
+        if jeopardy_grid.multiplier == 2 and not jeopardy_grid.bot_wait_until:
+            jeopardy_grid.call_lowest_player()
+        jeopardy_grid.update()
+
 
     # Render all surfaces in manager by their z-axis order
     manager.render()

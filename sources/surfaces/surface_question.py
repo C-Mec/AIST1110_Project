@@ -13,7 +13,6 @@ from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.visual import notify, BorderFlash
-from sources.surfaces.visual import Transition_Surface
 
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):
@@ -113,34 +112,6 @@ class Question_Surface(Base_Surface):
             if not self.bot_pending:
                 self.close_time = pygame.time.get_ticks() + 1000
     
-    def resolve(self):
-        if self.grid:
-            g_width, g_height = intxy(self.grid.grid_dimension)
-            all_used = all(self.grid.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
-
-            if all_used:
-                # First reset → Double Jeopardy
-                if self.grid.multiplier == 1:
-                    manager.add_surface(Transition_Surface("DOUBLE JEOPARDY!", mode="double"))
-                    self.grid.multiplier *= 2
-
-                    # Reset all cells to non-grey and update values
-                    for row in range(1, g_height):
-                        for col in range(g_width):
-                            rect, q, used = self.grid.grid[row][col]
-                            self.grid.grid[row][col][2] = False
-                            q.value = row * 200 * self.grid.multiplier
-
-                # Second reset → Final Jeopardy
-                elif self.grid.multiplier == 2:
-                    manager.add_surface(Transition_Surface("FINAL JEOPARDY!", mode="final"))
-
-                    # Optionally clear the grid or replace with a single Final Jeopardy question
-                    # For now, just clear greys so board looks fresh
-                    for row in range(1, g_height):
-                        for col in range(g_width):
-                            self.grid.grid[row][col][2] = False
-    
     def draw(self, screen: Surface):
         self.surface.fill(Color.background)
         pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 3)
@@ -165,20 +136,23 @@ class Question_Surface(Base_Surface):
                 radius = 50
                 pygame.draw.circle(self.surface, Color.border, center, radius, 2)
 
-                # Draw filled arc (pie slice shrinking)
+                # Filled pie slice shrinking
                 angle = 360 * (remaining / self.duration)
                 end_angle = -90 + angle
-                pygame.draw.arc(
-                    self.surface,
-                    Color.timer,
-                    pygame.Rect(center[0]-radius, center[1]-radius, radius*2, radius*2),
-                    math.radians(-90),
-                    math.radians(end_angle),
-                    8
-                )
+
+                points = [center]  # start at circle center
+                steps = 50  # number of segments for smoothness
+                for a in range(-90, int(end_angle), int(angle/steps) or 1):
+                    rad = math.radians(a)
+                    x = center[0] + radius * math.cos(rad)
+                    y = center[1] + radius * math.sin(rad)
+                    points.append((x, y))
+
+                pygame.draw.polygon(self.surface, Color.timer, points)
+                pygame.draw.circle(self.surface, Color.border, center, radius, 2)
 
                 # Seconds remaining in middle
-                sec_text = Font.small.render(str(int(remaining)), True, Color.text)
+                sec_text = Font.large.render(str(int(remaining)), True, Color.text)
                 self.surface.blit(sec_text, sec_text.get_rect(center=center))
 
                 if remaining <= 0:
@@ -242,8 +216,8 @@ class Question_Surface(Base_Surface):
     
         # Kill surface after 1s delay
         if self.close_time and pygame.time.get_ticks() >= self.close_time:
+            self.grid.advance_turn()
             manager.remove_surface(self)
-            self.resolve()
 
         screen.blit(self.surface, self.pos)
 
