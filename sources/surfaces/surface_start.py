@@ -8,6 +8,7 @@ import config
 from sources.util import Font, Color
 from sources.manager import manager, Base_Surface
 from sources.datatype.player import Player
+from sources.surfaces.visual import Transition_Surface
 
 class StartScreen(Base_Surface):
     def __init__(self):

@@ -26,6 +26,7 @@ from sources.datatype.player import init_players
 from sources.surfaces.surface_start import StartScreen
 from sources.surfaces.surface_grid import Grid_Surface
 from sources.surfaces.overlay import ScoreOverlay
+from sources.surfaces.visual import Transition_Surface
 
 # Create a resizable window
 main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
@@ -88,8 +89,8 @@ while running:
                 surface.click_at(rpos, player)
                 
     if not any(isinstance(s, StartScreen) for s in manager.layers):
-        if jeopardy_grid is None:
-            # Compute grid with buffer
+        
+        if jeopardy_grid is None and not any(isinstance(s, Transition_Surface) for s in manager.layers):
             screen_w, screen_h = config.screen_dimension
             buffer_w, buffer_h = screen_w // 12, screen_h // 12
             grid_w, grid_h = screen_w - 2 * buffer_w, screen_h - 2 * buffer_h
@@ -100,6 +101,8 @@ while running:
 
             score_overlay = ScoreOverlay(players)
             manager.add_surface(score_overlay)
+            
+            manager.add_surface(Transition_Surface("JEOPARDY!", mode="jeopardy"))
 
     # Render all surfaces in manager by their z-axis order
     manager.render()

@@ -28,6 +28,7 @@ class Grid_Surface(Base_Surface):
             round(height / g_height)
         )
         self.question_gen = LLMQuestionGenerator()   # Initialize LLM question generator
+        self.multiplier = 1
         self._grid_init()
 
     def _grid_init(self):
@@ -83,6 +84,24 @@ class Grid_Surface(Base_Surface):
 
         popup = Question_Surface(question, player, bots=self.players[1:])
         manager.add_surface(popup)
+        
+        self._check_reset()
+
+    def _check_reset(self):
+        g_width, g_height = intxy(self.grid_dimension)
+        for row in range(1, g_height):
+            for col in range(g_width):
+                if not self.grid[row][col][2]:
+                    return  # Found unused cell, no reset yet
+        
+        print("All questions answered! Resetting board for Double Jeopardy...")
+        self.multiplier *= 2
+        self._grid_init()
+        
+        for row in range(1, g_height):
+            for col in range(g_width):
+                rect, question, used = self.grid[row][col]
+                question.value = row * 200 * self.multiplier
 
     def _get_rowcol(self, rpos: Vec2):
         x, y = intxy(rpos)
@@ -119,8 +138,7 @@ class Grid_Surface(Base_Surface):
                 pygame.draw.rect(self.surface, fill_color, rect)
 
                 if not used:
-                    value = row * 200          # row=1 -> 200, row=2 -> 400, ...
-                    text = self.font.render(str(value), True, Color.text)
+                    text = self.font.render(str(question.value), True, Color.text)
                     text_rect = text.get_rect(center=rect.center)
                     self.surface.blit(text, text_rect)
 
