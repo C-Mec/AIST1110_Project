@@ -158,8 +158,32 @@ class Question_Surface(Base_Surface):
 
                     # Let a bot try to answer
                     if self.bots:
-                        bot = random.choice(self.bots)
-                        self.bot_try_answer(bot)
+                        available_bots = [b for b in self.bots if b not in self.bots_answered]
+                        if not available_bots:
+                            return
+
+                        bot = random.choice(available_bots)
+
+                        # Decide choice now
+                        remaining = [i for i in range(len(self.question.answer))
+                                    if i != self.selected_option]
+                        if not remaining:
+                            return
+
+                        correct_index = self.question.answer_index
+                        if len(remaining) == 1:
+                            choice = correct_index
+                        elif len(remaining) == 2:
+                            choice = correct_index if random.random() < 0.7 else [i for i in remaining if i != correct_index][0]
+                        else:
+                            choice = correct_index if random.random() < 0.5 else random.choice([i for i in remaining if i != correct_index])
+
+                        # Schedule buzz between 0.75–3s later
+                        delay = random.uniform(750, 1750)
+                        self.bot_buzz_time = pygame.time.get_ticks() + int(delay)
+
+                        # Store both bot and choice
+                        self.bot_pending = (bot, choice)
                     return
 
             # Options

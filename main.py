@@ -20,7 +20,7 @@ Vec2 = pygame.Vector2
 
 import config
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(encoding='utf-16')
 from sources.manager import manager
 from sources.datatype.player import init_players
 from sources.surfaces.surface_start import StartScreen
