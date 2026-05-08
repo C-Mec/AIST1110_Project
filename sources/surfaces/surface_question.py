@@ -8,22 +8,24 @@ import random
 import math
 
 import config
-from sources.util import Color, Font
+from sources.util import intxy, Color, Font
 from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.visual import notify, BorderFlash
+from sources.surfaces.visual import Transition_Surface
 
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):
-    def __init__(self, question: Question, player: Player, bots: list[Player]):
+    def __init__(self, question: Question, player: Player, bots: list[Player], grid):
         dimension = Vec2(config.screen_dimension[0] * 0.7,
                          config.screen_dimension[1] * 0.7)  # scale to window
         rect = Surface(dimension).get_rect(center=(config.screen_dimension[0]//2,
                                                    config.screen_dimension[1]//2))
         pos = rect.topleft
         super().__init__(dimension, pos)
-
+        self.grid = grid
+        
         self.option_border_color = Color.border
         self.selected_option = None
         self.correct_option_index = None
@@ -111,6 +113,34 @@ class Question_Surface(Base_Surface):
             if not self.bot_pending:
                 self.close_time = pygame.time.get_ticks() + 1000
     
+    def resolve(self):
+        if self.grid:
+            g_width, g_height = intxy(self.grid.grid_dimension)
+            all_used = all(self.grid.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
+
+            if all_used:
+                # First reset → Double Jeopardy
+                if self.grid.multiplier == 1:
+                    manager.add_surface(Transition_Surface("DOUBLE JEOPARDY!", mode="double"))
+                    self.grid.multiplier *= 2
+
+                    # Reset all cells to non-grey and update values
+                    for row in range(1, g_height):
+                        for col in range(g_width):
+                            rect, q, used = self.grid.grid[row][col]
+                            self.grid.grid[row][col][2] = False
+                            q.value = row * 200 * self.grid.multiplier
+
+                # Second reset → Final Jeopardy
+                elif self.grid.multiplier == 2:
+                    manager.add_surface(Transition_Surface("FINAL JEOPARDY!", mode="final"))
+
+                    # Optionally clear the grid or replace with a single Final Jeopardy question
+                    # For now, just clear greys so board looks fresh
+                    for row in range(1, g_height):
+                        for col in range(g_width):
+                            self.grid.grid[row][col][2] = False
+    
     def draw(self, screen: Surface):
         self.surface.fill(Color.background)
         pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 3)
@@ -118,7 +148,7 @@ class Question_Surface(Base_Surface):
         # Question text at top
         text = Font.medium.render(self.question.problem, True, Color.text)
         self.surface.blit(text, (30, 30))
-
+        
         if not self.buzzed:
             # Buzz button in player color
             pygame.draw.rect(self.surface, self.player.color, self.buzz_rect)
@@ -213,6 +243,7 @@ class Question_Surface(Base_Surface):
         # Kill surface after 1s delay
         if self.close_time and pygame.time.get_ticks() >= self.close_time:
             manager.remove_surface(self)
+            self.resolve()
 
         screen.blit(self.surface, self.pos)
 

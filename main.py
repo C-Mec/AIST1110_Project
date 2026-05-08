@@ -96,7 +96,7 @@ while running:
             grid_w, grid_h = screen_w - 2 * buffer_w, screen_h - 2 * buffer_h
             grid_pos = Vec2(buffer_w, buffer_h)
 
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
+            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(2, 2), players)
             manager.add_surface(jeopardy_grid)
 
             score_overlay = ScoreOverlay(players)
