@@ -19,7 +19,7 @@ class Grid_Surface(Base_Surface):
         self.players = players
         self.font = Font.large
         self.grid_dimension = grid_dimension
-        self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
+        self.categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]
         
         g_width, g_height = intxy(grid_dimension)
         width, height = intxy(self.dimension)
@@ -62,7 +62,7 @@ class Grid_Surface(Base_Surface):
                     answer_ind=q_data["options"].index(q_data["correct_answer"]),
                     value=value
                 )
-                self.grid[row + 1][col] = [rect, q, False]   # store rectangle, question, used flag
+                self.grid[row + 1][col] = [rect, q, False, None]   # store rectangle, question, used flag, flash
                     
     def click_at(self, pos: Vec2, player: Player):
         row, col = self._get_rowcol(pos)
@@ -73,17 +73,22 @@ class Grid_Surface(Base_Surface):
         
         # Convert to actual grid row (row 0 is category header)
         actual_row = row + 1
-        rect, question, used = self.grid[actual_row][col]
+        rect, question, used, flash = self.grid[actual_row][col]
 
         if used:
             print("This question has already been answered.")
             return
 
-        # Mark cell as used → will render grey next draw
+        # Mark cell as used
         self.grid[actual_row][col][2] = True
 
-        popup = Question_Surface(question, player, bots=self.players[1:], grid=self)
-        manager.add_surface(popup)
+        # Start flash animation (store player color and start time)
+        self.grid[actual_row][col][3] = {
+            "color": player.color, 
+            "start": pygame.time.get_ticks(),
+            "count": 0,
+            "player": player
+        }
 
     def _get_rowcol(self, rpos: Vec2):
         x, y = intxy(rpos)
@@ -114,17 +119,40 @@ class Grid_Surface(Base_Surface):
         # Draw question cells (skip row 0, start from row 1)
         for row in range(1, g_height):
             for col in range(g_width):
-                rect, question, used = self.grid[row][col]
+                rect, question, used, flash = self.grid[row][col]
 
-                fill_color = Color.greyed if used else Color.background
+                if flash:
+                    elapsed = (pygame.time.get_ticks() - flash["start"]) // 200  # 200ms per step
+                    if elapsed > flash["count"]:
+                        flash["count"] += 1
+
+                    if flash["count"] < 4:  # 2 flashes (on/off twice)
+                        fill_color = flash["color"] if flash["count"] % 2 == 0 else Color.background
+                    else:
+                        # Flash done → spawn popup
+                        popup = Question_Surface(
+                            question=question,
+                            player=flash["player"],
+                            bots=self.players[1:],
+                            grid=self
+                        )
+                        manager.add_surface(popup)
+
+                        # Clear flash state
+                        self.grid[row][col][3] = None
+                        fill_color = Color.greyed if used else Color.background
+                else:
+                    fill_color = Color.greyed if used else Color.background
+
                 pygame.draw.rect(self.surface, fill_color, rect)
 
-                if not used:
+                if not used or flash:
                     question.value = row * 200 * self.multiplier
                     text = self.font.render(str(question.value), True, Color.text)
                     text_rect = text.get_rect(center=rect.center)
                     self.surface.blit(text, text_rect)
 
                 pygame.draw.rect(self.surface, Color.border, rect, 2)
+
 
         screen.blit(self.surface, self.pos)

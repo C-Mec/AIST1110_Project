@@ -1,0 +1,58 @@
+[
+  [
+    {
+      "clue": "This ancient civilization is known for its pyramids and pharaohs.",
+      "correct_answer": "What is Ancient Egypt?",
+      "options": [
+        "What is Ancient Greece?",
+        "What is Ancient Egypt?",
+        "What is the Roman Empire?"
+      ]
+    },
+    {
+      "clue": "This process is how plants convert sunlight into energy.",
+      "correct_answer": "What is photosynthesis?",
+      "options": [
+        "What is respiration?",
+        "What is photosynthesis?",
+        "What is fermentation?"
+      ]
+    },
+    {
+      "clue": "This author wrote 'Pride and Prejudice'.",
+      "correct_answer": "Who is Jane Austen?",
+      "options": [
+        "Who is Emily Bronte?",
+        "Who is Jane Austen?",
+        "Who is Charles Dickens?"
+      ]
+    },
+    {
+      "clue": "This sport is known as 'the beautiful game'.",
+      "correct_answer": "What is soccer?",
+      "options": [
+        "What is basketball?",
+        "What is baseball?",
+        "What is soccer?"
+      ]
+    },
+    {
+      "clue": "This famous band was known for the song 'Hey Jude'.",
+      "correct_answer": "What are The Beatles?",
+      "options": [
+        "What are The Rolling Stones?",
+        "What are The Beatles?",
+        "What are Queen?"
+      ]
+    },
+    {
+      "clue": "This is the largest planet in our solar system.",
+      "correct_answer": "What is Jupiter?",
+      "options": [
+        "What is Saturn?",
+        "What is Earth?",
+        "What is Jupiter?"
+      ]
+    }
+  ]
+]
