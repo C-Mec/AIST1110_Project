@@ -65,3 +65,8 @@ class Color:
         chosen = random.sample(Color.palette, len(players))
         for player, color in zip(players, chosen):
             player.color = color
+
+def blit_text(text: str, font: pygame.font.Font, color: Color, screen: Surface, centerPos):
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=centerPos)
+    screen.blit(text_surface, text_rect)

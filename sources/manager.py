@@ -59,7 +59,7 @@ class Base_Surface:
     def time_update(self):
         pass
 
-    def click_at(self, pos: Vec2, player: Player):
+    def on_click(self, pos: Vec2, player: Player):
         pass
 
 class Surface_Manager:

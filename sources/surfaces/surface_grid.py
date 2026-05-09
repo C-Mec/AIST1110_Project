@@ -110,12 +110,12 @@ class Grid_Surface(Base_Surface):
 
     
     def time_update(self):
-        # print("updated")
-
         # --- Round reset check ---
-        g_width, g_height = intxy(self.grid_dimension)
-        all_used = all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
-        if all_used:
+        def board_all_used() -> bool:
+            g_width, g_height = intxy(self.grid_dimension)
+            all_used = all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
+            
+        if board_all_used():
             if self.multiplier == 1:
                 manager.add_surface(Transition_Surface(mode="double"))
                 self.multiplier = 2
@@ -156,36 +156,29 @@ class Grid_Surface(Base_Surface):
         g_width, g_height = intxy(self.grid_dimension)
         return any(self.grid[r][c][3] for r in range(1, g_height) for c in range(g_width))
     
-    def click_at(self, pos: Vec2, player: Player):
+    def on_click(self, pos: Vec2, player: Player):
         # Block if it's not this player's turn
         if self.players[self.turn_index] != player:
             print("Not your turn!")
             return
-
-        # Block if a question surface is already active
-        if any(isinstance(s, Question_Surface) for s in manager.layers) or self.is_flashing():
-            print("Question already active!")
-            return
         
         row, col = self._get_rowcol(pos)
         
-        if row < 0:
+        if row == 0:
             print("Category row – not clickable.")
             return
         
-        # Convert to actual grid row (row 0 is category header)
-        actual_row = row + 1
-        rect, question, used, flash = self.grid[actual_row][col]
+        rect, question, used, flash = self.grid[row][col]
 
         if used:
             print("This question has already been answered.")
             return
 
         # Mark cell as used
-        self.grid[actual_row][col][2] = True
+        self.grid[row][col][2] = True
 
         # Start flash animation (store player color and start time)
-        self.grid[actual_row][col][3] = {
+        self.grid[row][col][3] = {
             "color": player.color, 
             "start": pygame.time.get_ticks(),
             "count": 0,
@@ -209,7 +202,7 @@ class Grid_Surface(Base_Surface):
             return -1, -1
 
         col = rel_x // c_width
-        row = rel_y // c_height - 1   # subtract 1 because row 0 is category header
+        row = rel_y // c_height # Just use the grid indexes
 
         return row, col
     
@@ -217,34 +210,35 @@ class Grid_Surface(Base_Surface):
         # Draw full background first
         self.surface.blit(self.background, (2, 0))
 
-        c_width, c_height = intxy(self.cell_dimension)
+        def draw_categories():
+            c_width, c_height = intxy(self.cell_dimension)
 
-        # Category row
-        for col, category in enumerate(self.categories):
-            rect = pygame.Rect(
-                self.grid_area.left + round(col * c_width),
-                self.grid_area.top - 5,
-                round(c_width),
-                round(c_height)
-            )
-            pygame.draw.rect(self.surface, Color.background, rect)
-            pygame.draw.rect(self.surface, Color.border, rect, 2)
-            text = Font.category_medium.render(category, True, Color.white)
-            text_rect = text.get_rect(center=rect.center)
-            self.surface.blit(text, text_rect)
+            # Category row
+            for col, category in enumerate(self.categories):
+                rect = pygame.Rect(
+                    self.grid_area.left + round(col * c_width),
+                    self.grid_area.top - 5,
+                    round(c_width),
+                    round(c_height)
+                )
+                pygame.draw.rect(self.surface, Color.background, rect)
+                pygame.draw.rect(self.surface, Color.border, rect, 2)
+                text = Font.category_medium.render(category, True, Color.white)
+                text_rect = text.get_rect(center=rect.center)
+                self.surface.blit(text, text_rect)
 
-        g_width, g_height = intxy(self.grid_dimension)
-        for row in range(1, g_height):
-            for col in range(g_width):
+        draw_categories()
+        
+        for row in range(1, int(self.grid_dimension.x)):
+            for col in range(int(self.grid_dimension.y)):
                 rect, question, used, flash = self.grid[row][col]
 
                 if flash:
                     elapsed = (pygame.time.get_ticks() - flash["start"]) // 200
-                    if elapsed > flash["count"]:
-                        flash["count"] += 1
 
-                    if flash["count"] < 4:
-                        fill_color = flash["color"] if flash["count"] % 2 == 0 else Color.background
+                    if elapsed < 4:
+                        fill_color = flash["color"] if elapsed % 2 == 0 else Color.background
+                        
                     else:
                         popup = Question_Surface(
                             question=question,
@@ -259,8 +253,10 @@ class Grid_Surface(Base_Surface):
                     fill_color = Color.greyed if used else Color.background
 
                 pygame.draw.rect(self.surface, fill_color, rect)
+                
                 if not used or flash:
                     question.value = row * 200 * self.multiplier
+                    
                     text = Font.category_large.render(str(question.value), True, Color.text)
                     text_rect = text.get_rect(center=rect.center)
                     self.surface.blit(text, text_rect)

@@ -224,7 +224,7 @@ class Question_Surface(Base_Surface):
                 # Setup the next bot and its answer
                 self.schedule_bot_buzz()
 
-    def click_at(self, pos: Vec2, player: Player):
+    def on_click(self, pos: Vec2, player: Player):
         if self.stage == "Buzz" and self.buzz_rect.collidepoint(pos):
             self.stage = "Timed Answering"
             self.answer_start_time = pygame.time.get_ticks()

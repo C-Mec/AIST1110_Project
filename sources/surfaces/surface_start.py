@@ -34,7 +34,7 @@ class StartScreen(Base_Surface):
 
         screen.blit(self.surface, Vec2(0, 0))
 
-    def click_at(self, pos: Vec2, player: Player):
+    def on_click(self, pos: Vec2, player: Player):
         # Remove start screen when clicked
         manager.remove_surface(self)
 

@@ -89,7 +89,7 @@ while running:
             print(manager.layers)
             
             if surface is not None:
-                surface.click_at(rpos, player)
+                surface.on_click(rpos, player)
         
         if event.type == pygame.KEYDOWN:
             print(f"Keydown  {event.unicode}")
