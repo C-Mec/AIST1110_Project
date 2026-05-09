@@ -107,7 +107,9 @@ class Surface_Manager:
             base_surface.draw(self.main_screen)
         
         mx, my = pygame.mouse.get_pos()
-        self.main_screen.blit(self.pointer_img, (mx, my))
+        screen_w, screen_h = self.main_screen.get_size()
+        if 0.1 <= mx < screen_w - 0.1 and 0.1 <= my < screen_h - 0.1:
+            self.main_screen.blit(self.pointer_img, (mx, my))
         
         pygame.display.flip()
         
