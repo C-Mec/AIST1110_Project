@@ -11,7 +11,7 @@ from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.surface_question import Question_Surface
 from sources.surfaces.surface_final import FinalJeopardy
-from sources.surfaces.visual import Cutscene_Surface, Transition_Surface
+from sources.surfaces.visual import Transition_Surface
 
 from sources.llm.llm import LLMQuestionGenerator
 
@@ -20,12 +20,15 @@ class Grid_Surface(Base_Surface):
         super().__init__(dimension, pos)
 
         self.players = players
+        self.current_player = players[0]
+        
+        # Transition from the end of question to next selection
         self.bot_wait_until = None
-        self.turn_index = 0
 
         self.grid_dimension = grid_dimension
         self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
         
+        # Manage the related question surface
         self.current_popup: Question_Surface = None
         self.current_cell: tuple[int, int] = None # row, col
 
@@ -88,27 +91,25 @@ class Grid_Surface(Base_Surface):
                 )
                 self.grid[row + 1][col] = [rect, q, False, None]
     
-    def advance_turn(self):
-        if any(isinstance(s, Transition_Surface) for s in manager.layers):
-            return
+    def advance_turn(self, correct: bool):
+        next_player = random.choice(set(self.players) - set([self.current_player])) if not correct else self.current_player
 
-        self.turn_index = (self.turn_index + 1) % len(self.players)
-
-        if self.players[self.turn_index].bot:
-            delay_ms = int(random.uniform(750, 1750))
+        if next_player.bot:
+            # The time for cutsence is added here (manually)
+            delay_ms = int(random.uniform(3750, 4750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
 
     def call_lowest_player(self):
         # Find player with least money
-        lowest = min(self.players, key=lambda p: p.score)
-        self.turn_index = self.players.index(lowest)
+        poorest_player = min(self.players, key=lambda p: p.score)
+        self.current_player = poorest_player
 
         # If it's a bot, schedule delay
-        if lowest.bot:
+        if poorest_player.bot:
             delay_ms = int(random.uniform(750, 1750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
 
-        print(f"Double Jeopardy → {lowest.name} starts with ${lowest.score}")
+        print(f"Double Jeopardy → {poorest_player.name} starts with ${poorest_player.score}")
 
     
     def time_update(self):
@@ -133,8 +134,7 @@ class Grid_Surface(Base_Surface):
 
         # --- Bot delayed selection ---
         elif self.bot_wait_until and pygame.time.get_ticks() >= self.bot_wait_until:
-            current_player = self.players[self.turn_index]
-            if current_player.bot:
+            if self.current_player.bot:
                 g_width, g_height = intxy(self.grid_dimension)
                 available = [
                     (r, c)
@@ -146,10 +146,10 @@ class Grid_Surface(Base_Surface):
                     row, col = random.choice(available)
                     rect, question, used, flash = self.grid[row][col]
                     self.grid[row][col][3] = {
-                        "color": current_player.color,
+                        "color": self.current_player.color,
                         "start": pygame.time.get_ticks(),
                         "count": 0,
-                        "player": current_player
+                        "player": self.current_player
                     }
                     self.grid[row][col][2] = True
             self.bot_wait_until = None
@@ -176,7 +176,7 @@ class Grid_Surface(Base_Surface):
     
     def on_click(self, pos: Vec2, player: Player):
         # Block if it's not this player's turn
-        if self.players[self.turn_index] != player:
+        if self.current_player != player:
             print("Not your turn!")
             return
         

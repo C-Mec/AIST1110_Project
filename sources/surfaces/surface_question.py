@@ -57,6 +57,9 @@ class Question_Surface(Base_Surface):
         self.bot_pending: tuple[Player, int] = None
         self.bot_buzz_time: int = None
         self.submitted_answers: list[tuple[Player, int]] = []
+        
+        # For the next turn
+        self.correctly_answered = None
 
         # Options: compute dynamically
         self.option_rects = []
@@ -199,7 +202,7 @@ class Question_Surface(Base_Surface):
         screen.blit(self.surface, self.pos)
     
     def on_close(self):
-        self.grid_surface.advance_turn()
+        self.grid_surface.advance_turn(self.correctly_answered)
     
     def time_update(self):
         # Resolve pending bot answer after 1s
@@ -243,11 +246,15 @@ class Question_Surface(Base_Surface):
                     self.stage = "Non-timed Answering"
                     
                     if self.question.answer_index == i:
+                        self.correctly_answered = True
+                        
                         player.add_score(self.question.value)
                         notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
                         
                         self.close_time = pygame.time.get_ticks() + 1000
                     else:
+                        self.correctly_answered = False
+                        
                         player.add_score(-self.question.value)
                         notify(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
 

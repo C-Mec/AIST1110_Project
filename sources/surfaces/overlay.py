@@ -76,7 +76,7 @@ class ScoreOverlay(Base_Surface):
             self.surface.blit(score_render, score_rect)
 
             # arrow
-            if self.players[self.grid.turn_index] == player:
+            if self.grid.current_player == player:
                 arrow_tip = (bg_rect.left - 5, bg_rect.centery)
                 arrow_top = (bg_rect.left - 20, bg_rect.top)
                 arrow_bottom = (bg_rect.left - 20, bg_rect.bottom)
