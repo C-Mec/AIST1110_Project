@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pygame
 
 Surface = pygame.Surface
@@ -6,7 +8,7 @@ Vec2 = pygame.Vector2
 
 import random
 import math
-from typing import Literal
+from typing import Literal, TYPE_CHECKING
 
 import config
 from sources.util import intxy, Color, Font
@@ -15,9 +17,12 @@ from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.visual import notify, BorderFlash
 
+if TYPE_CHECKING:
+    from sources.surfaces.surface_grid import Grid_Surface
+
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):
-    def __init__(self, question: Question, player: Player, bots: list[Player], grid):
+    def __init__(self, question: Question, player: Player, bots: list[Player], grid_surface: Grid_Surface):
         dimension = Vec2(config.screen_dimension[0] * 0.7,
                          config.screen_dimension[1] * 0.7)  # scale to window
         rect = Surface(dimension).get_rect(center=(config.screen_dimension[0]//2,
@@ -25,7 +30,7 @@ class Question_Surface(Base_Surface):
         pos = rect.topleft
         super().__init__(dimension, pos)
         
-        self.grid = grid
+        self.grid_surface = grid_surface
         self.question = question
         self.player = player
         self.bots = bots
@@ -51,7 +56,7 @@ class Question_Surface(Base_Surface):
         # Bot Answering
         self.bot_pending: tuple[Player, int] = None
         self.bot_buzz_time: int = None
-        self.submitted_answers: list[tuple[Player, int]] = None
+        self.submitted_answers: list[tuple[Player, int]] = []
 
         # Options: compute dynamically
         self.option_rects = []
@@ -164,12 +169,14 @@ class Question_Surface(Base_Surface):
             for i, rect in enumerate(self.option_rects):
                 pygame.draw.rect(self.surface, Color.background, rect)
 
-                if i == self.question.answer_index:
-                    border_color = Color.correct
-                elif i in set(range(3)) - set([self.question.answer_index]):
-                    border_color = Color.wrong
-                else:
+                if self.stage == "Timed Answering":
                     border_color = Color.border
+                    
+                elif self.stage == "Non-timed Answering":
+                    if i == self.question.answer_index:
+                        border_color = Color.correct
+                    elif i in set(range(3)) - set([self.question.answer_index]):
+                        border_color = Color.wrong
 
                 pygame.draw.rect(self.surface, border_color, rect, 2)
 
@@ -188,7 +195,10 @@ class Question_Surface(Base_Surface):
 
         screen.blit(self.surface, self.pos)
     
-    def update(self):
+    def on_close(self):
+        self.grid_surface.advance_turn()
+    
+    def time_update(self):
         # Resolve pending bot answer after 1s
         if self.bot_pending and self.bot_buzz_time and pygame.time.get_ticks() >= self.bot_buzz_time:
             bot, choice = self.bot_pending
@@ -199,7 +209,6 @@ class Question_Surface(Base_Surface):
     
         # Kill surface after 1s delay
         if self.close_time and pygame.time.get_ticks() >= self.close_time:
-            self.grid.advance_turn()
             manager.remove_surface(self)
             
         if self.stage == "Timed Answering":
@@ -225,7 +234,7 @@ class Question_Surface(Base_Surface):
             
         ### Need to prevent multiple scoring
         
-        elif self.stage == "Timed Answering":  
+        elif self.stage == "Timed Answering":
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(pos):
                     self.stage = "Non-timed Answering"

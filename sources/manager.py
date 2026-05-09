@@ -53,7 +53,10 @@ class Base_Surface:
     def draw(self, screen: Surface):
         screen.blit(self.surface, self.pos)
     
-    def update(self):
+    def on_close(self):
+        pass
+    
+    def time_update(self):
         pass
 
     def click_at(self, pos: Vec2, player: Player):
@@ -75,6 +78,8 @@ class Surface_Manager:
         self.layers.append(base_surface)
    
     def remove_surface(self, base_surface: Base_Surface) -> None:
+        base_surface.on_close()
+        
         self.layers.remove(base_surface)
     
     def get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
@@ -100,7 +105,7 @@ class Surface_Manager:
         
     def update(self) -> None:
         for base_surface in self.layers:
-            base_surface.update()
+            base_surface.time_update()
 
 # The project-wise global instance of surface manager
 # Needs to be set in main.py

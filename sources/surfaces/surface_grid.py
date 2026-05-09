@@ -93,16 +93,6 @@ class Grid_Surface(Base_Surface):
         if self.players[self.turn_index].bot:
             delay_ms = int(random.uniform(750, 1750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
-    
-    def advance_turn(self):
-        if any(isinstance(s, Transition_Surface) for s in manager.layers):
-            return
-
-        self.turn_index = (self.turn_index + 1) % len(self.players)
-
-        if self.players[self.turn_index].bot:
-            delay_ms = int(random.uniform(750, 1750))
-            self.bot_wait_until = pygame.time.get_ticks() + delay_ms
 
     def call_lowest_player(self):
         # Find player with least money
@@ -117,7 +107,7 @@ class Grid_Surface(Base_Surface):
         print(f"Double Jeopardy → {lowest.name} starts with ${lowest.score}")
 
     
-    def update(self):
+    def time_update(self):
         # print("updated")
 
         # --- Round reset check ---
@@ -259,7 +249,7 @@ class Grid_Surface(Base_Surface):
                             question=question,
                             player=flash["player"],
                             bots=self.players[1:],
-                            grid=self
+                            grid_surface=self
                         )
                         manager.add_surface(popup)
                         self.grid[row][col][3] = None

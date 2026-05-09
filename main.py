@@ -120,7 +120,7 @@ while running:
         #     ft.draw(screen)
         #     if not alive:
         #         floating_texts.remove(ft)
-        jeopardy_grid.update()
+        jeopardy_grid.time_update()
 
 
 
