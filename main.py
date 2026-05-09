@@ -88,7 +88,7 @@ while running:
             print(manager.layers)
             
             if surface is not None:
-                surface.click_at(rpos, player)
+                surface.on_click(rpos, player)
                 
     if not any(isinstance(s, StartScreen) for s in manager.layers):
         if jeopardy_grid is None and not any(isinstance(s, Transition_Surface) for s in manager.layers):
