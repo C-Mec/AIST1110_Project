@@ -5,7 +5,7 @@ Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
-from sources.util import intxy, Font, Color
+from sources.util import intxy, blit_text, Font, Color
 from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
@@ -25,7 +25,9 @@ class Grid_Surface(Base_Surface):
 
         self.grid_dimension = grid_dimension
         self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
-        # self.categories = ["History"]  # For Testing only
+        
+        self.current_popup: Question_Surface = None
+        self.current_cell: tuple[int, int] = None # row, col
 
         self.screen_w, self.screen_h = intxy(dimension)
 
@@ -151,7 +153,23 @@ class Grid_Surface(Base_Surface):
                     }
                     self.grid[row][col][2] = True
             self.bot_wait_until = None
-
+        
+        if self.current_cell:
+            row, col = self.current_cell
+            current_cell = self.grid[row][col] # Mutable reference
+            
+            # When the flashing end, question surface appears
+            if not current_cell[3]:
+                self.current_popup.alpha = 255
+                
+            # When the popup screen is removed
+            if self.current_popup not in manager.layers:
+                
+                # Mark cell as used
+                current_cell[2] = True
+                
+                self.current_cell, self.current_popup = None, None
+            
     def is_flashing(self) -> bool:
         g_width, g_height = intxy(self.grid_dimension)
         return any(self.grid[r][c][3] for r in range(1, g_height) for c in range(g_width))
@@ -174,16 +192,27 @@ class Grid_Surface(Base_Surface):
             print("This question has already been answered.")
             return
 
-        # Mark cell as used
-        self.grid[row][col][2] = True
-
         # Start flash animation (store player color and start time)
-        self.grid[row][col][3] = {
+        flash = {
             "color": player.color, 
             "start": pygame.time.get_ticks(),
             "count": 0,
             "player": player
         }
+        self.grid[row][col][3] = flash
+        
+        popup = Question_Surface(
+            question=question,
+            player=flash["player"],
+            bots=self.players[1:],
+            grid_surface=self
+        )
+        popup.alpha = 0
+        
+        self.current_popup = popup
+        self.current_cell = (row, col)
+        
+        manager.add_surface(popup)
 
     def _get_rowcol(self, rpos: Vec2):
         x, y = intxy(rpos)
@@ -229,38 +258,32 @@ class Grid_Surface(Base_Surface):
 
         draw_categories()
         
+        def draw_cell(row, col):
+            rect, question, used, flash = self.grid[row][col]
+
+            if flash:
+                elapsed = (pygame.time.get_ticks() - flash["start"]) // 200
+
+                if elapsed < 4:
+                    fill_color = flash["color"] if elapsed % 2 == 0 else Color.background
+                
+                if elapsed >= 4:
+                    self.grid[row][col][3] = None
+                    fill_color = Color.greyed if used else Color.background
+            else:
+                fill_color = Color.greyed if used else Color.background
+
+            pygame.draw.rect(self.surface, fill_color, rect)
+            
+            if not used or flash:
+                question.value = row * 200 * self.multiplier
+                
+                blit_text(str(question.value), Font.category_large, Color.text, self.surface, rect.center)
+
+            pygame.draw.rect(self.surface, Color.border, rect, 2)
+        
         for row in range(1, int(self.grid_dimension.x)):
             for col in range(int(self.grid_dimension.y)):
-                rect, question, used, flash = self.grid[row][col]
-
-                if flash:
-                    elapsed = (pygame.time.get_ticks() - flash["start"]) // 200
-
-                    if elapsed < 4:
-                        fill_color = flash["color"] if elapsed % 2 == 0 else Color.background
-                        
-                    else:
-                        popup = Question_Surface(
-                            question=question,
-                            player=flash["player"],
-                            bots=self.players[1:],
-                            grid_surface=self
-                        )
-                        manager.add_surface(popup)
-                        self.grid[row][col][3] = None
-                        fill_color = Color.greyed if used else Color.background
-                else:
-                    fill_color = Color.greyed if used else Color.background
-
-                pygame.draw.rect(self.surface, fill_color, rect)
-                
-                if not used or flash:
-                    question.value = row * 200 * self.multiplier
-                    
-                    text = Font.category_large.render(str(question.value), True, Color.text)
-                    text_rect = text.get_rect(center=rect.center)
-                    self.surface.blit(text, text_rect)
-
-                pygame.draw.rect(self.surface, Color.border, rect, 2)
+                draw_cell(row, col)
 
         screen.blit(self.surface, self.pos)
