@@ -71,7 +71,7 @@ while running:
 
             # Replace old grid with new resized one
             manager.layers = [s for s in manager.layers if not isinstance(s, Grid_Surface)]
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(1, 2), players)
+            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
             manager.add_surface(jeopardy_grid)
 
             # Re-add score overlay in top-right
@@ -105,7 +105,7 @@ while running:
             grid_w, grid_h = screen_w, screen_h
             grid_pos = Vec2(0, 0)
 
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(1, 2), players)
+            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
             manager.add_surface(jeopardy_grid)
 
             score_overlay = ScoreOverlay(players, jeopardy_grid)

@@ -24,8 +24,8 @@ class Grid_Surface(Base_Surface):
         self.turn_index = 0
 
         self.grid_dimension = grid_dimension
-        # self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
-        self.categories = ["History"]
+        self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
+        # self.categories = ["History"]  # For Testing only
 
         self.screen_w, self.screen_h = intxy(dimension)
 
