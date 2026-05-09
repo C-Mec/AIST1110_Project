@@ -59,28 +59,10 @@ while running:
         
         # Handle window resize
         if event.type == pygame.VIDEORESIZE:
-            # Update screen dimension
             config.screen_dimension = (event.w, event.h)
-            main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
-            manager.init(main_screen)
 
-            # Recompute grid with 1/12 buffer
-            screen_w, screen_h = config.screen_dimension
-            buffer_w = screen_w // 12
-            buffer_h = screen_h // 12
-            grid_w = screen_w - 2 * buffer_w
-            grid_h = screen_h - 2 * buffer_h
-            grid_pos = Vec2(buffer_w, buffer_h)
-
-            # Replace old grid with new resized one
-            manager.layers = [s for s in manager.layers if not isinstance(s, Grid_Surface)]
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
-            manager.add_surface(jeopardy_grid)
-
-            # Re-add score overlay in top-right
-            manager.layers = [s for s in manager.layers if not isinstance(s, ScoreOverlay)]
-            score_overlay = ScoreOverlay(players, jeopardy_grid)
-            manager.add_surface(score_overlay)
+            # Let the manager handle resizing
+            manager.resize(config.screen_dimension)
         
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = Vec2(event.pos)

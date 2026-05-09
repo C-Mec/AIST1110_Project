@@ -9,22 +9,30 @@ Vec2 = pygame.Vector2
 
 class FinalJeopardy(Base_Surface):
     def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player]):
+        # Scale to 70% of window size
+        screen_w, screen_h = config.screen_dimension
+        dimension = Vec2(screen_w * 0.7, screen_h * 0.7)
+
+        # Center popup
+        rect = Surface(dimension).get_rect(center=(screen_w // 2, screen_h // 2))
+        pos = Vec2(rect.topleft)
+
         super().__init__(dimension, pos)
+
         self.players = players
         self.category = "PlaceHolder"
         self.clue = "Type answer"
         self.confirmed = False
-        self.input_text = ""   # for human wager entry
+        self.input_text = ""
         self.active_box = False
         self.phase = "wager"
         self.option = ["answer", "Answer", "anwer"]
         self.answer = "What is answer?"
 
-        # Precompute bot wagers
+        # Precompute bot wagers (unchanged)
         sorted_players = sorted(players, key=lambda p: p.score, reverse=True)
         leader = sorted_players[0]
         second = sorted_players[1] if len(sorted_players) > 1 else None
-
         for p in players:
             if p.bot:
                 if p == leader and second:
@@ -34,8 +42,9 @@ class FinalJeopardy(Base_Surface):
                 else:
                     p.wager = p.score
             else:
-                p.wager = 0  # human sets manually
-                
+                p.wager = 0
+
+        # Input boxes relative to popup size
         self.box_rect = Rect(40, 220, 200, 40)
         self.confirm_button = Rect(260, 220, 120, 40)
         self.answer_box = Rect(40, 320, 400, 40)
@@ -201,3 +210,24 @@ class FinalJeopardy(Base_Surface):
             self.surface.blit(btn_text, btn_rect)
 
         screen.blit(self.surface, self.pos)
+        
+    def resize(self, new_dimension: Vec2):
+        # Resize Final Jeopardy popup proportionally to new window size.
+        screen_w, screen_h = intxy(new_dimension)
+
+        # Scale to 70% of window
+        self.dimension = Vec2(screen_w * 0.7, screen_h * 0.7)
+
+        # Recreate surface buffer
+        self.surface = Surface(self.dimension, pygame.SRCALPHA)
+
+        # Center popup
+        rect = self.surface.get_rect(center=(screen_w // 2, screen_h // 2))
+        self.pos = Vec2(rect.topleft)
+        self.rect = rect
+
+        # Recompute input boxes relative to new popup size
+        self.box_rect = Rect(40, 220, 200, 40)
+        self.confirm_button = Rect(260, 220, 120, 40)
+        self.answer_box = Rect(40, 320, 400, 40)
+

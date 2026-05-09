@@ -23,6 +23,16 @@ class StartScreen(Base_Surface):
         # Scale to fit screen
         self.background = pygame.transform.scale(self.background, config.screen_dimension)
 
+    def resize(self, new_dimension: Vec2):
+        # Resize start screen to new window size.
+        self.dimension = new_dimension
+        self.surface = Surface(new_dimension, pygame.SRCALPHA)
+        self.rect = self.surface.get_rect(topleft=Vec2(0, 0))
+
+        # Rescale background to fit new screen
+        self.background = pygame.image.load("assets/Jeopardy-TitleScreen.webp").convert()
+        self.background = pygame.transform.scale(self.background, (int(new_dimension.x), int(new_dimension.y)))
+
     def draw(self, screen: Surface):
         # Draw background image
         self.surface.blit(self.background, (0, 0))

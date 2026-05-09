@@ -52,6 +52,13 @@ class BorderFlash(Base_Surface):
         # Apply alpha
         flash_surface.set_alpha(self.alpha)
         screen.blit(flash_surface, (0, 0))
+    
+    def resize(self, new_dimension: Vec2):
+        # Resize flash surface to new window size
+        self.dimension = new_dimension
+        self.surface = Surface(new_dimension, pygame.SRCALPHA)
+        self.rect = self.surface.get_rect(topleft=self.pos)
+
 
 class Cutscene_Surface(Base_Surface):
     def __init__(self, message: str):
@@ -83,6 +90,13 @@ class Cutscene_Surface(Base_Surface):
                 self.surface.blit(scaled, rect)
 
         screen.blit(self.surface, self.pos)
+    
+    def resize(self, new_dimension: Vec2):
+        # Resize cutscene overlay to new window size
+        self.dimension = new_dimension
+        self.surface = Surface(new_dimension, pygame.SRCALPHA)
+        self.rect = self.surface.get_rect(topleft=self.pos)
+
 
 class Transition_Surface(Base_Surface):
     def __init__(self, mode: str = "jeopardy"):
@@ -141,6 +155,24 @@ class Transition_Surface(Base_Surface):
 
         if elapsed > 4:
             self.fade(128)
+    
+    def resize(self, new_dimension: Vec2):
+        # Resize transition screen and rescale image
+        self.dimension = new_dimension
+        self.surface = Surface(new_dimension, pygame.SRCALPHA)
+        self.rect = self.surface.get_rect(topleft=self.pos)
+
+        # Reload and rescale image to new dimension
+        if self.mode == "double":
+            self.image = pygame.image.load("assets/Jeopardy-DailyDouble.webp").convert_alpha()
+        elif self.mode == "final":
+            self.image = pygame.image.load("assets/Jeopardy-FinalJeopardy.webp").convert_alpha()
+        else:
+            self.image = pygame.image.load("assets/Jeopardy-Jeopardy.webp").convert_alpha()
+
+        self.image = pygame.transform.smoothscale(self.image, (int(new_dimension.x), int(new_dimension.y)))
+        self.image_rect = self.image.get_rect(center=self.rect.center)
+
 
 class FloatingText:
     def __init__(self, player: Player, amount: int):

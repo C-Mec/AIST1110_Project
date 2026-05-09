@@ -117,6 +117,14 @@ class Surface_Manager:
         for base_surface in self.layers:
             base_surface.time_update()
 
+    def resize(self, new_dimension: tuple[int, int]):
+        # Update screen reference and propagate resize to all surfaces
+        self.main_screen = pygame.display.set_mode(new_dimension, pygame.RESIZABLE)
+
+        for surface in self.layers:
+            if hasattr(surface, "resize"):
+                surface.resize(Vec2(*new_dimension))
+                
 # The project-wise global instance of surface manager
 # Needs to be set in main.py
 manager = Surface_Manager()

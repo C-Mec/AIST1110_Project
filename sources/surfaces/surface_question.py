@@ -258,3 +258,36 @@ class Question_Surface(Base_Surface):
 
                         self.stage = ""
                         self.schedule_bot_buzz()
+    
+    def resize(self, new_dimension: Vec2):
+        # Resize popup proportionally to new window size.
+        screen_w, screen_h = intxy(new_dimension)
+
+        # Scale to 70% of window
+        self.dimension = Vec2(screen_w * 0.7, screen_h * 0.7)
+
+        # Recreate surface buffer
+        self.surface = Surface(self.dimension, pygame.SRCALPHA)
+
+        # Center popup
+        rect = self.surface.get_rect(center=(screen_w // 2, screen_h // 2))
+        self.pos = Vec2(rect.topleft)
+        self.rect = rect
+
+        # Recompute buzz button
+        self.buzz_rect = pygame.Rect(self.dimension.x // 2 - 100,
+                                    self.dimension.y // 3,
+                                    200, 60)
+
+        # Recompute option rects
+        self.option_rects = []
+        button_height = 50
+        margin = 20
+        total_height = len(self.question.options) * (button_height + margin) - margin
+        start_y = self.dimension.y - total_height - 40
+        for i in range(len(self.question.options)):
+            rect = pygame.Rect(50,
+                            start_y + i * (button_height + margin),
+                            self.dimension.x - 100,
+                            button_height)
+            self.option_rects.append(rect)

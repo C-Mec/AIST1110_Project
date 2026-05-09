@@ -91,6 +91,52 @@ class Grid_Surface(Base_Surface):
                 )
                 self.grid[row + 1][col] = [rect, q, False, None]
     
+    def _setup_background_and_grid(self):
+        # Load and scale background
+        self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
+        self.background = pygame.transform.smoothscale(self.background, (self.screen_w, self.screen_h))
+
+        # Margins and grid area
+        margin_x = int(self.screen_w * 0.175)
+        margin_y = int(self.screen_h * 0.19)
+        grid_w = self.screen_w - 2 * margin_x
+        grid_h = self.screen_h - 1.75 * margin_y
+        self.grid_area = pygame.Rect(margin_x, margin_y, grid_w, grid_h)
+
+        # Cell dimensions
+        g_width, g_height = intxy(self.grid_dimension)
+        self.cell_dimension = Vec2(
+            round(self.grid_area.width / g_width),
+            round(self.grid_area.height / g_height)
+        )
+    
+    def resize(self, new_dimension: Vec2):
+        # React to change in window dimension.
+        self.dimension = new_dimension
+        self.screen_w, self.screen_h = intxy(new_dimension)
+
+        # Recreate the drawing surface with new size
+        self.surface = Surface(new_dimension, pygame.SRCALPHA)
+        self.rect = self.surface.get_rect(topleft=self.pos)
+
+        # Recompute background and grid area
+        self._setup_background_and_grid()
+
+        # Recompute rects for existing cells
+        g_width, g_height = intxy(self.grid_dimension)
+        c_width, c_height = intxy(self.cell_dimension)
+
+        for row in range(1, g_height):
+            for col in range(g_width):
+                rect = pygame.Rect(
+                    self.grid_area.left + round(col * c_width),
+                    self.grid_area.top + round(row * c_height),
+                    round(c_width),
+                    round(c_height)
+                )
+                if self.grid[row][col]:
+                    self.grid[row][col][0] = rect
+
     def advance_turn(self, correct: bool):
         if correct:
             next_player = self.current_player
