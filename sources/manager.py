@@ -52,6 +52,9 @@ class Base_Surface:
         
     def draw(self, screen: Surface):
         screen.blit(self.surface, self.pos)
+    
+    def update(self):
+        pass
 
     def click_at(self, pos: Vec2, player: Player):
         pass
@@ -94,6 +97,10 @@ class Surface_Manager:
             base_surface.draw(self.main_screen)
         
         pygame.display.flip()
+        
+    def update(self) -> None:
+        for base_surface in self.layers:
+            base_surface.update()
 
 # The project-wise global instance of surface manager
 # Needs to be set in main.py

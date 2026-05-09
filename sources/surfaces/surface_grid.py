@@ -90,7 +90,7 @@ class Grid_Surface(Base_Surface):
 
         self.turn_index = (self.turn_index + 1) % len(self.players)
 
-        if self.players[self.turn_index].is_bot:
+        if self.players[self.turn_index].bot:
             delay_ms = int(random.uniform(750, 1750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
     
@@ -100,7 +100,7 @@ class Grid_Surface(Base_Surface):
 
         self.turn_index = (self.turn_index + 1) % len(self.players)
 
-        if self.players[self.turn_index].is_bot:
+        if self.players[self.turn_index].bot:
             delay_ms = int(random.uniform(750, 1750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
 
@@ -110,7 +110,7 @@ class Grid_Surface(Base_Surface):
         self.turn_index = self.players.index(lowest)
 
         # If it's a bot, schedule delay
-        if lowest.is_bot:
+        if lowest.bot:
             delay_ms = int(random.uniform(750, 1750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
 
@@ -141,7 +141,7 @@ class Grid_Surface(Base_Surface):
         # --- Bot delayed selection ---
         elif self.bot_wait_until and pygame.time.get_ticks() >= self.bot_wait_until:
             current_player = self.players[self.turn_index]
-            if current_player.is_bot:
+            if current_player.bot:
                 g_width, g_height = intxy(self.grid_dimension)
                 available = [
                     (r, c)

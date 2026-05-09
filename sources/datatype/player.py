@@ -1,11 +1,11 @@
 from sources.util import Color
 
 class Player:
-    def __init__(self, name: str, color: tuple[int, int, int], is_bot: bool):
+    def __init__(self, name: str, color: tuple[int, int, int], bot: bool):
         self.name = name
         self.score = 0
         self.color = color  # RGB tuple
-        self.is_bot = is_bot
+        self.bot = bot
         self.overlay = None
 
     def add_score(self, amount: int):

@@ -18,9 +18,10 @@ Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
-import config
 from dotenv import load_dotenv
 load_dotenv()
+
+import config
 from sources.manager import manager
 from sources.datatype.player import init_players
 from sources.surfaces.surface_start import StartScreen
@@ -125,6 +126,9 @@ while running:
 
     # Render all surfaces in manager by their z-axis order
     manager.render()
+    
+    # Update all the surfaces for realtime changes
+    manager.update()
 
     # fps
     clock.tick(60)
