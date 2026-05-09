@@ -45,6 +45,9 @@ manager.add_surface(start_screen)
 
 jeopardy_grid = None
 
+# Pointer
+# pygame.mouse.set_visible(False)
+
 running = True
 while running:
     # poll for events

@@ -73,6 +73,11 @@ class Surface_Manager:
 
         # A stash in which index = z-axis
         self.layers: list[Base_Surface] = []
+        
+        # --- Custom pointer setup ---
+        pointer_img = pygame.image.load("assets/pointer.png").convert_alpha()
+        w, h = pointer_img.get_size()
+        self.pointer_img = pygame.transform.smoothscale(pointer_img, (w // 8, h // 8))
     
     def add_surface(self, base_surface: Base_Surface) -> None: 
         self.layers.append(base_surface)
@@ -100,6 +105,9 @@ class Surface_Manager:
 
         for base_surface in self.layers:
             base_surface.draw(self.main_screen)
+        
+        mx, my = pygame.mouse.get_pos()
+        self.main_screen.blit(self.pointer_img, (mx, my))
         
         pygame.display.flip()
         
