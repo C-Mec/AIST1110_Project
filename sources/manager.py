@@ -6,7 +6,7 @@ Vec2 = pygame.Vector2
 
 import config
 from sources.util import intxy
-from sources.datatype.player import Player
+from sources.datatype.player import generate_players, Player
 from sources.util import Color
 
 class Base_Surface:
@@ -106,6 +106,14 @@ class Surface_Manager:
     def update(self) -> None:
         for base_surface in self.layers:
             base_surface.time_update()
+
+class Game_Manager:
+    players: list[Player] = []
+    
+    @classmethod
+    def init(cls) -> list[Player]:
+        cls.players = generate_players()
+        return cls.players
 
 # The project-wise global instance of surface manager
 # Needs to be set in main.py

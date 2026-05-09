@@ -209,8 +209,6 @@ class Grid_Surface(Base_Surface):
         
         popup = Question_Surface(
             question=question,
-            player=flash["player"],
-            bots=self.players[1:],
             grid_surface=self
         )
         popup.alpha = 0

@@ -22,8 +22,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import config
-from sources.manager import manager
-from sources.datatype.player import init_players
+from sources.manager import manager, Game_Manager
+from sources.datatype.player import generate_players
 from sources.surfaces.surface_start import StartScreen
 from sources.surfaces.surface_grid import Grid_Surface
 from sources.surfaces.overlay import ScoreOverlay
@@ -36,7 +36,7 @@ main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
 manager.init(main_screen)
 
 # Init players
-players = init_players()
+players = Game_Manager.init()
 player = players[0]
 
 # Add start screen before grid

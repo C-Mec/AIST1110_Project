@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):
-    def __init__(self, question: Question, player: Player, bots: list[Player], grid_surface: Grid_Surface):
+    def __init__(self, question: Question, grid_surface: Grid_Surface):
         dimension = Vec2(config.screen_dimension[0] * 0.7,
                          config.screen_dimension[1] * 0.7)  # scale to window
         rect = Surface(dimension).get_rect(center=(config.screen_dimension[0]//2,
@@ -32,16 +32,17 @@ class Question_Surface(Base_Surface):
         
         self.grid_surface = grid_surface
         self.question = question
-        self.player = player
+        self.current_player = None
         self.bots = bots
         
         self.overshade = True
         
         self.stage: Literal[
             "Buzz", 
-            "Timed Answering", 
-            "Non-timed Answering",
-            "Re-buzz"
+            "Answering", 
+            "Timeout Re-buzz",
+            "Wrong Re-buzz",
+            "Re-answering"
         ] = "Buzz"
         
         # Time for it close
@@ -135,7 +136,7 @@ class Question_Surface(Base_Surface):
         
         def draw_buzz_button():
             # Buzz button in player color
-            pygame.draw.rect(self.surface, self.player.color, self.buzz_rect)
+            pygame.draw.rect(self.surface, self.current_player.color, self.buzz_rect)
             pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
             buzz_text = Font.logo_large.render("BUZZ!", True, Color.black)
             self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
@@ -190,12 +191,13 @@ class Question_Surface(Base_Surface):
                 self.surface.blit(text, text.get_rect(center=rect.center))
             
         # Drawing Elements
-        if self.stage == "Timed Answering":
+        if self.stage == "Answering":
             draw_timer(self.session_remaining_time())
             draw_options()
-        elif self.stage == "Non-timed Answering":
+        if self.stage == "Re-buzz":
+            draw_buzz_button()
             draw_options()
-        elif self.stage == "Buzz":
+        if self.stage == "Buzz":
             draw_buzz_button()
 
         screen.blit(self.surface, self.pos)
@@ -220,9 +222,9 @@ class Question_Surface(Base_Surface):
             remaining_time = self.session_remaining_time()
             
             if remaining_time <= 0:
-                self.player.add_score(-self.question.value)
+                self.current_player.add_score(-self.question.value)
                 
-                notify(f"{self.player.name} timed out! -${self.question.value}")
+                notify(f"{self.current_player.name} timed out! -${self.question.value}")
                 
                 self.stage = "Non-timed Answering"
 
@@ -231,30 +233,27 @@ class Question_Surface(Base_Surface):
 
     def on_click(self, pos: Vec2, player: Player):
         if self.stage == "Buzz" and self.buzz_rect.collidepoint(pos):
-            self.stage = "Timed Answering"
+            self.stage = "Answering"
             self.answer_start_time = pygame.time.get_ticks()
             
             # Screen flash in player color
-            manager.add_surface(BorderFlash(self.player))
-            
-        ### Need to prevent multiple scoring
+            manager.add_surface(BorderFlash(self.current_player))
         
-        elif self.stage == "Timed Answering":
+        if self.stage == "Answering":
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(pos):
                     if self.question.answer_index == i:
-                        self.stage = "Non-timed Answering"
-                        self.correctly_answered = True
-                        
                         player.add_score(self.question.value)
                         notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
                         
                         self.close_time = pygame.time.get_ticks() + 1000
                     else:
-                        self.correctly_answered = False
+                        self.stage = "Wrong Re-buzz"
                         
                         player.add_score(-self.question.value)
                         notify(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
 
-                        self.stage = ""
                         self.schedule_bot_buzz()
+        
+        if self.stage == "Wrong Re-buzz" and self.buzz_rect.collidepoint(pos):
+            self.current_player = player
