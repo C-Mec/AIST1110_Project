@@ -124,6 +124,9 @@ class Question_Surface(Base_Surface):
         self.surface.fill(Color.background)
         pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 3)
 
+        # Set alpha
+        self.surface.set_alpha(self.alpha)
+
         # Question text at top
         text = Font.clue_medium.render(self.question.problem, True, Color.text)
         self.surface.blit(text, (30, 30))
