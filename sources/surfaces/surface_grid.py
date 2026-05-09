@@ -10,6 +10,7 @@ from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.surface_question import Question_Surface
+from sources.surfaces.surface_final import FinalJeopardy
 from sources.surfaces.visual import Cutscene_Surface, Transition_Surface
 
 from sources.llm.llm import LLMQuestionGenerator
@@ -23,20 +24,21 @@ class Grid_Surface(Base_Surface):
         self.turn_index = 0
 
         self.grid_dimension = grid_dimension
-        self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
+        # self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
+        self.categories = ["History"]
 
-        screen_w, screen_h = intxy(dimension)
+        self.screen_w, self.screen_h = intxy(dimension)
 
         # Load and scale background to full window
         self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
-        self.background = pygame.transform.smoothscale(self.background, (screen_w, screen_h))
+        self.background = pygame.transform.smoothscale(self.background, (self.screen_w, self.screen_h))
 
         # Define margins so grid sits inside the board frame
-        margin_x = int(screen_w * 0.175)
-        margin_y = int(screen_h * 0.19)
+        margin_x = int(self.screen_w * 0.175)
+        margin_y = int(self.screen_h * 0.19)
 
-        grid_w = screen_w - 2 * margin_x
-        grid_h = screen_h - 1.75 * margin_y
+        grid_w = self.screen_w - 2 * margin_x
+        grid_h = self.screen_h - 1.75 * margin_y
         self.grid_area = pygame.Rect(margin_x, margin_y, grid_w, grid_h)
 
         # Cell dimensions based on inner grid area
@@ -124,9 +126,8 @@ class Grid_Surface(Base_Surface):
                         q.value = row * 200 * self.multiplier
             elif self.multiplier == 2:
                 manager.add_surface(Transition_Surface(mode="final"))
-                for row in range(1, g_height):
-                    for col in range(g_width):
-                        self.grid[row][col][2] = False
+                manager.add_surface(FinalJeopardy(Vec2(self.screen_w, self.screen_h), Vec2(0,0), self.players))
+                manager.remove_surface(self)
 
         # --- Bot delayed selection ---
         elif self.bot_wait_until and pygame.time.get_ticks() >= self.bot_wait_until:

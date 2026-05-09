@@ -28,6 +28,7 @@ from sources.surfaces.surface_start import StartScreen
 from sources.surfaces.surface_grid import Grid_Surface
 from sources.surfaces.overlay import ScoreOverlay
 from sources.surfaces.surface_question import Question_Surface
+from sources.surfaces.surface_final import FinalJeopardy
 from sources.surfaces.visual import Cutscene_Surface, Transition_Surface
 
 # Create a resizable window
@@ -70,7 +71,7 @@ while running:
 
             # Replace old grid with new resized one
             manager.layers = [s for s in manager.layers if not isinstance(s, Grid_Surface)]
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
+            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(1, 2), players)
             manager.add_surface(jeopardy_grid)
 
             # Re-add score overlay in top-right
@@ -89,6 +90,12 @@ while running:
             
             if surface is not None:
                 surface.click_at(rpos, player)
+        
+        if event.type == pygame.KEYDOWN:
+            print(f"Keydown  {event.unicode}")
+            for surface in manager.layers:
+                if isinstance(surface, FinalJeopardy):
+                    surface.handle_event(event)
                 
     if not any(isinstance(s, StartScreen) for s in manager.layers):
         if jeopardy_grid is None and not any(isinstance(s, Transition_Surface) for s in manager.layers):
@@ -98,7 +105,7 @@ while running:
             grid_w, grid_h = screen_w, screen_h
             grid_pos = Vec2(0, 0)
 
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
+            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(1, 2), players)
             manager.add_surface(jeopardy_grid)
 
             score_overlay = ScoreOverlay(players, jeopardy_grid)
@@ -115,14 +122,7 @@ while running:
     ):
         if jeopardy_grid.multiplier == 2 and not jeopardy_grid.bot_wait_until:
             jeopardy_grid.call_lowest_player()
-        # for ft in floating_texts[:]:
-        #     alive = ft.update()
-        #     ft.draw(screen)
-        #     if not alive:
-        #         floating_texts.remove(ft)
         jeopardy_grid.time_update()
-
-
 
     # Render all surfaces in manager by their z-axis order
     manager.render()

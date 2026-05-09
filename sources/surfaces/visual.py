@@ -93,6 +93,8 @@ class Transition_Surface(Base_Surface):
         # Load the correct image depending on mode
         if self.mode == "double":
             self.image = pygame.image.load("assets/Jeopardy-DailyDouble.webp").convert_alpha()
+        elif self.mode == "final":
+            self.image = pygame.image.load("assets/Jeopardy-FinalJeopardy.webp").convert_alpha()
         else:
             self.image = pygame.image.load("assets/Jeopardy-Jeopardy.webp").convert_alpha()
 

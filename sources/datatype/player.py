@@ -7,6 +7,7 @@ class Player:
         self.color = color  # RGB tuple
         self.bot = bot
         self.overlay = None
+        self.wager = 0
 
     def add_score(self, amount: int):
         self.score += amount

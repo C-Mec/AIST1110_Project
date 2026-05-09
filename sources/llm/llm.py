@@ -104,7 +104,7 @@ Return ONLY valid JSON in the following exact structure:
             for cat in categories:
                 row_q.append({
                     "clue": f"Sample clue for {cat}, row {row+1}",
-                    "correct_answer": "Sample answer",
+                    "correct_answer": "Option A",
                     "options": ["Option A", "Option B", "Option C"],
                 })
             board.append(row_q)
