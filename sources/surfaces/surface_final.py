@@ -11,12 +11,14 @@ class FinalJeopardy(Base_Surface):
     def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player]):
         super().__init__(dimension, pos)
         self.players = players
-        self.category = "category"
-        self.clue = "clue"
+        self.category = "PlaceHolder"
+        self.clue = "Type answer"
         self.confirmed = False
         self.input_text = ""   # for human wager entry
         self.active_box = False
         self.phase = "wager"
+        self.option = ["answer", "Answer", "anwer"]
+        self.answer = "What is answer?"
 
         # Precompute bot wagers
         sorted_players = sorted(players, key=lambda p: p.score, reverse=True)
@@ -92,7 +94,33 @@ class FinalJeopardy(Base_Surface):
 
         for p in self.players:
             if p.bot:
-                p.final_answer = random.choice(["correct", "wrong"])
+                # Assign weights: 0.5 for correct, 0.25 for each wrong
+                weights = []
+                for opt in self.option:
+                    if opt == self.correct_option:
+                        weights.append(0.5)
+                    else:
+                        weights.append(0.25)
+
+                p.final_answer = random.choices(self.option, weights, k=1)[0]
+                print(f"{p.name} answered: {p.final_answer}")
+
+        # --- Scoring ---
+        for p in self.players:
+            if p.bot:
+                if p.final_answer == self.correct_option:
+                    p.score += p.wager
+                    print(f"{p.name} correct! +${p.wager}")
+                else:
+                    p.score -= p.wager
+                    print(f"{p.name} wrong! -${p.wager}")
+            else:
+                if human.final_answer.lower() == self.correct_option.lower():
+                    human.score += human.wager
+                    print(f"{human.name} correct! +${human.wager}")
+                else:
+                    human.score -= human.wager
+                    print(f"{human.name} wrong! -${human.wager}")
 
     
     def draw(self, screen: Surface):
@@ -123,6 +151,16 @@ class FinalJeopardy(Base_Surface):
             text_surface = Font.clue_medium.render(self.input_text, True, Color.text)
             self.surface.blit(text_surface, (self.box_rect.x+5, self.box_rect.y+5))
 
+            if self.active_box and not self.confirmed:
+                # Blink every ~500ms
+                if (pygame.time.get_ticks() // 500) % 2 == 0:
+                    caret_x = self.box_rect.x + 5 + text_surface.get_width() + 2
+                    caret_y = self.box_rect.y + 5
+                    caret_height = text_surface.get_height()
+                    pygame.draw.line(self.surface, Color.text,
+                                    (caret_x, caret_y),
+                                    (caret_x, caret_y + caret_height), 2)
+            
             # Confirm button
             self.confirm_button = Rect(260, 220, 120, 40)
             pygame.draw.rect(self.surface, Color.greyed if self.confirmed else Color.white, self.confirm_button)
@@ -140,8 +178,19 @@ class FinalJeopardy(Base_Surface):
             pygame.draw.rect(self.surface, color, self.answer_box, 0)
             pygame.draw.rect(self.surface, Color.border, self.answer_box, 2)
             
-            text_surface = Font.clue_medium.render(self.input_text, True, Color.text)
+            answer_display = f"What is {self.input_text}?"
+            text_surface = Font.clue_medium.render(answer_display, True, Color.text)
             self.surface.blit(text_surface, (self.answer_box.x+5, self.answer_box.y+5))
+            
+            # Caret blinking (answer phase)
+            if self.active_box and not self.confirmed:
+                if (pygame.time.get_ticks() // 500) % 2 == 0:
+                    caret_x = self.answer_box.x + 5 + Font.clue_medium.size(answer_display)[0] + 2
+                    caret_y = self.answer_box.y + 5
+                    caret_height = text_surface.get_height()
+                    pygame.draw.line(self.surface, Color.text,
+                                    (caret_x, caret_y),
+                                    (caret_x, caret_y + caret_height), 2)
             
             # Confirm button
             self.confirm_button = Rect(520, 320, 120, 40)
