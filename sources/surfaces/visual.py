@@ -140,5 +140,37 @@ class Transition_Surface(Base_Surface):
         if elapsed > 4:
             self.fade(128)
 
+class FloatingText:
+    def __init__(self, player: Player, amount: int):
+        self.player = player
+        self.amount = amount
+        self.color = player.color
+        self.font = player.overlay.font
+        self.alpha = 255
+        self.start_time = pygame.time.get_ticks()
+        self.duration = 1500  # ms lifetime
+
+        # Get starting position directly from overlay
+        score_rect = player.overlay.get_score_rect(player)
+        self.pos = Vec2(score_rect.right, score_rect.centery)
+
+        self.direction = "up" if amount > 0 else "down"
+
+    def update(self):
+        elapsed = pygame.time.get_ticks() - self.start_time
+        progress = elapsed / self.duration
+        self.pos.y += -0.3 if self.direction == "up" else 0.3
+        self.alpha = max(0, 255 * (1 - progress))
+        return progress < 1.0
+
+    def draw(self, surface: Surface):
+        text = f"{'+' if self.amount > 0 else ''}{self.amount}"
+        render = self.font.render(text, True, self.color)
+        render.set_alpha(int(self.alpha))
+        rect = render.get_rect()
+        rect.centery = int(self.pos.y)
+        rect.right = int(self.pos.x)  # keep right aligned
+        surface.blit(render, rect)
+
 def notify(message: str) -> None:
     manager.add_surface(Cutscene_Surface(message))

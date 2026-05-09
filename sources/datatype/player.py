@@ -6,9 +6,13 @@ class Player:
         self.score = 0
         self.color = color  # RGB tuple
         self.is_bot = is_bot
+        self.overlay = None
 
     def add_score(self, amount: int):
         self.score += amount
+        if self.overlay:
+            self.overlay.spawn_floating_text(self, amount)
+        
         
 def init_players():
     # Create a human player

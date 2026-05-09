@@ -86,7 +86,7 @@ class Question_Surface(Base_Surface):
         delay = random.uniform(750, 1500)
         self.bot_buzz_time = pygame.time.get_ticks() + int(delay)
         self.bot_pending = (bot, choice)
-    
+
     def bot_try_answer(self, bot: Player, choice: int):
         # Flash immediately when buzz happens
         manager.add_surface(BorderFlash(bot))
@@ -100,11 +100,13 @@ class Question_Surface(Base_Surface):
 
         if choice == self.question.answer_index:
             bot.add_score(self.question.value)
+            
             print(f"{bot.name} answered correctly! +${self.question.value}")
             self.correct_option_index = choice
             self.close_time = pygame.time.get_ticks() + 1000
         else:
             bot.add_score(-self.question.value)
+            
             self.wrong_option_indices.add(choice)
             print(f"{bot.name} answered wrong! -${self.question.value}")
 
@@ -138,11 +140,11 @@ class Question_Surface(Base_Surface):
 
                 # Filled pie slice shrinking
                 angle = 360 * (remaining / self.duration)
-                end_angle = -90 + angle
+                end_angle = -90 - angle
 
                 points = [center]  # start at circle center
                 steps = 50  # number of segments for smoothness
-                for a in range(-90, int(end_angle), int(angle/steps) or 1):
+                for a in range(-90, int(end_angle), -max(1, int(angle/steps))):
                     rad = math.radians(a)
                     x = center[0] + radius * math.cos(rad)
                     y = center[1] + radius * math.sin(rad)

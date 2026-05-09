@@ -114,7 +114,13 @@ while running:
     ):
         if jeopardy_grid.multiplier == 2 and not jeopardy_grid.bot_wait_until:
             jeopardy_grid.call_lowest_player()
+        # for ft in floating_texts[:]:
+        #     alive = ft.update()
+        #     ft.draw(screen)
+        #     if not alive:
+        #         floating_texts.remove(ft)
         jeopardy_grid.update()
+
 
 
     # Render all surfaces in manager by their z-axis order
