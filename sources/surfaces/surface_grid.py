@@ -92,7 +92,13 @@ class Grid_Surface(Base_Surface):
                 self.grid[row + 1][col] = [rect, q, False, None]
     
     def advance_turn(self, correct: bool):
-        next_player = random.choice(list(set(self.players) - set([self.current_player]))) if not correct else self.current_player
+        if correct:
+            next_player = self.current_player
+        else:
+            other_players = [p for p in self.players if p is not self.current_player]
+            next_player = random.choice(other_players)
+
+        self.current_player = next_player
 
         if next_player.bot:
             # The time for cutsence is added here (manually)

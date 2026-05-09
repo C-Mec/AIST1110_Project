@@ -40,7 +40,8 @@ class Question_Surface(Base_Surface):
         self.stage: Literal[
             "Buzz", 
             "Timed Answering", 
-            "Non-timed Answering"
+            "Non-timed Answering",
+            "Re-buzz"
         ] = "Buzz"
         
         # Time for it close
@@ -98,18 +99,16 @@ class Question_Surface(Base_Surface):
         manager.add_surface(BorderFlash(bot))
 
         self.submitted_answers.append((bot, choice))
-        self.timer_isActive = False
+        self.stage = "Non-timed Answering"
 
         if choice == self.question.answer_index:
             bot.add_score(self.question.value)
             
             print(f"{bot.name} answered correctly! +${self.question.value}")
-            self.correct_option_index = choice
             self.close_time = pygame.time.get_ticks() + 1000
         else:
             bot.add_score(-self.question.value)
             
-            self.wrong_option_indices.add(choice)
             print(f"{bot.name} answered wrong! -${self.question.value}")
 
             self.schedule_bot_buzz()
@@ -243,9 +242,8 @@ class Question_Surface(Base_Surface):
         elif self.stage == "Timed Answering":
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(pos):
-                    self.stage = "Non-timed Answering"
-                    
                     if self.question.answer_index == i:
+                        self.stage = "Non-timed Answering"
                         self.correctly_answered = True
                         
                         player.add_score(self.question.value)
@@ -258,4 +256,5 @@ class Question_Surface(Base_Surface):
                         player.add_score(-self.question.value)
                         notify(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
 
+                        self.stage = ""
                         self.schedule_bot_buzz()
