@@ -45,9 +45,9 @@ class ScoreOverlay(Base_Surface):
             # --- Background strip under both (draw first) ---
             bg_rect = Rect(
                 name_rect.left - 5,
-                name_rect.top,
+                name_rect.top - 2,
                 (score_rect.right - name_rect.left) + 10,
-                max(name_rect.height, score_rect.height)
+                max(name_rect.height, score_rect.height) + 2
             )
             pygame.draw.rect(self.surface, (0, 0, 0, 128), bg_rect)
 

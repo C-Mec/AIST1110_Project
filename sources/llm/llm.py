@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv(encoding='utf-16')
+load_dotenv()
 AZURE_API_KEY = os.getenv("AZURE_API_KEY")
 assert AZURE_API_KEY, "Missing AZURE_API_KEY in .env"
 
