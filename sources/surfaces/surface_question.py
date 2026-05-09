@@ -25,10 +25,6 @@ class Question_Surface(Base_Surface):
         super().__init__(dimension, pos)
         self.grid = grid
         
-        self.option_border_color = Color.border
-        self.selected_options = None
-        self.correct_option_index = None
-        self.wrong_option_indices = set()
         self.close_time = None
 
         self.overshade = True
@@ -45,11 +41,9 @@ class Question_Surface(Base_Surface):
         self.answer_start_time = None
         self.answer_duration = 5
         
-        # Bot
-        self.bot_pending = None
-        self.bot_buzz_time = None
-        self.bots_answered = set()
-        
+        # Bot Answering
+        self.bot_pending: tuple[Player, int] = None
+        self.bot_buzz_time: int = None
         self.submitted_answers: list[tuple[Player, int]] = None
 
         # Options: compute dynamically
@@ -63,7 +57,7 @@ class Question_Surface(Base_Surface):
                                dimension.x - 100, button_height)
             self.option_rects.append(rect)
 
-    def schedule_bot_buzz(self):
+    def schedule_bot_buzz(self) -> None:
         bot_answered = set(map(lambda x: x[0], filter(lambda x: x[0].bot, self.submitted_answers)))
         bot_not_answered = set(self.bots) - bot_answered
         
@@ -88,11 +82,7 @@ class Question_Surface(Base_Surface):
         # Flash immediately when buzz happens
         manager.add_surface(BorderFlash(bot))
 
-        # mark bot as used
-        self.bots_answered.add(bot)
-
-        # apply choice
-        self.selected_options = choice
+        self.submitted_answers.append((bot, choice))
         self.timer_isActive = False
 
         if choice == self.question.answer_index:
@@ -191,9 +181,10 @@ class Question_Surface(Base_Surface):
         # Resolve pending bot answer after 1s
         if self.bot_pending and self.bot_buzz_time and pygame.time.get_ticks() >= self.bot_buzz_time:
             bot, choice = self.bot_pending
+            self.bot_try_answer(bot, choice)
+            
             self.bot_pending = None
             self.bot_buzz_time = None
-            self.bot_try_answer(bot, choice)
     
         # Kill surface after 1s delay
         if self.close_time and pygame.time.get_ticks() >= self.close_time:
@@ -209,34 +200,8 @@ class Question_Surface(Base_Surface):
             
             self.timer_active = False
 
-            # Let a bot try to answer
-            if self.bots:
-                available_bots = [b for b in self.bots if b not in self.bots_answered]
-                if not available_bots:
-                    return
-
-                bot = random.choice(available_bots)
-
-                # Decide choice now
-                remaining_time = [i for i in range(len(self.question.options))
-                            if i != self.selected_options]
-                if not remaining_time:
-                    return
-
-                correct_index = self.question.answer_index
-                if len(remaining_time) == 1:
-                    choice = correct_index
-                elif len(remaining_time) == 2:
-                    choice = correct_index if random.random() < 0.7 else [i for i in remaining_time if i != correct_index][0]
-                else:
-                    choice = correct_index if random.random() < 0.5 else random.choice([i for i in remaining_time if i != correct_index])
-
-                # Schedule buzz between 0.75–3s later
-                delay = random.uniform(750, 1750)
-                self.bot_buzz_time = pygame.time.get_ticks() + int(delay)
-
-                # Store both bot and choice
-                self.bot_pending = (bot, choice)
+            # Setup the next bot and its answer
+            self.schedule_bot_buzz()
 
     def click_at(self, pos: Vec2, player: Player):
         if not self.buzzed and self.buzz_rect.collidepoint(pos):
