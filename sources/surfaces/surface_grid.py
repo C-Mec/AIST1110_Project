@@ -22,7 +22,6 @@ class Grid_Surface(Base_Surface):
         self.bot_wait_until = None
         self.turn_index = 0
 
-        self.font = Font.large
         self.grid_dimension = grid_dimension
         self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
 
@@ -239,7 +238,7 @@ class Grid_Surface(Base_Surface):
             )
             pygame.draw.rect(self.surface, Color.background, rect)
             pygame.draw.rect(self.surface, Color.border, rect, 2)
-            text = self.font.render(category, True, Color.white)
+            text = Font.category_medium.render(category, True, Color.white)
             text_rect = text.get_rect(center=rect.center)
             self.surface.blit(text, text_rect)
 
@@ -271,7 +270,7 @@ class Grid_Surface(Base_Surface):
                 pygame.draw.rect(self.surface, fill_color, rect)
                 if not used or flash:
                     question.value = row * 200 * self.multiplier
-                    text = self.font.render(str(question.value), True, Color.text)
+                    text = Font.category_large.render(str(question.value), True, Color.text)
                     text_rect = text.get_rect(center=rect.center)
                     self.surface.blit(text, text_rect)
 

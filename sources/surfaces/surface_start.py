@@ -16,7 +16,7 @@ class StartScreen(Base_Surface):
         super().__init__(dimension)
 
         self.overshade = True  # blocks interaction until dismissed
-        self.info_font = Font.large
+        self.info_font = Font.logo_large
 
         # Load the Jeopardy title image
         self.background = pygame.image.load("assets/Jeopardy-TitleScreen.webp").convert()

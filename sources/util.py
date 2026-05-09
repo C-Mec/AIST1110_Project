@@ -11,16 +11,30 @@ import config
 def intxy(vec: Vec2) -> tuple[int, int]:
     return round(vec.x), round(vec.y)
 
-def font(size: int) -> pygame.font.Font:
-    # Use width for auto-scaling
-    size = round(size * (config.screen_dimension.x / 1280))
-    return pygame.font.Font(None, size)
+def make_font(path: str, size: int) -> pygame.font.Font:
+    """Load a font file and auto-scale based on screen width."""
+    scaled_size = round(size * (config.screen_dimension.x / 1280))
+    return pygame.font.Font(path, scaled_size)
 
 class Font:
-    small = font(24)
-    large = font(36)
-    extralarge = font(72)
-    medium = font(28)
+    # Define paths to your font files
+    swiss911 = "assets/fonts/Swiss 911 Compressed Regular.otf"
+    korinna  = "assets/fonts/itc-korinna-std/ITC Korinna Regular.otf"
+    gyparody = "assets/fonts/gyparody.ttf"
+
+    # Category / board values
+    category_small  = make_font(swiss911, 24)
+    category_medium = make_font(swiss911, 36)
+    category_large  = make_font(swiss911, 60)
+
+    # Clue text
+    clue_small  = make_font(korinna, 24)
+    clue_medium = make_font(korinna, 28)
+    clue_large  = make_font(korinna, 36)
+
+    # Logo / transitions
+    logo_large = make_font(gyparody, 72)
+    logo_huge  = make_font(gyparody, 120)
     
 class Color:
     border = "#000000"   #"#FFFFFF"

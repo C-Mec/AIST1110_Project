@@ -7,7 +7,7 @@ Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
 import config
-from sources.util import font, Color, Font
+from sources.util import Color, Font
 from sources.manager import manager, Base_Surface
 from sources.datatype.player import Player
 

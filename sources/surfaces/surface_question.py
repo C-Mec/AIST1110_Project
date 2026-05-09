@@ -119,14 +119,14 @@ class Question_Surface(Base_Surface):
         pygame.draw.rect(self.surface, Color.border, self.surface.get_rect(), 3)
 
         # Question text at top
-        text = Font.medium.render(self.question.problem, True, Color.text)
+        text = Font.clue_medium.render(self.question.problem, True, Color.text)
         self.surface.blit(text, (30, 30))
         
         if not self.buzzed:
             # Buzz button in player color
             pygame.draw.rect(self.surface, self.player.color, self.buzz_rect)
             pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
-            buzz_text = Font.small.render("BUZZ!", True, Color.black)
+            buzz_text = Font.logo_large.render("BUZZ!", True, Color.black)
             self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
         else:
             if self.timer_active:
@@ -154,7 +154,7 @@ class Question_Surface(Base_Surface):
                 pygame.draw.circle(self.surface, Color.border, center, radius, 2)
 
                 # Seconds remaining in middle
-                sec_text = Font.large.render(str(int(remaining)), True, Color.text)
+                sec_text = Font.clue_large.render(str(int(remaining)), True, Color.text)
                 self.surface.blit(sec_text, sec_text.get_rect(center=center))
 
                 if remaining <= 0:
@@ -206,7 +206,7 @@ class Question_Surface(Base_Surface):
                 pygame.draw.rect(self.surface, border_color, rect, 2)
 
                 option_text = f"{chr(65+i)}. {self.question.answer[i]}"
-                text = Font.small.render(option_text, True, Color.text)
+                text = Font.clue_small.render(option_text, True, Color.text)
                 self.surface.blit(text, text.get_rect(center=rect.center))
 
         # Resolve pending bot answer after 1s

@@ -22,7 +22,7 @@ class ScoreOverlay(Base_Surface):
 
         self.players = players
         self.grid = grid
-        self.font = Font.small
+        self.font = Font.category_small
         self.floating_texts = []
 
         # give each player a reference back to this overlay
