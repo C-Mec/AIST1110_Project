@@ -75,10 +75,10 @@ class Question_Surface(Base_Surface):
         
         ### Handle Empty Robot Case
         
-        bot = random.choice(bot_not_answered)
+        bot = random.choice(list(bot_not_answered))
         
         correct_index = self.question.answer_index
-        wrong_index = random.choice(set(i for i in range(3)) - set(map(lambda x: x[1], self.submitted_answers)))
+        wrong_index = random.choice(list(set(i for i in range(3)) - set(map(lambda x: x[1], self.submitted_answers))))
 
         if random.random() < config.bot_skill:
             choice = correct_index
