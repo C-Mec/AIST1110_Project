@@ -1,7 +1,7 @@
-import pygame, random
+import pygame, random, config
 from sources.manager import manager, Base_Surface
 from sources.datatype.player import Player
-from sources.util import Font, Color
+from sources.util import Font, Color, intxy
 
 Surface = pygame.Surface
 Rect = pygame.Rect
@@ -9,13 +9,15 @@ Vec2 = pygame.Vector2
 
 class FinalJeopardy(Base_Surface):
     def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player]):
-        # Scale to 70% of window size
         screen_w, screen_h = config.screen_dimension
-        dimension = Vec2(screen_w * 0.7, screen_h * 0.7)
+        margin_x = int(screen_w * 0.18)
+        margin_y = int(screen_h * 0.195)
 
-        # Center popup
-        rect = Surface(dimension).get_rect(center=(screen_w // 2, screen_h // 2))
-        pos = Vec2(rect.topleft)
+        grid_w = screen_w - 2 * margin_x
+        grid_h = screen_h - 1.8 * margin_y
+
+        dimension = Vec2(grid_w, grid_h)
+        pos = Vec2(margin_x, margin_y)
 
         super().__init__(dimension, pos)
 
@@ -27,7 +29,11 @@ class FinalJeopardy(Base_Surface):
         self.active_box = False
         self.phase = "wager"
         self.option = ["answer", "Answer", "anwer"]
-        self.answer = "What is answer?"
+        self.correct_option = "What is answer?"
+        
+        self.screen_w, self.screen_h = intxy(config.screen_dimension)
+        self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
+        self.background = pygame.transform.smoothscale(self.background, (self.screen_w, self.screen_h))
 
         # Precompute bot wagers (unchanged)
         sorted_players = sorted(players, key=lambda p: p.score, reverse=True)
@@ -61,7 +67,7 @@ class FinalJeopardy(Base_Surface):
             else:
                 self.input_text += event.unicode
 
-    def click_at(self, pos, player):
+    def on_click(self, pos, player):
         if self.phase == "wager":
             if self.box_rect.collidepoint(pos):
                 self.active_box = True
@@ -80,7 +86,6 @@ class FinalJeopardy(Base_Surface):
             if self.confirm_button.collidepoint(pos):
                 self._lock_answer()
         
-                
     def _confirm_wager(self):
         try:
             human = next(p for p in self.players if not p.bot)
@@ -97,7 +102,7 @@ class FinalJeopardy(Base_Surface):
 
     def _lock_answer(self):
         human = next(p for p in self.players if not p.bot)
-        human.final_answer = self.input_text.strip()
+        human.final_answer = f"What is {self.input_text.strip()}?"
         self.confirmed = True
         print(f"{human.name} answered: {human.final_answer}")
 
@@ -133,10 +138,11 @@ class FinalJeopardy(Base_Surface):
 
     
     def draw(self, screen: Surface):
+        screen.blit(self.background, (2, 0))
         self.surface.fill(Color.background)
 
         # Title
-        title = Font.logo_large.render("Final Jeopardy", True, Color.text)
+        title = Font.logo_large.render("Final Jeopardy!", True, Color.text)
         self.surface.blit(title, (self.surface.get_width()//2 - title.get_width()//2, 20))
 
         # Category
@@ -165,7 +171,7 @@ class FinalJeopardy(Base_Surface):
                 if (pygame.time.get_ticks() // 500) % 2 == 0:
                     caret_x = self.box_rect.x + 5 + text_surface.get_width() + 2
                     caret_y = self.box_rect.y + 5
-                    caret_height = text_surface.get_height()
+                    caret_height = text_surface.get_height() - 3
                     pygame.draw.line(self.surface, Color.text,
                                     (caret_x, caret_y),
                                     (caret_x, caret_y + caret_height), 2)
@@ -194,7 +200,7 @@ class FinalJeopardy(Base_Surface):
             # Caret blinking (answer phase)
             if self.active_box and not self.confirmed:
                 if (pygame.time.get_ticks() // 500) % 2 == 0:
-                    caret_x = self.answer_box.x + 5 + Font.clue_medium.size(answer_display)[0] + 2
+                    caret_x = self.answer_box.x + Font.clue_medium.size(answer_display)[0] - 7
                     caret_y = self.answer_box.y + 5
                     caret_height = text_surface.get_height()
                     pygame.draw.line(self.surface, Color.text,
@@ -212,22 +218,24 @@ class FinalJeopardy(Base_Surface):
         screen.blit(self.surface, self.pos)
         
     def resize(self, new_dimension: Vec2):
-        # Resize Final Jeopardy popup proportionally to new window size.
         screen_w, screen_h = intxy(new_dimension)
 
-        # Scale to 70% of window
-        self.dimension = Vec2(screen_w * 0.7, screen_h * 0.7)
+        # Match grid: recompute margins and grid area
+        margin_x = int(screen_w * 0.18)
+        margin_y = int(screen_h * 0.195)
+        grid_w = screen_w - 2 * margin_x
+        grid_h = screen_h - 1.8 * margin_y
+        self.grid_area = pygame.Rect(margin_x, margin_y, grid_w, grid_h)
 
-        # Recreate surface buffer
+        # Update dimension and position to match grid_area
+        self.dimension = Vec2(grid_w, grid_h)
         self.surface = Surface(self.dimension, pygame.SRCALPHA)
+        self.pos = Vec2(self.grid_area.topleft)
+        self.rect = self.surface.get_rect(topleft=self.pos)
 
-        # Center popup
-        rect = self.surface.get_rect(center=(screen_w // 2, screen_h // 2))
-        self.pos = Vec2(rect.topleft)
-        self.rect = rect
+        # --- Rescale background to full window ---
+        self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
+        self.background = pygame.transform.smoothscale(self.background, (screen_w, screen_h))
 
-        # Recompute input boxes relative to new popup size
-        self.box_rect = Rect(40, 220, 200, 40)
-        self.confirm_button = Rect(260, 220, 120, 40)
-        self.answer_box = Rect(40, 320, 400, 40)
+
 

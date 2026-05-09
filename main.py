@@ -44,6 +44,8 @@ start_screen = StartScreen()
 manager.add_surface(start_screen)
 
 jeopardy_grid = None
+score_overlay = None
+final_surface = None
 
 # Pointer
 pygame.mouse.set_visible(False)
@@ -64,7 +66,7 @@ while running:
             # Let the manager handle resizing
             manager.resize(config.screen_dimension)
         
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left Click
             pos = Vec2(event.pos)
 
             surface, rpos = manager.get_top_collision(pos)
@@ -97,6 +99,11 @@ while running:
             manager.add_surface(score_overlay)
 
             manager.add_surface(Transition_Surface(mode="jeopardy"))
+            
+            # # testing only
+            # if final_surface is None:
+            #     final_surface = FinalJeopardy(Vec2(screen_w, screen_h), Vec2(0, 0), players)
+            #     manager.add_surface(final_surface)
     
     if (
         jeopardy_grid
