@@ -90,20 +90,20 @@ while running:
                 surface.click_at(rpos, player)
                 
     if not any(isinstance(s, StartScreen) for s in manager.layers):
-        
         if jeopardy_grid is None and not any(isinstance(s, Transition_Surface) for s in manager.layers):
             screen_w, screen_h = config.screen_dimension
-            buffer_w, buffer_h = screen_w // 12, screen_h // 12
-            grid_w, grid_h = screen_w - 2 * buffer_w, screen_h - 2 * buffer_h
-            grid_pos = Vec2(buffer_w, buffer_h)
+
+            # Grid should cover the whole window, aligned with background
+            grid_w, grid_h = screen_w, screen_h
+            grid_pos = Vec2(0, 0)
 
             jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
             manager.add_surface(jeopardy_grid)
 
             score_overlay = ScoreOverlay(players, jeopardy_grid)
             manager.add_surface(score_overlay)
-            
-            manager.add_surface(Transition_Surface("JEOPARDY!", mode="jeopardy"))
+
+            manager.add_surface(Transition_Surface(mode="jeopardy"))
     
     if (
         jeopardy_grid

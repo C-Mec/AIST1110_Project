@@ -67,9 +67,9 @@ class ScoreOverlay(Base_Surface):
                 name_rect.left - 5,
                 name_rect.top - 2,
                 (score_rect.right - name_rect.left) + 10,
-                max(name_rect.height, score_rect.height) + 2
+                max(name_rect.height, score_rect.height) + 4
             )
-            pygame.draw.rect(self.surface, (0, 0, 0, 128), bg_rect)
+            pygame.draw.rect(self.surface, (0, 0, 0, 200), bg_rect)
 
             # blit text
             self.surface.blit(name_render, name_rect)

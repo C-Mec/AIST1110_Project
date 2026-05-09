@@ -85,28 +85,28 @@ class Cutscene_Surface(Base_Surface):
         screen.blit(self.surface, self.pos)
 
 class Transition_Surface(Base_Surface):
-    def __init__(self, message: str, mode: str = "jeopardy"):
+    def __init__(self, mode: str = "jeopardy"):
         super().__init__(Vec2(*config.screen_dimension), Vec2(0, 0))
-        self.message = message
         self.mode = mode.lower()
         self.create_time = pygame.time.get_ticks()
 
-        # Pre-render text
-        self.font = pygame.font.Font(None, 96)
-        self.text_surface = self.font.render(self.message, True, Color.text)
-        self.text_rect = self.text_surface.get_rect(center=self.rect.center)
+        # Load the correct image depending on mode
+        if self.mode == "double":
+            self.image = pygame.image.load("assets/Jeopardy-DailyDouble.webp").convert_alpha()
+        else:
+            self.image = pygame.image.load("assets/Jeopardy-Jeopardy.webp").convert_alpha()
+
+        # Scale image to full screen
+        self.image = pygame.transform.smoothscale(self.image, config.screen_dimension)
+        self.image_rect = self.image.get_rect(center=self.rect.center)
 
     def _bounce(self, t: float) -> int:
         bounce_period = 0.6
         bounce_index = int(t // bounce_period) + 1
         local_t = (t % bounce_period) / bounce_period
 
-        # Height decays exponentially with bounce index
         amplitude = 200 * (0.5 ** bounce_index)
-
-        # Parabolic arc: starts at baseline (0), peaks at amplitude, returns to baseline
         y = amplitude * (1 - (2 * local_t - 1) ** 2)
-
         return int(y)
 
     def draw(self, screen: Surface):
@@ -123,7 +123,7 @@ class Transition_Surface(Base_Surface):
         elif self.mode in ("jeopardy", "double"):
             # Bounce above baseline
             t = elapsed - 1.0
-            y_offset = -self._bounce(t)   # negative so it goes upward only
+            y_offset = -self._bounce(t)
         elif self.mode == "final":
             # Drop then shake
             if elapsed < 1.6:
@@ -132,11 +132,11 @@ class Transition_Surface(Base_Surface):
                 t = elapsed - 1.6
                 x_offset = int(20 * math.sin(25 * t))
 
-        rect = self.text_surface.get_rect(center=(self.rect.centerx + x_offset,
-                                                  self.rect.centery + y_offset))
-        self.surface.blit(self.text_surface, rect)
+        rect = self.image.get_rect(center=(self.rect.centerx + x_offset,
+                                           self.rect.centery + y_offset))
+        self.surface.blit(self.image, rect)
         screen.blit(self.surface, self.pos)
-        
+
         if elapsed > 4:
             self.fade(128)
 

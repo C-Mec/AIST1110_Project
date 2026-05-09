@@ -17,63 +17,73 @@ from sources.llm.llm import LLMQuestionGenerator
 class Grid_Surface(Base_Surface):
     def __init__(self, dimension: Vec2, pos: Vec2, grid_dimension: Vec2, players: list[Player]):
         super().__init__(dimension, pos)
-        
+
         self.players = players
         self.bot_wait_until = None
         self.turn_index = 0
-        
+
         self.font = Font.large
         self.grid_dimension = grid_dimension
         self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
-        
+
+        screen_w, screen_h = intxy(dimension)
+
+        # Load and scale background to full window
+        self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
+        self.background = pygame.transform.smoothscale(self.background, (screen_w, screen_h))
+
+        # Define margins so grid sits inside the board frame
+        margin_x = int(screen_w * 0.175)
+        margin_y = int(screen_h * 0.19)
+
+        grid_w = screen_w - 2 * margin_x
+        grid_h = screen_h - 1.75 * margin_y
+        self.grid_area = pygame.Rect(margin_x, margin_y, grid_w, grid_h)
+
+        # Cell dimensions based on inner grid area
         g_width, g_height = intxy(grid_dimension)
-        width, height = intxy(self.dimension)
         self.cell_dimension = Vec2(
-            round(width / g_width),
-            round(height / g_height)
+            round(self.grid_area.width / g_width),
+            round(self.grid_area.height / g_height)
         )
-        self.question_gen = LLMQuestionGenerator()   # Initialize LLM question generator
+
+        self.question_gen = LLMQuestionGenerator()
         self.multiplier = 1
         self._grid_init()
 
     def _grid_init(self):
         g_width, g_height = intxy(self.grid_dimension)
         c_width, c_height = intxy(self.cell_dimension)
-        
-        # First row is for category titles, so actual question rows = g_height - 1
-        num_cols = g_width      # number of categories (columns)
-        num_rows = g_height - 1 # number of question rows (e.g., 5)
-        
-        # Generate questions via LLM, returns board_data[question_row][category_col]
+
+        num_cols = g_width
+        num_rows = g_height - 1
+
         board_data = self.question_gen.generate_board(self.categories, rows=num_rows)
-        
         while len(board_data) < num_rows:
             board_data.append([{"clue":"Placeholder","options":["A"],"correct_answer":"A"} for _ in range(num_cols)])
         for r in range(num_rows):
             while len(board_data[r]) < num_cols:
                 board_data[r].append({"clue":"Placeholder","options":["A"],"correct_answer":"A"})
-        
-        # Initialize grid: [row][col] where row=0 is category row (empty for questions)
+
         self.grid = [[None for _ in range(g_width)] for _ in range(g_height)]
-        
-        # Fill question cells (skip row 0)
+
         for row in range(num_rows):
             for col in range(num_cols):
                 rect = pygame.Rect(
-                    round(col * c_width),
-                    round((row + 1) * c_height),   # shift one row down for category header
+                    self.grid_area.left + round(col * c_width),
+                    self.grid_area.top + round((row + 1) * c_height),
                     round(c_width),
                     round(c_height)
                 )
                 value = (row + 1) * 200
-                q_data = board_data[row][col]       # get clue, correct_answer, options
+                q_data = board_data[row][col]
                 q = Question(
                     problem=q_data["clue"],
                     options=q_data["options"],
                     answer_ind=q_data["options"].index(q_data["correct_answer"]),
                     value=value
                 )
-                self.grid[row + 1][col] = [rect, q, False, None]   # store rectangle, question, used flag, flash
+                self.grid[row + 1][col] = [rect, q, False, None]
     
     def advance_turn(self):
         if any(isinstance(s, Transition_Surface) for s in manager.layers):
@@ -116,7 +126,7 @@ class Grid_Surface(Base_Surface):
         all_used = all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
         if all_used:
             if self.multiplier == 1:
-                manager.add_surface(Transition_Surface("DOUBLE JEOPARDY!", mode="double"))
+                manager.add_surface(Transition_Surface(mode="double"))
                 self.multiplier = 2
                 for row in range(1, g_height):
                     for col in range(g_width):
@@ -124,7 +134,7 @@ class Grid_Surface(Base_Surface):
                         self.grid[row][col][2] = False
                         q.value = row * 200 * self.multiplier
             elif self.multiplier == 2:
-                manager.add_surface(Transition_Surface("FINAL JEOPARDY!", mode="final"))
+                manager.add_surface(Transition_Surface(mode="final"))
                 for row in range(1, g_height):
                     for col in range(g_width):
                         self.grid[row][col][2] = False
@@ -195,43 +205,57 @@ class Grid_Surface(Base_Surface):
     def _get_rowcol(self, rpos: Vec2):
         x, y = intxy(rpos)
         c_width, c_height = intxy(self.cell_dimension)
-        
-        col = x // c_width
-        row = y // c_height - 1
-        
+
+        # Adjust for grid_area offset
+        rel_x = x - self.grid_area.left
+        rel_y = y - self.grid_area.top
+
+        # Category row was shifted upward, so compensate
+        category_offset = -20   # same value you used in draw
+        rel_y -= category_offset
+
+        # If click is outside the grid area, return invalid
+        if rel_x < 0 or rel_y < 0:
+            return -1, -1
+
+        col = rel_x // c_width
+        row = rel_y // c_height - 1   # subtract 1 because row 0 is category header
+
         return row, col
     
     def draw(self, screen: Surface):
-        # Draw category row (row 0)
+        # Draw full background first
+        self.surface.blit(self.background, (2, 0))
+
         c_width, c_height = intxy(self.cell_dimension)
+
+        # Category row
         for col, category in enumerate(self.categories):
             rect = pygame.Rect(
-                round(col * c_width),
-                0,
+                self.grid_area.left + round(col * c_width),
+                self.grid_area.top - 5,
                 round(c_width),
                 round(c_height)
             )
             pygame.draw.rect(self.surface, Color.background, rect)
             pygame.draw.rect(self.surface, Color.border, rect, 2)
-            text = self.font.render(category, True, Color.text)
+            text = self.font.render(category, True, Color.white)
             text_rect = text.get_rect(center=rect.center)
             self.surface.blit(text, text_rect)
 
         g_width, g_height = intxy(self.grid_dimension)
-        # Draw question cells (skip row 0, start from row 1)
         for row in range(1, g_height):
             for col in range(g_width):
                 rect, question, used, flash = self.grid[row][col]
 
                 if flash:
-                    elapsed = (pygame.time.get_ticks() - flash["start"]) // 200  # 200ms per step
+                    elapsed = (pygame.time.get_ticks() - flash["start"]) // 200
                     if elapsed > flash["count"]:
                         flash["count"] += 1
 
-                    if flash["count"] < 4:  # 2 flashes (on/off twice)
+                    if flash["count"] < 4:
                         fill_color = flash["color"] if flash["count"] % 2 == 0 else Color.background
                     else:
-                        # Flash done → spawn popup
                         popup = Question_Surface(
                             question=question,
                             player=flash["player"],
@@ -239,15 +263,12 @@ class Grid_Surface(Base_Surface):
                             grid=self
                         )
                         manager.add_surface(popup)
-
-                        # Clear flash state
                         self.grid[row][col][3] = None
                         fill_color = Color.greyed if used else Color.background
                 else:
                     fill_color = Color.greyed if used else Color.background
 
                 pygame.draw.rect(self.surface, fill_color, rect)
-
                 if not used or flash:
                     question.value = row * 200 * self.multiplier
                     text = self.font.render(str(question.value), True, Color.text)
@@ -255,6 +276,5 @@ class Grid_Surface(Base_Surface):
                     self.surface.blit(text, text_rect)
 
                 pygame.draw.rect(self.surface, Color.border, rect, 2)
-
 
         screen.blit(self.surface, self.pos)

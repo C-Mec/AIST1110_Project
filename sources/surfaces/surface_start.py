@@ -8,7 +8,6 @@ import config
 from sources.util import Font, Color
 from sources.manager import manager, Base_Surface
 from sources.datatype.player import Player
-from sources.surfaces.visual import Transition_Surface
 
 class StartScreen(Base_Surface):
     def __init__(self):
@@ -17,23 +16,22 @@ class StartScreen(Base_Surface):
         super().__init__(dimension)
 
         self.overshade = True  # blocks interaction until dismissed
-        self.title_font = Font.extralarge
         self.info_font = Font.large
 
+        # Load the Jeopardy title image
+        self.background = pygame.image.load("assets/Jeopardy-TitleScreen.webp").convert()
+        # Scale to fit screen
+        self.background = pygame.transform.scale(self.background, config.screen_dimension)
+
     def draw(self, screen: Surface):
-        # Fill background
-        self.surface.fill(Color.background)
+        # Draw background image
+        self.surface.blit(self.background, (0, 0))
 
-        # Title
-        title_text = self.title_font.render("JEOPARDY!", True, Color.text)
-        title_rect = title_text.get_rect(center=(self.dimension.x // 2, self.dimension.y // 3))
-        self.surface.blit(title_text, title_rect)
-
-        # Info
+        # Overlay info text
         info_text = self.info_font.render("Press any key or click to start", True, Color.text)
-        info_rect = info_text.get_rect(center=(self.dimension.x // 2, self.dimension.y // 2))
+        info_rect = info_text.get_rect(center=(self.dimension.x // 2, self.dimension.y * 3 // 4))
         self.surface.blit(info_text, info_rect)
-        
+
         screen.blit(self.surface, Vec2(0, 0))
 
     def click_at(self, pos: Vec2, player: Player):

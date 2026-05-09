@@ -23,10 +23,11 @@ class Font:
     medium = font(28)
     
 class Color:
-    border = "#FFFFFF"
-    text = "#FFFFFF"
-    background = "#4682C8"
+    border = "#000000"   #"#FFFFFF"
+    text = "#f6a53a"   #"#FFFFFF"
+    background = "#051c96"   #4682C8"
     black = "#000000"
+    white = "#FFFFFF"
     greyed = "#808080"
     
     correct = "#3CB371"  # green
