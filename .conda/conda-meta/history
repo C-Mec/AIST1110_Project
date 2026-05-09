@@ -70,3 +70,29 @@
 +conda-forge/win-64::vs2015_runtime-14.44.35208-h38c0c73_34
 +conda-forge/win-64::zstd-1.5.7-h534d264_6
 # update specs: ['pygame']
+==> 2026-05-09 16:00:22 <==
+# cmd: C:\Users\user\miniconda3\Scripts\conda-script.py install -p .\.conda -c conda-forge -y python=3.12
+# conda version: 25.11.1
+-conda-forge/noarch::pip-26.0.1-pyh145f28c_0
+-conda-forge/noarch::python_abi-3.13-8_cp313
+-conda-forge/win-64::libmpdec-4.0.0-hfd05255_1
+-conda-forge/win-64::pygame-2.6.1-py313h12c88fb_0
+-conda-forge/win-64::python-3.13.13-h09917c8_100_cp313
++conda-forge/noarch::packaging-26.2-pyhc364b38_0
++conda-forge/noarch::pip-26.1.1-pyh8b19718_0
++conda-forge/noarch::python_abi-3.12-8_cp312
++conda-forge/noarch::setuptools-82.0.1-pyh332efcf_0
++conda-forge/noarch::wheel-0.47.0-pyhd8ed1ab_0
++conda-forge/win-64::pygame-2.6.1-py312hea106ac_0
++conda-forge/win-64::python-3.12.13-h0159041_0_cpython
+# update specs: ['python=3.12']
+==> 2026-05-09 16:01:18 <==
+# cmd: C:\Users\user\miniconda3\Scripts\conda-script.py install -p .\.conda -c conda-forge -y --force-reinstall pydantic-core pydantic
+# conda version: 25.11.1
++conda-forge/noarch::annotated-types-0.7.0-pyhd8ed1ab_1
++conda-forge/noarch::pydantic-2.13.4-pyhcf101f3_0
++conda-forge/noarch::typing-extensions-4.15.0-h396c80c_0
++conda-forge/noarch::typing-inspection-0.4.2-pyhcf101f3_2
++conda-forge/noarch::typing_extensions-4.15.0-pyhcf101f3_0
++conda-forge/win-64::pydantic-core-2.46.4-py312hdabe01f_0
+# update specs: ['pydantic', 'pydantic-core']

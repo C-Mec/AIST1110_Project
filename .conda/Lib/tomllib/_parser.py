@@ -142,7 +142,7 @@ class Flags:
     EXPLICIT_NEST = 1
 
     def __init__(self) -> None:
-        self._flags: dict[str, dict[Any, Any]] = {}
+        self._flags: dict[str, dict] = {}
         self._pending_flags: set[tuple[Key, int]] = set()
 
     def add_pending(self, key: Key, flag: int) -> None:
@@ -200,7 +200,7 @@ class NestedDict:
         key: Key,
         *,
         access_lists: bool = True,
-    ) -> dict[str, Any]:
+    ) -> dict:
         cont: Any = self.dict
         for k in key:
             if k not in cont:
@@ -210,7 +210,7 @@ class NestedDict:
                 cont = cont[-1]
             if not isinstance(cont, dict):
                 raise KeyError("There is no nest behind this key")
-        return cont  # type: ignore[no-any-return]
+        return cont
 
     def append_nest_to_list(self, key: Key) -> None:
         cont = self.get_or_create_nest(key[:-1])
@@ -409,9 +409,9 @@ def parse_one_line_basic_str(src: str, pos: Pos) -> tuple[Pos, str]:
     return parse_basic_str(src, pos, multiline=False)
 
 
-def parse_array(src: str, pos: Pos, parse_float: ParseFloat) -> tuple[Pos, list[Any]]:
+def parse_array(src: str, pos: Pos, parse_float: ParseFloat) -> tuple[Pos, list]:
     pos += 1
-    array: list[Any] = []
+    array: list = []
 
     pos = skip_comments_and_array_ws(src, pos)
     if src.startswith("]", pos):
@@ -433,7 +433,7 @@ def parse_array(src: str, pos: Pos, parse_float: ParseFloat) -> tuple[Pos, list[
             return pos + 1, array
 
 
-def parse_inline_table(src: str, pos: Pos, parse_float: ParseFloat) -> tuple[Pos, dict[str, Any]]:
+def parse_inline_table(src: str, pos: Pos, parse_float: ParseFloat) -> tuple[Pos, dict]:
     pos += 1
     nested_dict = NestedDict()
     flags = Flags()
@@ -679,7 +679,7 @@ def make_safe_parse_float(parse_float: ParseFloat) -> ParseFloat:
     instead of returning illegal types.
     """
     # The default `float` callable never returns illegal types. Optimize it.
-    if parse_float is float:
+    if parse_float is float:  # type: ignore[comparison-overlap]
         return float
 
     def safe_parse_float(float_str: str) -> Any:

@@ -47,11 +47,7 @@ class ZoneInfo(tzinfo):
         cls._strong_cache[key] = cls._strong_cache.pop(key, instance)
 
         if len(cls._strong_cache) > cls._strong_cache_size:
-            try:
-                cls._strong_cache.popitem(last=False)
-            except KeyError:
-                # another thread may have already emptied the cache
-                pass
+            cls._strong_cache.popitem(last=False)
 
         return instance
 
@@ -79,12 +75,12 @@ class ZoneInfo(tzinfo):
         return obj
 
     @classmethod
-    def from_file(cls, file_obj, /, key=None):
+    def from_file(cls, fobj, /, key=None):
         obj = super().__new__(cls)
         obj._key = key
         obj._file_path = None
-        obj._load_file(file_obj)
-        obj._file_repr = repr(file_obj)
+        obj._load_file(fobj)
+        obj._file_repr = repr(fobj)
 
         # Disable pickling for objects created from files
         obj.__reduce__ = obj._file_reduce
@@ -338,7 +334,7 @@ class ZoneInfo(tzinfo):
             if not isdsts[comp_idx]:
                 dstoff = utcoff - utcoffsets[comp_idx]
 
-            if not dstoff and idx < (typecnt - 1) and i + 1 < len(trans_idx):
+            if not dstoff and idx < (typecnt - 1):
                 comp_idx = trans_idx[i + 1]
 
                 # If the following transition is also DST and we couldn't

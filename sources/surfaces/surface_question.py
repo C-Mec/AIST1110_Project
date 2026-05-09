@@ -26,7 +26,7 @@ class Question_Surface(Base_Surface):
         self.grid = grid
         
         self.option_border_color = Color.border
-        self.selected_option = None
+        self.selected_options = None
         self.correct_option_index = None
         self.wrong_option_indices = set()
         self.close_time = None
@@ -54,26 +54,26 @@ class Question_Surface(Base_Surface):
         self.option_rects = []
         button_height = 50
         margin = 20
-        total_height = len(self.question.answer) * (button_height + margin) - margin
+        total_height = len(self.question.options) * (button_height + margin) - margin
         start_y = dimension.y - total_height - 40  # 40px padding from bottom
-        for i in range(len(self.question.answer)):
+        for i in range(len(self.question.options)):
             rect = pygame.Rect(50, start_y + i * (button_height + margin),
                                dimension.x - 100, button_height)
             self.option_rects.append(rect)
 
     def schedule_bot_buzz(self):
-        available_bots = [b for b in self.bots if b not in self.bots_answered]
-        if not available_bots:
-            return  # stop if no bots left
-
-        remaining = [i for i in range(len(self.question.answer))
-                    if i != self.selected_option]
+        
+        
+        remaining = [i for i in range(len(self.question.options))
+                    if i != self.selected_options]
         if not remaining:
             return  # stop if no choices left
 
-        bot = random.choice(available_bots)
+        bot = random.choice(self.bots)
         correct_index = self.question.answer_index
 
+        if random.random() < config.bot_skill:
+            choice = 
         # decide choice now
         if len(remaining) == 1:
             choice = correct_index
@@ -95,7 +95,7 @@ class Question_Surface(Base_Surface):
         self.bots_answered.add(bot)
 
         # apply choice
-        self.selected_option = choice
+        self.selected_options = choice
         self.timer_active = False
 
         if choice == self.question.answer_index:
@@ -122,12 +122,15 @@ class Question_Surface(Base_Surface):
         text = Font.clue_medium.render(self.question.problem, True, Color.text)
         self.surface.blit(text, (30, 30))
         
-        if not self.buzzed:
+        def draw_buzz_button():
             # Buzz button in player color
             pygame.draw.rect(self.surface, self.player.color, self.buzz_rect)
             pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
             buzz_text = Font.logo_large.render("BUZZ!", True, Color.black)
             self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
+            
+        if not self.buzzed:
+            draw_buzz_button()
         else:
             if self.timer_active:
                 elapsed = (pygame.time.get_ticks() - self.start_time) / 1000
@@ -171,8 +174,8 @@ class Question_Surface(Base_Surface):
                         bot = random.choice(available_bots)
 
                         # Decide choice now
-                        remaining = [i for i in range(len(self.question.answer))
-                                    if i != self.selected_option]
+                        remaining = [i for i in range(len(self.question.options))
+                                    if i != self.selected_options]
                         if not remaining:
                             return
 
@@ -205,7 +208,7 @@ class Question_Surface(Base_Surface):
 
                 pygame.draw.rect(self.surface, border_color, rect, 2)
 
-                option_text = f"{chr(65+i)}. {self.question.answer[i]}"
+                option_text = f"{chr(65+i)}. {self.question.options[i]}"
                 text = Font.clue_small.render(option_text, True, Color.text)
                 self.surface.blit(text, text.get_rect(center=rect.center))
 
@@ -232,10 +235,10 @@ class Question_Surface(Base_Surface):
             # Screen flash in player color
             manager.add_surface(BorderFlash(self.player))
             
-        elif self.buzzed and self.selected_option is None:  # prevent multiple scoring
+        elif self.buzzed and self.selected_options is None:  # prevent multiple scoring
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(pos):
-                    self.selected_option = i
+                    self.selected_options = i
                     self.timer_active = False
                     
                     if self.question.answer_index == i:
@@ -246,7 +249,7 @@ class Question_Surface(Base_Surface):
                         self.close_time = pygame.time.get_ticks() + 1000
                     else:
                         player.add_score(-self.question.value)
-                        print(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
+                        notify(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
                         self.wrong_option_indices.add(i)
 
                         self.draw(pygame.display.get_surface())
@@ -262,8 +265,8 @@ class Question_Surface(Base_Surface):
                             bot = random.choice(available_bots)
 
                             # Decide choice now
-                            remaining = [i for i in range(len(self.question.answer))
-                                        if i != self.selected_option]
+                            remaining = [i for i in range(len(self.question.options))
+                                        if i != self.selected_options]
                             if not remaining:
                                 return
 

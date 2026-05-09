@@ -111,9 +111,6 @@ class CodecInfo(tuple):
                 (self.__class__.__module__, self.__class__.__qualname__,
                  self.name, id(self))
 
-    def __getnewargs__(self):
-        return tuple(self)
-
 class Codec:
 
     """ Defines the interface for stateless encoders/decoders.
@@ -618,7 +615,7 @@ class StreamReader(Codec):
             method and are included in the list entries.
 
             sizehint, if given, is ignored since there is no efficient
-            way of finding the true end-of-line.
+            way to finding the true end-of-line.
 
         """
         data = self.read()
@@ -709,13 +706,13 @@ class StreamReaderWriter:
 
         return self.reader.read(size)
 
-    def readline(self, size=None, keepends=True):
+    def readline(self, size=None):
 
-        return self.reader.readline(size, keepends)
+        return self.reader.readline(size)
 
-    def readlines(self, sizehint=None, keepends=True):
+    def readlines(self, sizehint=None):
 
-        return self.reader.readlines(sizehint, keepends)
+        return self.reader.readlines(sizehint)
 
     def __next__(self):
 

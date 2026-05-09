@@ -141,7 +141,7 @@ def _decode_uu(encoded):
 class Message:
     """Basic message object.
 
-    A message object is defined as something that has a bunch of RFC 5322
+    A message object is defined as something that has a bunch of RFC 2822
     headers and a payload.  It may optionally have an envelope header
     (a.k.a. Unix-From or From_ header).  If the message is a container (i.e. a
     multipart or a message/rfc822), then the payload is a list of Message
@@ -319,8 +319,6 @@ class Message:
                 # If it does happen, turn the string into bytes in a way
                 # guaranteed not to fail.
                 bpayload = payload.encode('raw-unicode-escape')
-        else:
-            bpayload = payload
         if cte == 'quoted-printable':
             return quopri.decodestring(bpayload)
         elif cte == 'base64':
@@ -572,7 +570,7 @@ class Message:
 
         msg.add_header('content-disposition', 'attachment', filename='bud.gif')
         msg.add_header('content-disposition', 'attachment',
-                       filename=('utf-8', '', 'Fußballer.ppt'))
+                       filename=('utf-8', '', Fußballer.ppt'))
         msg.add_header('content-disposition', 'attachment',
                        filename='Fußballer.ppt'))
         """

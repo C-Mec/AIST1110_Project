@@ -289,6 +289,8 @@ class HelpSource(Query):
     def browse_file(self):
         filetypes = [
             ("HTML Files", "*.htm *.html", "TEXT"),
+            ("PDF Files", "*.pdf", "TEXT"),
+            ("Windows Help Files", "*.chm"),
             ("Text Files", "*.txt", "TEXT"),
             ("All Files", "*")]
         path = self.pathvar.get()

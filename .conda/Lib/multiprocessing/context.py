@@ -145,13 +145,7 @@ class BaseContext(object):
         '''Check whether this is a fake forked process in a frozen executable.
         If so then run code specified by commandline and exit.
         '''
-        # gh-140814: allow_none=True avoids locking in the default start
-        # method, which would cause a later set_start_method() to fail.
-        # None is safe to pass through: spawn.freeze_support()
-        # independently detects whether this process is a spawned
-        # child, so the start method check here is only an optimization.
-        if (getattr(sys, 'frozen', False)
-                and self.get_start_method(allow_none=True) in ('spawn', None)):
+        if sys.platform == 'win32' and getattr(sys, 'frozen', False):
             from .spawn import freeze_support
             freeze_support()
 

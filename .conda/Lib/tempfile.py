@@ -57,11 +57,10 @@ _bin_openflags = _text_openflags
 if hasattr(_os, 'O_BINARY'):
     _bin_openflags |= _os.O_BINARY
 
-# This is more than enough.
-# Each name contains over 40 random bits.  Even with a million temporary
-# files, the chance of a conflict is less than 1 in a million, and with
-# 20 attempts, it is less than 1e-120.
-TMP_MAX = 20
+if hasattr(_os, 'TMP_MAX'):
+    TMP_MAX = _os.TMP_MAX
+else:
+    TMP_MAX = 10000
 
 # This variable _was_ unused for legacy reasons, see issue 10354.
 # But as of 3.5 we actually use it at runtime so changing it would
@@ -181,7 +180,7 @@ def _candidate_tempdir_list():
 
     return dirlist
 
-def _get_default_tempdir(dirlist=None):
+def _get_default_tempdir():
     """Calculate the default directory to use for temporary files.
     This routine should be called exactly once.
 
@@ -191,13 +190,13 @@ def _get_default_tempdir(dirlist=None):
     service, the name of the test file must be randomized."""
 
     namer = _RandomNameSequence()
-    if dirlist is None:
-        dirlist = _candidate_tempdir_list()
+    dirlist = _candidate_tempdir_list()
 
     for dir in dirlist:
         if dir != _os.curdir:
             dir = _os.path.abspath(dir)
-        for seq in range(TMP_MAX):
+        # Try only a few names per directory.
+        for seq in range(100):
             name = next(namer)
             filename = _os.path.join(dir, name)
             try:
@@ -213,8 +212,10 @@ def _get_default_tempdir(dirlist=None):
             except FileExistsError:
                 pass
             except PermissionError:
-                # See the comment in mkdtemp().
-                if _os.name == 'nt' and _os.path.isdir(dir):
+                # This exception is thrown when a directory with the chosen name
+                # already exists on windows.
+                if (_os.name == 'nt' and _os.path.isdir(dir) and
+                    _os.access(dir, _os.W_OK)):
                     continue
                 break   # no point trying more names in this directory
             except OSError:
@@ -256,8 +257,10 @@ def _mkstemp_inner(dir, pre, suf, flags, output_type):
         except FileExistsError:
             continue    # try again
         except PermissionError:
-            # See the comment in mkdtemp().
-            if _os.name == 'nt' and _os.path.isdir(dir) and seq < TMP_MAX - 1:
+            # This exception is thrown when a directory with the chosen name
+            # already exists on windows.
+            if (_os.name == 'nt' and _os.path.isdir(dir) and
+                _os.access(dir, _os.W_OK)):
                 continue
             else:
                 raise
@@ -270,7 +273,7 @@ def _dont_follow_symlinks(func, path, *args):
     # Pass follow_symlinks=False, unless not supported on this platform.
     if func in _os.supports_follow_symlinks:
         func(path, *args, follow_symlinks=False)
-    elif not _os.path.islink(path):
+    elif _os.name == 'nt' or not _os.path.islink(path):
         func(path, *args)
 
 def _resetperms(path):
@@ -382,14 +385,10 @@ def mkdtemp(suffix=None, prefix=None, dir=None):
         except FileExistsError:
             continue    # try again
         except PermissionError:
-            # On Posix, this exception is raised when the user has no
-            # write access to the parent directory.
-            # On Windows, it is also raised when a directory with
-            # the chosen name already exists, or if the parent directory
-            # is not a directory.
-            # We cannot distinguish between "directory-exists-error" and
-            # "access-denied-error".
-            if _os.name == 'nt' and _os.path.isdir(dir) and seq < TMP_MAX - 1:
+            # This exception is thrown when a directory with the chosen name
+            # already exists on windows.
+            if (_os.name == 'nt' and _os.path.isdir(dir) and
+                _os.access(dir, _os.W_OK)):
                 continue
             else:
                 raise

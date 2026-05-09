@@ -3302,10 +3302,7 @@ class Decimal(object):
         return opa, opb
 
     def logical_and(self, other, context=None):
-        """Applies an 'and' operation between self and other's digits.
-
-        Both self and other must be logical numbers.
-        """
+        """Applies an 'and' operation between self and other's digits."""
         if context is None:
             context = getcontext()
 
@@ -3322,20 +3319,14 @@ class Decimal(object):
         return _dec_from_triple(0, result.lstrip('0') or '0', 0)
 
     def logical_invert(self, context=None):
-        """Invert all its digits.
-
-        The self must be logical number.
-        """
+        """Invert all its digits."""
         if context is None:
             context = getcontext()
         return self.logical_xor(_dec_from_triple(0,'1'*context.prec,0),
                                 context)
 
     def logical_or(self, other, context=None):
-        """Applies an 'or' operation between self and other's digits.
-
-        Both self and other must be logical numbers.
-        """
+        """Applies an 'or' operation between self and other's digits."""
         if context is None:
             context = getcontext()
 
@@ -3352,10 +3343,7 @@ class Decimal(object):
         return _dec_from_triple(0, result.lstrip('0') or '0', 0)
 
     def logical_xor(self, other, context=None):
-        """Applies an 'xor' operation between self and other's digits.
-
-        Both self and other must be logical numbers.
-        """
+        """Applies an 'xor' operation between self and other's digits."""
         if context is None:
             context = getcontext()
 
@@ -6095,7 +6083,7 @@ _parse_format_specifier_regex = re.compile(r"""\A
 (?P<alt>\#)?
 (?P<zeropad>0)?
 (?P<minimumwidth>(?!0)\d+)?
-(?P<thousands_sep>[,_])?
+(?P<thousands_sep>,)?
 (?:\.(?P<precision>0|(?!0)\d+))?
 (?P<type>[eEfFgGn%])?
 \Z

@@ -22,6 +22,7 @@ import itertools
 import linecache
 import os
 import os.path
+from platform import python_version
 import re
 import socket
 import subprocess
@@ -423,9 +424,7 @@ class ModifiedInterpreter(InteractiveInterpreter):
     def spawn_subprocess(self):
         if self.subprocess_arglist is None:
             self.subprocess_arglist = self.build_subprocess_arglist()
-        # gh-127060: Disable traceback colors
-        env = dict(os.environ, TERM='dumb')
-        self.rpcsubproc = subprocess.Popen(self.subprocess_arglist, env=env)
+        self.rpcsubproc = subprocess.Popen(self.subprocess_arglist)
 
     def build_subprocess_arglist(self):
         assert (self.port!=0), (
@@ -840,7 +839,7 @@ class ModifiedInterpreter(InteractiveInterpreter):
 class PyShell(OutputWindow):
     from idlelib.squeezer import Squeezer
 
-    shell_title = "IDLE Shell"
+    shell_title = "IDLE Shell " + python_version()
 
     # Override classes
     ColorDelegator = ModifiedColorDelegator
@@ -876,9 +875,10 @@ class PyShell(OutputWindow):
     from idlelib.sidebar import ShellSidebar
 
     def __init__(self, flist=None):
-        ms = self.menu_specs
-        if ms[2][0] != "shell":
-            ms.insert(2, ("shell", "She_ll"))
+        if use_subprocess:
+            ms = self.menu_specs
+            if ms[2][0] != "shell":
+                ms.insert(2, ("shell", "She_ll"))
         self.interp = ModifiedInterpreter(self)
         if flist is None:
             root = Tk()
@@ -951,11 +951,6 @@ class PyShell(OutputWindow):
         # events generated in Tcl/Tk to go through this delegator.
         self.text.insert = self.per.top.insert
         self.per.insertfilter(UserInputTaggingDelegator())
-
-        if not use_subprocess:
-            # Menu options "View Last Restart" and "Restart Shell" are disabled
-            self.update_menu_state("shell", 0, "disabled")
-            self.update_menu_state("shell", 1, "disabled")
 
     def ResetFont(self):
         super().ResetFont()

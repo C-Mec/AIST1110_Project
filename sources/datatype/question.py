@@ -1,14 +1,14 @@
 class Question:
     def __init__(self, problem: str, options: list[str], answer_ind: int, value: int):
         self.problem = problem
-        self.answer = options
+        self.options = options
         self.answer_index = answer_ind
         self.value = value
         self.used = False
 
     def listAnswer(self):
-        for i in range(len(self.answer)):
-            print(f"{i+1}. {self.answer[i]}")
+        for i in range(len(self.options)):
+            print(f"{i+1}. {self.options[i]}")
     
     @staticmethod
     def sample(col: int, row: int, value: int):

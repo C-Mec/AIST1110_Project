@@ -6,8 +6,7 @@ if __name__ != 'test.support':
 import contextlib
 import dataclasses
 import functools
-import logging
-import _opcode
+import opcode
 import os
 import re
 import stat
@@ -27,11 +26,10 @@ __all__ = [
     "Error", "TestFailed", "TestDidNotRun", "ResourceDenied",
     # io
     "record_original_stdout", "get_original_stdout", "captured_stdout",
-    "captured_stdin", "captured_stderr", "captured_output",
+    "captured_stdin", "captured_stderr",
     # unittest
-    "is_resource_enabled", "get_resource_value", "requires", "requires_resource",
-    "requires_freebsd_version",
-    "requires_gil_enabled", "requires_linux_version", "requires_mac_ver",
+    "is_resource_enabled", "requires", "requires_freebsd_version",
+    "requires_linux_version", "requires_mac_ver",
     "check_syntax_error",
     "requires_gzip", "requires_bz2", "requires_lzma",
     "bigmemtest", "bigaddrspacetest", "cpython_only", "get_attribute",
@@ -58,12 +56,8 @@ __all__ = [
     "run_with_tz", "PGO", "missing_compiler_executable",
     "ALWAYS_EQ", "NEVER_EQ", "LARGEST", "SMALLEST",
     "LOOPBACK_TIMEOUT", "INTERNET_TIMEOUT", "SHORT_TIMEOUT", "LONG_TIMEOUT",
-    "Py_DEBUG", "exceeds_recursion_limit", "get_c_recursion_limit",
+    "Py_DEBUG", "EXCEEDS_RECURSION_LIMIT", "C_RECURSION_LIMIT",
     "skip_on_s390x",
-    "without_optimizer",
-    "force_not_colorized",
-    "force_not_colorized_test_class",
-    "make_clean_env",
     "BrokenIter",
     ]
 
@@ -180,7 +174,7 @@ def get_attribute(obj, name):
         return attribute
 
 verbose = 1              # Flag set to 0 by regrtest.py
-use_resources = None     # Flag set to {} by regrtest.py
+use_resources = None     # Flag set to [] by regrtest.py
 max_memuse = 0           # Disable bigmem tests (they will still be run with
                          # small sizes, to make sure they work.)
 real_max_memuse = 0
@@ -295,16 +289,6 @@ def is_resource_enabled(resource):
     """
     return use_resources is None or resource in use_resources
 
-def get_resource_value(resource):
-    """Test whether a resource is enabled.
-
-    Known resources are set by regrtest.py.  If not running under regrtest.py,
-    all resources are assumed enabled unless use_resources has been set.
-    """
-    if use_resources is None:
-        return None
-    return use_resources.get(resource)
-
 def requires(resource, msg=None):
     """Raise ResourceDenied if the specified resource is not available."""
     if not is_resource_enabled(resource):
@@ -408,7 +392,7 @@ def skip_if_buildbot(reason=None):
     try:
         isbuildbot = getpass.getuser().lower() == 'buildbot'
     except (KeyError, OSError) as err:
-        logging.getLogger(__name__).warning('getpass.getuser() failed %s.', err, exc_info=err)
+        warnings.warn(f'getpass.getuser() failed {err}.', RuntimeWarning)
         isbuildbot = False
     return unittest.skipIf(isbuildbot, reason)
 
@@ -533,65 +517,23 @@ def has_no_debug_ranges():
     return not bool(config['code_debug_ranges'])
 
 def requires_debug_ranges(reason='requires co_positions / debug_ranges'):
+    return unittest.skipIf(has_no_debug_ranges(), reason)
+
+def requires_legacy_unicode_capi():
     try:
-        skip = has_no_debug_ranges()
-    except unittest.SkipTest as e:
-        skip = True
-        reason = e.args[0] if e.args else reason
-    return unittest.skipIf(skip, reason)
-
-
-def can_use_suppress_immortalization(suppress=True):
-    """Check if suppress_immortalization(suppress) can be used.
-
-    Use this helper in code where SkipTest must be eagerly handled.
-    """
-    if not suppress:
-        return True
-    try:
-        import _testinternalcapi
+        from _testcapi import unicode_legacy_string
     except ImportError:
-        return False
-    return True
+        unicode_legacy_string = None
 
-
-@contextlib.contextmanager
-def suppress_immortalization(suppress=True):
-    """Suppress immortalization of deferred objects.
-
-    If _testinternalcapi is not available, the decorated test or class
-    is skipped. Use can_use_suppress_immortalization() outside test cases
-    to check if this decorator can be used.
-    """
-    if not suppress:
-        yield  # no-op
-        return
-
-    from .import_helper import import_module
-
-    _testinternalcapi = import_module("_testinternalcapi")
-    _testinternalcapi.suppress_immortalization(True)
-    try:
-        yield
-    finally:
-        _testinternalcapi.suppress_immortalization(False)
-
-
-def skip_if_suppress_immortalization():
-    try:
-        import _testinternalcapi
-    except ImportError:
-        return
-    return unittest.skipUnless(_testinternalcapi.get_immortalize_deferred(),
-                                "requires immortalization of deferred objects")
-
+    return unittest.skipUnless(unicode_legacy_string,
+                               'requires legacy Unicode C API')
 
 MS_WINDOWS = (sys.platform == 'win32')
 
 # Is not actually used in tests, but is kept for compatibility.
 is_jython = sys.platform.startswith('java')
 
-is_android = sys.platform == "android"
+is_android = hasattr(sys, 'getandroidapilevel')
 
 if sys.platform not in {"win32", "vxworks", "ios", "tvos", "watchos"}:
     unix_shell = '/system/bin/sh' if is_android else '/bin/sh'
@@ -603,33 +545,24 @@ else:
 is_emscripten = sys.platform == "emscripten"
 is_wasi = sys.platform == "wasi"
 
+# Apple mobile platforms (iOS/tvOS/watchOS) are POSIX-like but do not
+# have subprocess or fork support.
 is_apple_mobile = sys.platform in {"ios", "tvos", "watchos"}
 is_apple = is_apple_mobile or sys.platform == "darwin"
 
 has_fork_support = hasattr(os, "fork") and not (
-    # WASM and Apple mobile platforms do not support subprocesses.
     is_emscripten
     or is_wasi
     or is_apple_mobile
-
-    # Although Android supports fork, it's unsafe to call it from Python because
-    # all Android apps are multi-threaded.
-    or is_android
 )
 
 def requires_fork():
     return unittest.skipUnless(has_fork_support, "requires working os.fork()")
 
 has_subprocess_support = not (
-    # WASM and Apple mobile platforms do not support subprocesses.
     is_emscripten
     or is_wasi
     or is_apple_mobile
-
-    # Although Android supports subproceses, they're almost never useful in
-    # practice (see PEP 738). And most of the tests that use them are calling
-    # sys.executable, which won't work when Python is embedded in an Android app.
-    or is_android
 )
 
 def requires_subprocess():
@@ -868,15 +801,6 @@ def disable_gc():
         if have_gc:
             gc.enable()
 
-@contextlib.contextmanager
-def gc_threshold(*args):
-    import gc
-    old_threshold = gc.get_threshold()
-    gc.set_threshold(*args)
-    try:
-        yield
-    finally:
-        gc.set_threshold(*old_threshold)
 
 def python_is_optimized():
     """Find if Python was built with optimizations."""
@@ -910,6 +834,13 @@ def check_cflags_pgo():
     return any(option in cflags_nodist for option in pgo_options)
 
 
+_header = 'nP'
+_align = '0n'
+if hasattr(sys, "getobjects"):
+    _header = '2P' + _header
+    _align = '0P'
+_vheader = _header + 'n'
+
 def check_bolt_optimized():
     # Always return false, if the platform is WASI,
     # because BOLT optimization does not support WASM binary.
@@ -919,28 +850,10 @@ def check_bolt_optimized():
     return '--enable-bolt' in config_args
 
 
-Py_GIL_DISABLED = bool(sysconfig.get_config_var('Py_GIL_DISABLED'))
-
-def requires_gil_enabled(msg="needs the GIL enabled"):
-    """Decorator for skipping tests on the free-threaded build."""
-    return unittest.skipIf(Py_GIL_DISABLED, msg)
-
-def expected_failure_if_gil_disabled():
-    """Expect test failure if the GIL is disabled."""
-    if Py_GIL_DISABLED:
-        return unittest.expectedFailure
-    return lambda test_case: test_case
-
-if Py_GIL_DISABLED:
-    _header = 'PHBBInP'
-else:
-    _header = 'nP'
-_align = '0n'
-_vheader = _header + 'n'
-
 def calcobjsize(fmt):
     import struct
     return struct.calcsize(_header + fmt + _align)
+
 
 def calcvobjsize(fmt):
     import struct
@@ -1128,7 +1041,7 @@ def set_memlimit(limit: str) -> None:
     global real_max_memuse
     memlimit = _parse_memlimit(limit)
     if memlimit < _2G - 1:
-        raise ValueError(f'Memory limit {limit!r} too low to be useful')
+        raise ValueError('Memory limit {limit!r} too low to be useful')
 
     real_max_memuse = memlimit
     memlimit = min(memlimit, MAX_Py_ssize_t)
@@ -1149,7 +1062,8 @@ class _MemoryWatchdog:
         try:
             f = open(self.procfile, 'r')
         except OSError as e:
-            logging.getLogger(__name__).warning('/proc not available for stats: %s', e, exc_info=e)
+            warnings.warn('/proc not available for stats: {}'.format(e),
+                          RuntimeWarning)
             sys.stderr.flush()
             return
 
@@ -1286,30 +1200,18 @@ def check_impl_detail(**guards):
 
 def no_tracing(func):
     """Decorator to temporarily turn off tracing for the duration of a test."""
-    trace_wrapper = func
-    if hasattr(sys, 'gettrace'):
+    if not hasattr(sys, 'gettrace'):
+        return func
+    else:
         @functools.wraps(func)
-        def trace_wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             original_trace = sys.gettrace()
             try:
                 sys.settrace(None)
                 return func(*args, **kwargs)
             finally:
                 sys.settrace(original_trace)
-
-    coverage_wrapper = trace_wrapper
-    if 'test.cov' in sys.modules:  # -Xpresite=test.cov used
-        cov = sys.monitoring.COVERAGE_ID
-        @functools.wraps(func)
-        def coverage_wrapper(*args, **kwargs):
-            original_events = sys.monitoring.get_events(cov)
-            try:
-                sys.monitoring.set_events(cov, 0)
-                return trace_wrapper(*args, **kwargs)
-            finally:
-                sys.monitoring.set_events(cov, original_events)
-
-    return coverage_wrapper
+        return wrapper
 
 
 def refcount_test(test):
@@ -1326,19 +1228,14 @@ def refcount_test(test):
 def requires_limited_api(test):
     try:
         import _testcapi
-        import _testlimitedcapi
     except ImportError:
-        return unittest.skip('needs _testcapi and _testlimitedcapi modules')(test)
-    return test
-
-
-# Windows build doesn't support --disable-test-modules feature, so there's no
-# 'TEST_MODULES' var in config
-TEST_MODULES_ENABLED = (sysconfig.get_config_var('TEST_MODULES') or 'yes') == 'yes'
+        return unittest.skip('needs _testcapi module')(test)
+    return unittest.skipUnless(
+        _testcapi.LIMITED_API_AVAILABLE, 'needs Limited API support')(test)
 
 def requires_specialization(test):
     return unittest.skipUnless(
-        _opcode.ENABLE_SPECIALIZATION, "requires specialization")(test)
+        opcode.ENABLE_SPECIALIZATION, "requires specialization")(test)
 
 
 #=======================================================================
@@ -1354,8 +1251,8 @@ MISSING_C_DOCSTRINGS = (check_impl_detail() and
                         sys.platform != 'win32' and
                         not sysconfig.get_config_var('WITH_DOC_STRINGS'))
 
-HAVE_PY_DOCSTRINGS = _check_docstrings.__doc__ is not None
-HAVE_DOCSTRINGS = (HAVE_PY_DOCSTRINGS and not MISSING_C_DOCSTRINGS)
+HAVE_DOCSTRINGS = (_check_docstrings.__doc__ is not None and
+                   not MISSING_C_DOCSTRINGS)
 
 requires_docstrings = unittest.skipUnless(HAVE_DOCSTRINGS,
                                           "test requires docstrings")
@@ -1666,7 +1563,7 @@ def check__all__(test_case, module, name_of_module=None, extra=(),
     'module'.
 
     The 'name_of_module' argument can specify (as a string or tuple thereof)
-    what module(s) an API could be defined in order to be detected as a
+    what module(s) an API could be defined in in order to be detected as a
     public API. One case for this is when 'module' imports part of its public
     API from other modules, possibly a C backend (like 'csv' and its '_csv').
 
@@ -1883,10 +1780,7 @@ def run_in_subinterp(code):
     module is enabled.
     """
     _check_tracemalloc()
-    try:
-        import _testcapi
-    except ImportError:
-        raise unittest.SkipTest("requires _testcapi")
+    import _testcapi
     return _testcapi.run_in_subinterp(code)
 
 
@@ -1896,25 +1790,11 @@ def run_in_subinterp_with_config(code, *, own_gil=None, **config):
     module is enabled.
     """
     _check_tracemalloc()
-    try:
-        import _testinternalcapi
-    except ImportError:
-        raise unittest.SkipTest("requires _testinternalcapi")
+    import _testcapi
     if own_gil is not None:
         assert 'gil' not in config, (own_gil, config)
-        config['gil'] = 'own' if own_gil else 'shared'
-    else:
-        gil = config['gil']
-        if gil == 0:
-            config['gil'] = 'default'
-        elif gil == 1:
-            config['gil'] = 'shared'
-        elif gil == 2:
-            config['gil'] = 'own'
-        elif not isinstance(gil, str):
-            raise NotImplementedError(gil)
-    config = types.SimpleNamespace(**config)
-    return _testinternalcapi.run_in_subinterp_with_config(code, config)
+        config['gil'] = 2 if own_gil else 1
+    return _testcapi.run_in_subinterp_with_config(code, **config)
 
 
 def _check_tracemalloc():
@@ -1932,22 +1812,19 @@ def _check_tracemalloc():
 
 
 def check_free_after_iterating(test, iter, cls, args=()):
+    class A(cls):
+        def __del__(self):
+            nonlocal done
+            done = True
+            try:
+                next(it)
+            except StopIteration:
+                pass
+
     done = False
-    def wrapper():
-        class A(cls):
-            def __del__(self):
-                nonlocal done
-                done = True
-                try:
-                    next(it)
-                except StopIteration:
-                    pass
-
-        it = iter(A(*args))
-        # Issue 26494: Shouldn't crash
-        test.assertRaises(StopIteration, next, it)
-
-    wrapper()
+    it = iter(A(*args))
+    # Issue 26494: Shouldn't crash
+    test.assertRaises(StopIteration, next, it)
     # The sequence should be deallocated just after the end of iterating
     gc_collect()
     test.assertTrue(done)
@@ -1987,18 +1864,18 @@ def missing_compiler_executable(cmd_names=[]):
             return cmd[0]
 
 
-_old_android_emulator = None
+_is_android_emulator = None
 def setswitchinterval(interval):
     # Setting a very low gil interval on the Android emulator causes python
     # to hang (issue #26939).
-    minimum_interval = 1e-4   # 100 us
+    minimum_interval = 1e-5
     if is_android and interval < minimum_interval:
-        global _old_android_emulator
-        if _old_android_emulator is None:
-            import platform
-            av = platform.android_ver()
-            _old_android_emulator = av.is_emulator and av.api_level < 24
-        if _old_android_emulator:
+        global _is_android_emulator
+        if _is_android_emulator is None:
+            import subprocess
+            _is_android_emulator = (subprocess.check_output(
+                               ['getprop', 'ro.kernel.qemu']).strip() == b'1')
+        if _is_android_emulator:
             interval = minimum_interval
     return sys.setswitchinterval(interval)
 
@@ -2073,19 +1950,8 @@ class SaveSignals:
 
 
 def with_pymalloc():
-    try:
-        import _testcapi
-    except ImportError:
-        raise unittest.SkipTest("requires _testcapi")
-    return _testcapi.WITH_PYMALLOC and not Py_GIL_DISABLED
-
-
-def with_mimalloc():
-    try:
-        import _testcapi
-    except ImportError:
-        raise unittest.SkipTest("requires _testcapi")
-    return _testcapi.WITH_MIMALLOC
+    import _testcapi
+    return _testcapi.WITH_PYMALLOC
 
 
 class _ALWAYS_EQ:
@@ -2313,7 +2179,6 @@ def check_disallow_instantiation(testcase, tp, *args, **kwds):
         qualname = f"{name}"
     msg = f"cannot create '{re.escape(qualname)}' instances"
     testcase.assertRaisesRegex(TypeError, msg, tp, *args, **kwds)
-    testcase.assertRaisesRegex(TypeError, msg, tp.__new__, tp, *args, **kwds)
 
 def get_recursion_depth():
     """Get the recursion depth of the caller function.
@@ -2365,7 +2230,7 @@ def infinite_recursion(max_depth=None):
         # very deep recursion.
         max_depth = 20_000
     elif max_depth < 3:
-        raise ValueError(f"max_depth must be at least 3, got {max_depth}")
+        raise ValueError("max_depth must be at least 3, got {max_depth}")
     depth = get_recursion_depth()
     depth = max(depth - 1, 1)  # Ignore infinite_recursion() frame.
     limit = depth + max_depth
@@ -2443,26 +2308,17 @@ def _findwheel(pkgname):
 # Context manager that creates a virtual environment, install setuptools in it,
 # and returns the paths to the venv directory and the python executable
 @contextlib.contextmanager
-def setup_venv_with_pip_setuptools(venv_dir):
+def setup_venv_with_pip_setuptools_wheel(venv_dir):
     import subprocess
     from .os_helper import temp_cwd
-
-    def run_command(cmd):
-        if verbose:
-            import shlex
-            print()
-            print('Run:', ' '.join(map(shlex.quote, cmd)))
-            subprocess.run(cmd, check=True)
-        else:
-            subprocess.run(cmd,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.STDOUT,
-                           check=True)
 
     with temp_cwd() as temp_dir:
         # Create virtual environment to get setuptools
         cmd = [sys.executable, '-X', 'dev', '-m', 'venv', venv_dir]
-        run_command(cmd)
+        if verbose:
+            print()
+            print('Run:', ' '.join(cmd))
+        subprocess.run(cmd, check=True)
 
         venv = os.path.join(temp_dir, venv_dir)
 
@@ -2476,8 +2332,11 @@ def setup_venv_with_pip_setuptools(venv_dir):
         cmd = (python, '-X', 'dev',
                '-m', 'pip', 'install',
                _findwheel('setuptools'),
-               )
-        run_command(cmd)
+               _findwheel('wheel'))
+        if verbose:
+            print()
+            print('Run:', ' '.join(cmd))
+        subprocess.run(cmd, check=True)
 
         yield python
 
@@ -2600,46 +2459,6 @@ def sleeping_retry(timeout, err_msg=None, /,
         delay = min(delay * 2, max_delay)
 
 
-class CPUStopwatch:
-    """Context manager to roughly time a CPU-bound operation.
-
-    Disables GC. Uses CPU time if it can (i.e. excludes sleeps & time of
-    other processes).
-
-    N.B.:
-    - This *includes* time spent in other threads.
-    - Some systems only have a coarse resolution; check
-      stopwatch.clock_info.rseolution if.
-
-    Usage:
-
-    with ProcessStopwatch() as stopwatch:
-        ...
-    elapsed = stopwatch.seconds
-    resolution = stopwatch.clock_info.resolution
-    """
-    def __enter__(self):
-        get_time = time.process_time
-        clock_info = time.get_clock_info('process_time')
-        if get_time() <= 0:  # some platforms like WASM lack process_time()
-            get_time = time.monotonic
-            clock_info = time.get_clock_info('monotonic')
-        self.context = disable_gc()
-        self.context.__enter__()
-        self.get_time = get_time
-        self.clock_info = clock_info
-        self.start_time = get_time()
-        return self
-
-    def __exit__(self, *exc):
-        try:
-            end_time = self.get_time()
-        finally:
-            result = self.context.__exit__(*exc)
-        self.seconds = end_time - self.start_time
-        return result
-
-
 @contextlib.contextmanager
 def adjust_int_max_str_digits(max_digits):
     """Temporarily change the integer string conversion length limit."""
@@ -2650,42 +2469,30 @@ def adjust_int_max_str_digits(max_digits):
     finally:
         sys.set_int_max_str_digits(current)
 
+#For recursion tests, easily exceeds default recursion limit
+EXCEEDS_RECURSION_LIMIT = 5000
 
-def get_c_recursion_limit():
-    try:
-        import _testcapi
-        return _testcapi.Py_C_RECURSION_LIMIT
-    except ImportError:
-        raise unittest.SkipTest('requires _testcapi')
-
-
-def exceeds_recursion_limit():
-    """For recursion tests, easily exceeds default recursion limit."""
-    return get_c_recursion_limit() * 3
-
+# The default C recursion limit (from Include/cpython/pystate.h).
+if Py_DEBUG:
+    if is_wasi:
+        C_RECURSION_LIMIT = 150
+    else:
+        C_RECURSION_LIMIT = 500
+else:
+    if is_wasi:
+        C_RECURSION_LIMIT = 500
+    elif hasattr(os, 'uname') and os.uname().machine == 's390x':
+        C_RECURSION_LIMIT = 800
+    elif sys.platform.startswith('win'):
+        C_RECURSION_LIMIT = 3000
+    elif check_sanitizer(address=True):
+        C_RECURSION_LIMIT = 4000
+    else:
+        C_RECURSION_LIMIT = 10000
 
 # Windows doesn't have os.uname() but it doesn't support s390x.
 is_s390x = hasattr(os, 'uname') and os.uname().machine == 's390x'
 skip_on_s390x = unittest.skipIf(is_s390x, 'skipped on s390x')
-
-Py_TRACE_REFS = hasattr(sys, 'getobjects')
-
-# Decorator to disable optimizer while a function run
-def without_optimizer(func):
-    try:
-        from _testinternalcapi import get_optimizer, set_optimizer
-    except ImportError:
-        return func
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        save_opt = get_optimizer()
-        try:
-            set_optimizer(None)
-            return func(*args, **kwargs)
-        finally:
-            set_optimizer(save_opt)
-    return wrapper
-
 
 _BASE_COPY_SRC_DIR_IGNORED_NAMES = frozenset({
     # SRC_DIR/.git
@@ -2769,59 +2576,6 @@ def iter_slot_wrappers(cls):
             yield name, True
 
 
-@contextlib.contextmanager
-def no_color():
-    import _colorize
-    from .os_helper import EnvironmentVarGuard
-
-    with (
-        swap_attr(_colorize, "can_colorize", lambda *, file=None: False),
-        EnvironmentVarGuard() as env,
-    ):
-        env.unset("FORCE_COLOR", "NO_COLOR", "PYTHON_COLORS")
-        env.set("NO_COLOR", "1")
-        yield
-
-
-def force_not_colorized(func):
-    """Force the terminal not to be colorized."""
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        with no_color():
-            return func(*args, **kwargs)
-    return wrapper
-
-
-def force_not_colorized_test_class(cls):
-    """Force the terminal not to be colorized for the entire test class."""
-    original_setUpClass = cls.setUpClass
-
-    @classmethod
-    @functools.wraps(cls.setUpClass)
-    def new_setUpClass(cls):
-        cls.enterClassContext(no_color())
-        original_setUpClass()
-
-    cls.setUpClass = new_setUpClass
-    return cls
-
-
-def make_clean_env() -> dict[str, str]:
-    clean_env = os.environ.copy()
-    for k in clean_env.copy():
-        if k.startswith("PYTHON"):
-            clean_env.pop(k)
-    clean_env.pop("FORCE_COLOR", None)
-    clean_env.pop("NO_COLOR", None)
-    return clean_env
-
-
-def initialized_with_pyrepl():
-    """Detect whether PyREPL was used during Python initialization."""
-    # If the main module has a __file__ attribute it's a Python module, which means PyREPL.
-    return hasattr(sys.modules["__main__"], "__file__")
-
-
 class BrokenIter:
     def __init__(self, init_raises=False, next_raises=False, iter_raises=False):
         if init_raises:
@@ -2837,25 +2591,6 @@ class BrokenIter:
         if self.iter_raises:
             1/0
         return self
-
-
-def linked_to_musl():
-    """
-    Test if the Python executable is linked to the musl C library.
-    """
-    if sys.platform != 'linux':
-        return False
-
-    import subprocess
-    exe = getattr(sys, '_base_executable', sys.executable)
-    cmd = ['ldd', exe]
-    try:
-        stdout = subprocess.check_output(cmd,
-                                         text=True,
-                                         stderr=subprocess.STDOUT)
-    except (OSError, subprocess.CalledProcessError):
-        return False
-    return ('musl' in stdout)
 
 
 def control_characters_c0() -> list[str]:

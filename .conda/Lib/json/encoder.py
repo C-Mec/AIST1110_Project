@@ -111,10 +111,9 @@ class JSONEncoder(object):
         encoding of keys that are not str, int, float, bool or None.
         If skipkeys is True, such items are simply skipped.
 
-        If ensure_ascii is true, the output is guaranteed to be str objects
-        with all incoming non-ASCII and non-printable characters escaped.
-        If ensure_ascii is false, the output can contain non-ASCII and
-        non-printable characters.
+        If ensure_ascii is true, the output is guaranteed to be str
+        objects with all incoming non-ASCII characters escaped.  If
+        ensure_ascii is false, the output can contain non-ASCII characters.
 
         If check_circular is true, then lists, dicts, and custom encoded
         objects will be checked for circular references during encoding to
@@ -135,15 +134,14 @@ class JSONEncoder(object):
         indent level.  An indent level of 0 will only insert newlines.
         None is the most compact representation.
 
-        If specified, separators should be an (item_separator,
-        key_separator) tuple.  The default is (', ', ': ') if *indent* is
-        ``None`` and (',', ': ') otherwise.  To get the most compact JSON
-        representation, you should specify (',', ':') to eliminate
-        whitespace.
+        If specified, separators should be an (item_separator, key_separator)
+        tuple.  The default is (', ', ': ') if *indent* is ``None`` and
+        (',', ': ') otherwise.  To get the most compact JSON representation,
+        you should specify (',', ':') to eliminate whitespace.
 
         If specified, default is a function that gets called for objects
-        that can't otherwise be serialized.  It should return a JSON
-        encodable version of the object or raise a ``TypeError``.
+        that can't otherwise be serialized.  It should return a JSON encodable
+        version of the object or raise a ``TypeError``.
 
         """
 
@@ -246,18 +244,15 @@ class JSONEncoder(object):
             return text
 
 
-        if self.indent is None or isinstance(self.indent, str):
-            indent = self.indent
-        else:
-            indent = ' ' * self.indent
-        if _one_shot and c_make_encoder is not None:
+        if (_one_shot and c_make_encoder is not None
+                and self.indent is None):
             _iterencode = c_make_encoder(
-                markers, self.default, _encoder, indent,
+                markers, self.default, _encoder, self.indent,
                 self.key_separator, self.item_separator, self.sort_keys,
                 self.skipkeys, self.allow_nan)
         else:
             _iterencode = _make_iterencode(
-                markers, self.default, _encoder, indent, floatstr,
+                markers, self.default, _encoder, self.indent, floatstr,
                 self.key_separator, self.item_separator, self.sort_keys,
                 self.skipkeys, _one_shot)
         return _iterencode(o, 0)
@@ -276,6 +271,9 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
         tuple=tuple,
         _intstr=int.__repr__,
     ):
+
+    if _indent is not None and not isinstance(_indent, str):
+        _indent = ' ' * _indent
 
     def _iterencode_list(lst, _current_indent_level):
         if not lst:
@@ -347,6 +345,7 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
             _current_indent_level += 1
             newline_indent = '\n' + _indent * _current_indent_level
             item_separator = _item_separator + newline_indent
+            yield newline_indent
         else:
             newline_indent = None
             item_separator = _item_separator
@@ -379,8 +378,6 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
                                 f'not {key.__class__.__name__}')
             if first:
                 first = False
-                if newline_indent is not None:
-                    yield newline_indent
             else:
                 yield item_separator
             yield _encoder(key)
@@ -407,7 +404,7 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
                 else:
                     chunks = _iterencode(value, _current_indent_level)
                 yield from chunks
-        if not first and newline_indent is not None:
+        if newline_indent is not None:
             _current_indent_level -= 1
             yield '\n' + _indent * _current_indent_level
         yield '}'

@@ -85,10 +85,6 @@ dict_values = type({}.values())
 dict_items = type({}.items())
 ## misc ##
 mappingproxy = type(type.__dict__)
-def _get_framelocalsproxy():
-    return type(sys._getframe().f_locals)
-framelocalsproxy = _get_framelocalsproxy()
-del _get_framelocalsproxy
 generator = type((lambda: (yield))())
 ## coroutine ##
 async def _coro(): pass
@@ -840,7 +836,6 @@ class Mapping(Collection):
     __reversed__ = None
 
 Mapping.register(mappingproxy)
-Mapping.register(framelocalsproxy)
 
 
 class MappingView(Sized):
@@ -1083,7 +1078,7 @@ class _DeprecateByteStringMeta(ABCMeta):
 
             warnings._deprecated(
                 "collections.abc.ByteString",
-                remove=(3, 17),
+                remove=(3, 14),
             )
         return super().__new__(cls, name, bases, namespace, **kwargs)
 
@@ -1092,18 +1087,14 @@ class _DeprecateByteStringMeta(ABCMeta):
 
         warnings._deprecated(
             "collections.abc.ByteString",
-            remove=(3, 17),
+            remove=(3, 14),
         )
         return super().__instancecheck__(instance)
 
 class ByteString(Sequence, metaclass=_DeprecateByteStringMeta):
-    """Deprecated ABC serving as a common supertype of ``bytes`` and ``bytearray``.
+    """This unifies bytes and bytearray.
 
-    This ABC is scheduled for removal in Python 3.17.
-    Use ``isinstance(obj, collections.abc.Buffer)`` to test if ``obj``
-    implements the buffer protocol at runtime. For use in type annotations,
-    either use ``Buffer`` or a union that explicitly specifies the types your
-    code supports (e.g., ``bytes | bytearray | memoryview``).
+    XXX Should add all their methods.
     """
 
     __slots__ = ()
