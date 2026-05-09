@@ -61,7 +61,7 @@ void
 premul_surf_color_by_alpha_sse2(SDL_Surface *src, SDL_Surface *dst);
 
 int
-pg_has_avx2(void);
+pg_has_avx2();
 void
 blit_blend_rgba_mul_avx2(SDL_BlitInfo *info);
 void
