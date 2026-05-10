@@ -203,7 +203,7 @@ class Grid_Surface(Base_Surface):
             elif self.multiplier == 2:
                 manager.add_surface(Transition_Surface(mode="final"))
                 manager.add_surface(FinalJeopardy(Vec2(self.screen_w, self.screen_h), Vec2(0,0), self.players, self.index2))
-                manager.remove_surface(self)
+                # manager.remove_surface(self)
 
         # --- Bot delayed selection ---
         elif self.bot_wait_until and pygame.time.get_ticks() >= self.bot_wait_until:

@@ -33,7 +33,7 @@ class Font:
     category_large  = make_font(swiss911, 48)
 
     # Clue text
-    clue_small  = make_font(korinna, 24)
+    clue_small  = make_font(korinna, 20)
     clue_medium = make_font(korinna, 28)
     clue_large  = make_font(korinna, 36)
 

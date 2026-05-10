@@ -253,11 +253,11 @@
     },
     {
       "clue": "This American football team is known as the 'Packers'.",
-      "correct_answer": "What is the Green Bay Packers?",
+      "correct_answer": "What is Green Bay Packers?",
       "options": [
-        "What is the Chicago Bears?",
-        "What is the Green Bay Packers?",
-        "What is the Dallas Cowboys?"
+        "What is Chicago Bears?",
+        "What is Green Bay Packers?",
+        "What is Dallas Cowboys?"
       ]
     },
     {
