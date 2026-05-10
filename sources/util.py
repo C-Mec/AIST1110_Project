@@ -11,6 +11,9 @@ import config
 def intxy(vec: Vec2) -> tuple[int, int]:
     return round(vec.x), round(vec.y)
 
+def now():
+    return pygame.time.get_ticks()
+    
 def now_is_time(time: int):
     from sources.manager import Game_Manager
     
