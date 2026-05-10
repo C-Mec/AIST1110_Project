@@ -24,6 +24,7 @@ from sources.manager import Surface_Manager, Game_Manager
 from sources.surfaces.surface_start import StartScreen
 from sources.surfaces.overlay import ScoreOverlay
 from sources.surfaces.surface_question import Question_Surface
+from sources.surfaces.surface_dailydouble import DailyDouble_Surface
 from sources.surfaces.surface_final import FinalJeopardy
 from sources.surfaces.visual import Cutscene_Surface, Transition_Surface
 
@@ -55,6 +56,8 @@ while running:
             print(f"Keydown  {event.unicode}")
             for surface in Surface_Manager.layers:
                 if isinstance(surface, FinalJeopardy):
+                    surface.handle_event(event)
+                elif isinstance(surface, DailyDouble_Surface):
                     surface.handle_event(event)
 
     # Render all surfaces in manager by their z-axis order
