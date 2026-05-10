@@ -217,10 +217,10 @@ class Grid_Surface(Base_Surface):
             # When the flashing end, question surface appears
             if not current_cell[3]:
                 self.current_popup.alpha = 255
+                self.current_popup.interactive = True
                 
             # When the popup screen is removed
             if self.current_popup not in manager.layers:
-                
                 # Mark cell as used
                 current_cell[2] = True
                 
@@ -264,6 +264,7 @@ class Grid_Surface(Base_Surface):
             grid_surface=self
         )
         popup.alpha = 0
+        popup.interactive = False
         
         self.current_popup = popup
         self.current_cell = (row, col)

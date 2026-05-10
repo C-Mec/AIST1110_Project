@@ -15,7 +15,7 @@ from sources.util import intxy, Color, Font
 from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
-from sources.surfaces.visual import notify, BorderFlash
+from sources.surfaces.visual import notify, BorderFlash, Cutscene_Surface
 
 if TYPE_CHECKING:
     from sources.surfaces.surface_grid import Grid_Surface
@@ -34,6 +34,7 @@ class Question_Surface(Base_Surface):
         self.question = question
         self.player = player
         self.bots = bots
+        self.interactive = False
         
         self.overshade = True
         
@@ -55,9 +56,10 @@ class Question_Surface(Base_Surface):
         self.answer_duration = 5
         
         # Bot Answering
-        self.bot_pending: tuple[Player, int] = None
+        self.bot_pending = None
         self.bot_buzz_time: int = None
         self.submitted_answers: list[tuple[Player, int]] = []
+        self.answer_start_time = None
         
         # For the next turn
         self.correctly_answered = None
@@ -73,53 +75,80 @@ class Question_Surface(Base_Surface):
                                dimension.x - 100, button_height)
             self.option_rects.append(rect)
 
-    def schedule_bot_buzz(self) -> None:
-        bot_answered = set(map(lambda x: x[0], filter(lambda x: x[0].bot, self.submitted_answers)))
-        bot_not_answered = set(self.bots) - bot_answered
-        
-        ### Handle Empty Robot Case
-        
-        bot = random.choice(list(bot_not_answered))
-        
+    def schedule_next_bot(self):
+        answered = {ans[0] for ans in self.submitted_answers}
+        remaining_bots = [b for b in self.bots if b not in answered]
+
+        if not remaining_bots:
+            self.close_time = pygame.time.get_ticks() + 1000
+            return
+
+        bot = random.choice(remaining_bots)
+
+        # Pick choice
+        all_indices = set(range(len(self.question.options)))
+        used_indices = {ans[1] for ans in self.submitted_answers}
+        remaining_indices = list(all_indices - used_indices)
+
+        if not remaining_indices:
+            self.close_time = pygame.time.get_ticks() + 1000
+            return
+
         correct_index = self.question.answer_index
-        wrong_index = random.choice(list(set(i for i in range(3)) - set(map(lambda x: x[1], self.submitted_answers))))
+        wrong_pool = [i for i in remaining_indices if i != correct_index]
 
-        if random.random() < config.bot_skill:
+        if len(remaining_indices) == 1:
             choice = correct_index
+        elif len(remaining_indices) == 2:
+            # 70% correct, 30% wrong
+            if random.random() < 0.7:
+                choice = correct_index
+            else:
+                choice = wrong_pool[0]
+        elif len(remaining_indices) == 3:
+            # 50% correct, 25% each wrong
+            r = random.random()
+            if r < 0.5:
+                choice = correct_index
+            elif r < 0.75:
+                choice = wrong_pool[0]
+            else:
+                choice = wrong_pool[1]
         else:
-            choice = wrong_index
+            # Fallback: 50/50 correct vs random wrong
+            if random.random() < 0.5:
+                choice = correct_index
+            else:
+                choice = random.choice(wrong_pool)
 
-        # schedule buzz
-        delay = random.uniform(750, 1500)
-        self.bot_buzz_time = pygame.time.get_ticks() + int(delay)
-        self.bot_pending = (bot, choice)
+        # Random delay 0.75–1.5s
+        delay_ms = int(random.uniform(750, 1500))
+        buzz_time = pygame.time.get_ticks() + delay_ms
+
+        # Queue only this bot
+        self.bot_pending = (buzz_time, bot, choice)
 
     def bot_try_answer(self, bot: Player, choice: int):
-        # Flash immediately when buzz happens
         manager.add_surface(BorderFlash(bot))
-
         self.submitted_answers.append((bot, choice))
-        self.stage = "Non-timed Answering"
 
         if choice == self.question.answer_index:
             bot.add_score(self.question.value)
-            
-            print(f"{bot.name} answered correctly! +${self.question.value}")
+            notify(f"{bot.name} answered correctly! +${self.question.value}")
+            self.correctly_answered = True
             self.close_time = pygame.time.get_ticks() + 1000
         else:
             bot.add_score(-self.question.value)
-            
-            print(f"{bot.name} answered wrong! -${self.question.value}")
+            notify(f"{bot.name} answered wrong! -${self.question.value}")
+            self.correctly_answered = False
 
-            self.schedule_bot_buzz()
-            if not self.bot_pending:
-                self.close_time = pygame.time.get_ticks() + 1000
+        self.bot_pending = None
     
     def session_remaining_time(self) -> float:
+        if not self.answer_start_time:
+            return 0
         elapsed_time = (pygame.time.get_ticks() - self.answer_start_time) / 1000
-        remaining_time = max(0, self.answer_duration - elapsed_time)
-        
-        return remaining_time
+        return max(0, self.answer_duration - elapsed_time)
     
     def draw(self, screen: Surface):
         # Paint background
@@ -170,33 +199,30 @@ class Question_Surface(Base_Surface):
             self.surface.blit(sec_text, sec_text.get_rect(center=center))
         
         def draw_options():
-            # Draw options
             for i, rect in enumerate(self.option_rects):
                 pygame.draw.rect(self.surface, Color.background, rect)
 
-                if self.stage == "Timed Answering":
+                if i == self.question.answer_index and self.correctly_answered:
+                    border_color = Color.correct
+                elif any(ans[1] == i for ans in self.submitted_answers):
+                    border_color = Color.wrong
+                else:
                     border_color = Color.border
-                    
-                elif self.stage == "Non-timed Answering":
-                    if i == self.question.answer_index:
-                        border_color = Color.correct
-                    elif i in set(range(3)) - set([self.question.answer_index]):
-                        border_color = Color.wrong
 
                 pygame.draw.rect(self.surface, border_color, rect, 2)
 
                 option_text = f"{chr(65+i)}. {self.question.options[i]}"
                 text = Font.clue_small.render(option_text, True, Color.text)
                 self.surface.blit(text, text.get_rect(center=rect.center))
-            
+
         # Drawing Elements
-        if self.stage == "Timed Answering":
-            draw_timer(self.session_remaining_time())
-            draw_options()
-        elif self.stage == "Non-timed Answering":
-            draw_options()
-        elif self.stage == "Buzz":
+        if self.stage == "Buzz":
             draw_buzz_button()
+        else:
+            if self.stage == "Timed Answering":
+                draw_timer(self.session_remaining_time())
+            # Always show options
+            draw_options()
 
         screen.blit(self.surface, self.pos)
     
@@ -204,61 +230,81 @@ class Question_Surface(Base_Surface):
         self.grid_surface.advance_turn(self.correctly_answered)
     
     def time_update(self):
-        # Resolve pending bot answer after 1s
-        if self.bot_pending and self.bot_buzz_time and pygame.time.get_ticks() >= self.bot_buzz_time:
-            bot, choice = self.bot_pending
-            self.bot_try_answer(bot, choice)
-            
-            self.bot_pending = None
-            self.bot_buzz_time = None
-    
-        # Kill surface after 1s delay
-        if self.close_time and pygame.time.get_ticks() >= self.close_time:
+        now = pygame.time.get_ticks()
+
+        # --- Bot buzz resolution ---
+        if self.bot_pending:
+            buzz_time, bot, choice = self.bot_pending
+            if now >= buzz_time:
+                self.bot_try_answer(bot, choice)
+
+                if self.correctly_answered:
+                    self.close_time = now + 1000
+
+        # --- Close after delay ---
+        if self.close_time and now >= self.close_time:
             manager.remove_surface(self)
-            
+
+        # --- Timeout handling ---
         if self.stage == "Timed Answering":
             remaining_time = self.session_remaining_time()
-            
-            if remaining_time <= 0:
+            if remaining_time < 0:
                 self.player.add_score(-self.question.value)
-                
                 notify(f"{self.player.name} timed out! -${self.question.value}")
-                
-                self.stage = "Non-timed Answering"
+                self.correctly_answered = False
 
-                # Setup the next bot and its answer
-                self.schedule_bot_buzz()
+                # Stop timer
+                self.answer_start_time = None
+                self.interactive = False
+
+                # Cutscene delay before bots buzz
+                self.cutscene_done_time = now + 1000
+                self.stage = "Bot Buzzing"
+
+        # --- Cutscene → start bots ---
+        elif self.stage == "Bot Buzzing":
+            if (not self.bot_pending
+                and not any(isinstance(s, Cutscene_Surface) for s in manager.layers)):
+                
+                self.schedule_next_bot()
 
     def on_click(self, pos: Vec2, player: Player):
+        if not getattr(self, "interactive", True):
+            return
+        
         if self.stage == "Buzz" and self.buzz_rect.collidepoint(pos):
             self.stage = "Timed Answering"
             self.answer_start_time = pygame.time.get_ticks()
             
             # Screen flash in player color
             manager.add_surface(BorderFlash(self.player))
-            
-        ### Need to prevent multiple scoring
         
         elif self.stage == "Timed Answering":
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(pos):
                     if self.question.answer_index == i:
-                        self.stage = "Non-timed Answering"
+                        # Correct answer
                         self.correctly_answered = True
-                        
                         player.add_score(self.question.value)
                         notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
-                        
                         self.close_time = pygame.time.get_ticks() + 1000
                     else:
+                        # Wrong answer
                         self.correctly_answered = False
-                        
                         player.add_score(-self.question.value)
                         notify(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
 
-                        self.stage = ""
-                        self.schedule_bot_buzz()
-    
+                        self.submitted_answers.append((player, i))
+                        
+                        # Stop timer immediately
+                        self.answer_start_time = None  
+                        self.interactive = False
+
+                        # Trigger cutscene delay before bots buzz
+                        self.cutscene_done_time = pygame.time.get_ticks() + 1000
+                        self.stage = "Bot Buzzing"
+
+        
     def resize(self, new_dimension: Vec2):
         # Resize popup proportionally to new window size.
         screen_w, screen_h = intxy(new_dimension)
