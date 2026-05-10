@@ -159,11 +159,11 @@
     },
     {
       "clue": "This natural phenomenon is caused by the interaction of solar wind with Earth's magnetic field.",
-      "correct_answer": "What are auroras?",
+      "correct_answer": "What is auroras?",
       "options": [
-        "What are auroras?",
-        "What are eclipses?",
-        "What are meteors?"
+        "What is auroras?",
+        "What is eclipses?",
+        "What is meteors?"
       ]
     }
   ],
@@ -215,11 +215,11 @@
     },
     {
       "clue": "This ancient structure was built as a tomb for the pharaohs.",
-      "correct_answer": "What are the pyramids?",
+      "correct_answer": "What is the pyramids?",
       "options": [
-        "What are the pyramids?",
-        "What are ziggurats?",
-        "What are temples?"
+        "What is the pyramids?",
+        "What is ziggurats?",
+        "What is temples?"
       ]
     }
   ],

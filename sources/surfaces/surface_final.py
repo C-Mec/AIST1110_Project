@@ -1,5 +1,6 @@
 import pygame, random, config, json
 from sources.manager import manager, Base_Surface, Game_Manager
+from sources.surfaces.surface_end import End_Surface
 from sources.datatype.player import Player
 from sources.util import Font, Color, intxy
 from pathlib import Path
@@ -48,7 +49,10 @@ class FinalJeopardy(Base_Surface):
         self.input_text = ""
         self.active_box = False
         self.phase = "wager"
+        
+        # Countdowns
         self.no_wager_start = None
+        self.end_countdown = None
         
         self.screen_w, self.screen_h = intxy(config.screen_dimension)
         self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
@@ -145,6 +149,8 @@ class FinalJeopardy(Base_Surface):
         self.confirmed = True
         print(f"{human.name} answered: {human.final_answer}")
 
+        self.end_countdown = pygame.time.get_ticks()
+
         for p in Game_Manager.players:
             if p.bot:
                 # Assign weights: 0.5 for correct, 0.25 for each wrong
@@ -177,6 +183,12 @@ class FinalJeopardy(Base_Surface):
 
     
     def draw(self, screen: Surface):
+        if self.end_countdown and pygame.time.get_ticks() - 2000 > self.end_countdown:
+            # Call end surface
+            end_surface = End_Surface(Vec2(self.screen_w, self.screen_h), Vec2(0,0))
+            manager.add_surface(end_surface)
+            manager.remove_surface(self)
+        
         screen.blit(self.background, (2, 0))
         self.surface.fill(Color.background)
 
@@ -211,7 +223,7 @@ class FinalJeopardy(Base_Surface):
                     rect2 = line2.get_rect(center=(x_positions[i], y+25))
                     self.surface.blit(line1, rect1)
                     self.surface.blit(line2, rect2)
-            else:
+            elif self.phase == "answer":
                 if p.wager == 0:
                     line1 = Font.clue_medium.render(f"{p.name}", True, Color.text)
                     line2 = Font.clue_medium.render(f"Did not wager", True, Color.text)
@@ -342,13 +354,8 @@ class FinalJeopardy(Base_Surface):
 
                 self.surface.blit(msg1, rect1)
 
-                # After 2 seconds, move to answer phase
-                if self.no_wager_start:
-                    elapsed = pygame.time.get_ticks() - self.no_wager_start
-                    if elapsed >= 3000:
-                        self.phase = "answer"
-                else:
-                    self.no_wager_start = pygame.time.get_ticks()
+                if not self.end_countdown:
+                    self.end_countdown = pygame.time.get_ticks()
             else:
                 # --- Answer input centered in 3 parts ---
                 prefix = "What is" if "What" in self.correct_option else "Who is"

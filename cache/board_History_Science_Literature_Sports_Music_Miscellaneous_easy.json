@@ -150,11 +150,11 @@
     },
     {
       "clue": "This famous band was known for the song 'Hey Jude'.",
-      "correct_answer": "Who are The Beatles?",
+      "correct_answer": "Who is The Beatles?",
       "options": [
-        "Who are The Rolling Stones?",
-        "Who are The Beatles?",
-        "Who are Led Zeppelin?"
+        "Who is The Rolling Stones?",
+        "Who is The Beatles?",
+        "Who is Led Zeppelin?"
       ]
     },
     {

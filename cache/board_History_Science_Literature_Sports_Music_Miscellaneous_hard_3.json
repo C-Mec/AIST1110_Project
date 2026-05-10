@@ -197,11 +197,11 @@
     },
     {
       "clue": "This event occurs every four years and features athletes from around the world.",
-      "correct_answer": "What are the Olympic Games?",
+      "correct_answer": "What is the Olympic Games?",
       "options": [
-        "What are the Pan American Games?",
-        "What are the Commonwealth Games?",
-        "What are the Olympic Games?"
+        "What is the Pan American Games?",
+        "What is the Commonwealth Games?",
+        "What is the Olympic Games?"
       ]
     },
     {

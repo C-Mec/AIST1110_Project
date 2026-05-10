@@ -253,11 +253,11 @@
     },
     {
       "clue": "This event is held every four years and features summer and winter sports.",
-      "correct_answer": "What are the Olympics?",
+      "correct_answer": "What is the Olympics?",
       "options": [
-        "What are the World Cup?",
-        "What are the Olympics?",
-        "What are the Commonwealth Games?"
+        "What is the World Cup?",
+        "What is the Olympics?",
+        "What is the Commonwealth Games?"
       ]
     },
     {

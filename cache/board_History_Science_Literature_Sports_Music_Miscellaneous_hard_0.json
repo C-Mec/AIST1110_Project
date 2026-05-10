@@ -271,11 +271,11 @@
     },
     {
       "clue": "This ancient wonder was located in the city of Babylon.",
-      "correct_answer": "What are the Hanging Gardens?",
+      "correct_answer": "What is the Hanging Gardens?",
       "options": [
-        "What are the Pyramids of Giza?",
-        "What are the Colossus of Rhodes?",
-        "What are the Hanging Gardens?"
+        "What is the Pyramids of Giza?",
+        "What is the Colossus of Rhodes?",
+        "What is the Hanging Gardens?"
       ]
     }
   ]

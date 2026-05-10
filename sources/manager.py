@@ -124,8 +124,9 @@ class Surface_Manager:
         pygame.display.flip()
         
     def update(self) -> None:
-        for base_surface in self.layers:
-            base_surface.time_update()
+        for surface in self.layers:
+            if hasattr(surface, "time_update"):
+                surface.time_update()
             
     def resize(self, new_dimension: tuple[int, int]):
         # Update screen reference and propagate resize to all surfaces

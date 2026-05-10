@@ -94,11 +94,11 @@
     },
     {
       "clue": "This famous band was from Liverpool.",
-      "correct_answer": "Who are The Beatles?",
+      "correct_answer": "Who is The Beatles?",
       "options": [
-        "Who are The Rolling Stones?",
-        "Who are The Beatles?",
-        "Who are The Who?"
+        "Who is The Rolling Stones?",
+        "Who is The Beatles?",
+        "Who is The Who?"
       ]
     },
     {
