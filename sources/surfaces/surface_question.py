@@ -90,31 +90,23 @@ class Question_Surface(Base_Surface):
             bot = random.choice(list(bot_not_answered))
         
         correct_index = self.question.answer_index
-        wrong_pool = [i for i in remaining_indices if i != correct_index]
+        wrong_index = [i for i in range(3) if i != correct_index]
 
-        if len(remaining_indices) == 1:
-            choice = correct_index
-        elif len(remaining_indices) == 2:
+        if len(wrong_index) == 1:
             # 70% correct, 30% wrong
             if random.random() < 0.7:
                 choice = correct_index
             else:
-                choice = wrong_pool[0]
-        elif len(remaining_indices) == 3:
+                choice = wrong_index[0]
+        elif len(wrong_index) == 2:
             # 50% correct, 25% each wrong
             r = random.random()
             if r < 0.5:
                 choice = correct_index
             elif r < 0.75:
-                choice = wrong_pool[0]
+                choice = wrong_index[0]
             else:
-                choice = wrong_pool[1]
-        else:
-            # Fallback: 50/50 correct vs random wrong
-            if random.random() < 0.5:
-                choice = correct_index
-            else:
-                choice = random.choice(wrong_pool)
+                choice = wrong_index[1]
 
         # schedule buzz
         delay = random.uniform(2750, 3500)
