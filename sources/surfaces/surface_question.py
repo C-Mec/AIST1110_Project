@@ -11,11 +11,11 @@ import math
 from typing import Literal, TYPE_CHECKING
 
 import config
-from sources.util import intxy, now_is_time, Color, Font
+from sources.util import intxy, now_is_time, blit_text_with_center, Color, Font
 from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.question import Question
 from sources.datatype.player import Player
-from sources.surfaces.visual import notify, BorderFlash, Cutscene_Surface
+from sources.surfaces.visual import notify, time_froze, BorderFlash, Cutscene_Surface
 
 if TYPE_CHECKING:
     from sources.surfaces.surface_grid import Grid_Surface
@@ -42,7 +42,6 @@ class Question_Surface(Base_Surface):
             "Answering", 
             "Timeout Re-buzz",
             "Wrong Re-buzz",
-            "Re-answering",
             "Result"
         ] = "Buzz"
         self.current_player = None
@@ -54,19 +53,17 @@ class Question_Surface(Base_Surface):
         self.buzz_rect = pygame.Rect(dimension.x//2 - 100, dimension.y//3, 200, 60)
 
         # Timer
-        self.answer_start_time = None
+        self.session_time = None
+        self.timer_time = None
         self.answer_duration = 5
         
         # Bot Answering
-        self.bot_action: tuple[Player, int, int] = None # Player, choice, time
+        self.bot_action: tuple[Player, Vec2, int] = None # bot, pos, time
         self.submitted_answers: list[tuple[Player, int]] = []
-        self.answer_start_time = None
+        self.timer_time = None
         
         self.schedule_bot_action()
         print(self.bot_action)
-        
-        # For the next turn
-        self.correctly_answered = None
 
         # Options: compute dynamically
         self.option_rects = []
@@ -79,46 +76,49 @@ class Question_Surface(Base_Surface):
                                dimension.x - 100, button_height)
             self.option_rects.append(rect)
 
-    def schedule_bot_action(self, same_player = False) -> None:
-        if same_player:
-            bot = self.current_player
-        else:
-            bots = filter(lambda x: x.bot, Game_Manager.players)
-            bot_answered = set(map(lambda x: x[0], filter(lambda x: x[0].bot, self.submitted_answers)))
-            bot_not_answered = set(bots) - bot_answered
+    def schedule_bot_action(self) -> None:
+        def determine_bot() -> Player:
+            bots = filter(lambda x: x.bot and x != self.current_player, Game_Manager.players)
             
-            bot = random.choice(list(bot_not_answered))
-        
-        correct_index = self.question.answer_index
-        wrong_index = [i for i in range(3) if i != correct_index]
+            return random.choice(list(bots))
+            
+        def determine_choice() -> int:
+            correct_index = self.question.answer_index
+            
+            # Submitted answers must be wrong
+            used_indexes = map(lambda x: x[1], self.submitted_answers) 
+            wrong_indexes = [i for i in range(3) if i != correct_index and i not in used_indexes]
 
-        if len(wrong_index) == 1:
-            # 70% correct, 30% wrong
-            if random.random() < 0.7:
-                choice = correct_index
+            if random.random() < config.bot_skill:
+                return random.choice(wrong_indexes)
             else:
-                choice = wrong_index[0]
-        elif len(wrong_index) == 2:
-            # 50% correct, 25% each wrong
-            r = random.random()
-            if r < 0.5:
-                choice = correct_index
-            elif r < 0.75:
-                choice = wrong_index[0]
-            else:
-                choice = wrong_index[1]
-
-        # schedule buzz
-        delay = random.uniform(2750, 3500)
-        click_time = pygame.time.get_ticks() + int(delay)
-        self.bot_action = (bot, choice, click_time)
+                return correct_index
         
-        print(self.bot_action, "SEttttttting")
+        buzz_point = Vec2(640, 310)
+        option_points = [Vec2(640, 400), Vec2(640, 475), Vec2(640, 540)]
+        
+        # Schedule bot answer
+        if self.stage == "Answering" and self.current_player.bot:
+            choice = determine_choice()
+            
+            click_time = pygame.time.get_ticks() + random.uniform(3000, 7000)
+            self.bot_action = (self.current_player, option_points[choice], click_time)
+        
+        if self.stage == "Buzz" or self.stage == "Timeout Re-buzz" or self.stage == "Wrong Re-buzz":
+            bot = determine_bot()
+            
+            click_time = pygame.time.get_ticks() + random.uniform(3000, 7000)
+            
+            # If bot_rebuzz time is later than the previous bot answer time, it should not override the previous bot's answer
+            if self.bot_action and click_time > self.bot_action[2]:
+                return
+            
+            self.bot_action = (bot, buzz_point, click_time)
     
     def session_remaining_time(self) -> float:
-        if not self.answer_start_time:
-            return 0
-        elapsed_time = (pygame.time.get_ticks() - self.answer_start_time) / 1000
+        assert self.timer_time
+        
+        elapsed_time = (pygame.time.get_ticks() - self.timer_time) / 1000
         return max(0, self.answer_duration - elapsed_time)
     
     def draw(self, screen: Surface):
@@ -134,11 +134,11 @@ class Question_Surface(Base_Surface):
         self.surface.blit(text, (30, 30))
         
         def draw_buzz_button():
-            # Buzz button in player color
             pygame.draw.rect(self.surface, Color.timer, self.buzz_rect)
-            pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
-            buzz_text = Font.logo_medium.render("BUZZ!", True, Color.black)
-            self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
+            pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 4)
+            
+            
+            blit_text_with_center("BUZZ", Font.logo_medium, Color.black, self.surface, self.buzz_rect.center)
         
         def draw_timer(remaining_time: float):
             # Circle depletion in degrees
@@ -207,123 +207,92 @@ class Question_Surface(Base_Surface):
         screen.blit(self.surface, self.pos)
     
     def on_close(self):
-        self.grid_surface.advance_turn(self.correctly_answered)
+        self.grid_surface.advance_turn(self.current_player)
         
     def time_update(self):
-        
-        def _bot_click():
-            bot, choice, click_time = self.bot_action
-            self.bot_action = None
-
-            buzz_point = Vec2(640, 310)
-            option_points = [Vec2(640, 400), Vec2(640, 475), Vec2(640, 540)]
-            
-            if self.stage in ["Buzz", "Timeout Re-buzz", "Wrong Re-buzz"]:
-                click_point = buzz_point
-            elif self.stage in ["Answering", "Re-answering"]:
-                click_point = option_points[choice]
-            
-            print(click_point, bot)
-            manager.click_at(click_point, bot)
-        
         # Resolve pending bot answer after 1s
         if self.bot_action and now_is_time(self.bot_action[2]):
             print("triggered")
 
-            _bot_click()
-    
-        # Kill surface after 1s delay
-        if self.close_time and pygame.time.get_ticks() >= self.close_time:
-            manager.remove_surface(self)
-
-        # --- Timeout handling ---
-        if self.stage == "Timed Answering":
-            remaining_time = self.session_remaining_time()
+            bot, pos, time = self.bot_action
+            self.bot_action = None
             
-            if remaining_time <= 0:
-                self.current_player.add_score(-self.question.value)
-                
-                notify(f"{self.current_player.name} timed out! -${self.question.value}")
-                
-                self.stage = "Non-timed Answering"
-
-                # Setup the next bot and its answer
-                self.schedule_bot_action()
-
-    def on_click(self, pos: Vec2, player: Player):
-        print(pos, player)
-        
-        def init_answer_session(player):
-            self.current_player = player
-            self.answer_start_time = pygame.time.get_ticks()
+            manager.click_at(pos, bot)
+            
+        if self.session_time and now_is_time(self.session_time):
+            self.session_time = None
+            print(pygame.time.get_ticks())
+            
+            self.stage = "Answering"
+            
+            self.timer_time = pygame.time.get_ticks()
             
             # Screen flash in player color
             manager.add_surface(BorderFlash(self.current_player))
             
-            if player.bot:
-                self.schedule_bot_action(True)
+            self.schedule_bot_action()
+    
+        # Kill surface after 1s delay
+        if self.close_time and now_is_time(self.close_time):
+            manager.remove_surface(self)
+
+        # --- Timeout handling ---
+        if self.stage == "Answering" and self.session_remaining_time() <= 0:
+            self.stage = "Timeout Re-buzz"
+            self.schedule_bot_action()
+
+    def on_click(self, pos: Vec2, player: Player):
+        print(pos, player)
+        
+        if self.stage in ["Buzz", "Wrong Re-buzz", "Timeout Re-buzz"] and self.buzz_rect.collidepoint(pos):
+            answered_players = map(lambda x: x[0], self.submitted_answers)
             
+            if player == self.current_player or player in answered_players:
+                warn("You are not allowed to buzz!")
+                return
+            
+            # When someone is robbed he cannot answered again
+            if self.current_player:
+                self.submitted_answers.append((self.current_player, -1))
+                
+            self.current_player = player
+            self.bot_action = None # Clear all bot actions
+            
+            # Delay for cutsence
+            notify(f"{player.name} buzzed!")
+            
+            # buzz_flash()
+            
+            self.session_time = pygame.time.get_ticks() + 100
+            print("Session Time Setup", self.session_time)
         
-        if self.stage == "Buzz" and self.buzz_rect.collidepoint(pos):
-            self.stage = "Answering"
-            init_answer_session(player)
-        
-        
-        if self.stage == "Answering":
+        if self.stage == "Answering" or self.stage == "Timeout Re-buzz":
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(pos):
                     if player != self.current_player:
                         warn("Only the current player can answer!")
                         return
+
+                    selected_answers = map(lambda x: x[1], self.submitted_answers)
+                    if i in selected_answers:
+                        warn("This answer is already selected!")
+                    
+                    self.submitted_answers.append((player, i))
                     
                     if self.question.answer_index == i:
                         self.stage = "Result"
-                        self._frozen_timer_time = pygame.time.get_ticks()
+                        self._frozen_timer_time = self.session_remaining_time()
                         
                         player.add_score(self.question.value)
+                        
                         notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
+                        
                         self.close_time = pygame.time.get_ticks() + 1000
                     else:
                         self.stage = "Wrong Re-buzz"
                         
                         player.add_score(-self.question.value)
+                        
                         notify(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
 
                         self.schedule_bot_action()
-        
-        if self.stage == "Timeout Re-buzz":
-            if self.buzz_rect.collidepoint(pos):
-                if player == self.current_player:
-                    warn("You cannot buzz while answering!")
-                    return
-
-                # Now player must be other players
-                self.stage = "Re-answering"
-                init_answer_session(player)
-                
-                notify(f"{player.name} buzzes!")
-        
-        if self.stage == "Wrong Re-buzz" and self.buzz_rect.collidepoint(pos):
-            if player == self.current_player:
-                warn("You cannot buzz again!")
-                return
-            
-            self.stage = "Re-answering"
-            init_answer_session(player)
-        
-        if self.stage == "Re-answering":
-            for i, rect in enumerate(self.option_rects):
-                if rect.collidepoint(pos):
-                    if player != self.current_player:
-                        warn("Only the current player can answer!")
-                        return
-                    
-                    if self.question.answer_index == i:
-                        player.add_score(self.question.value)
-                        notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
-                    else:
-                        notify(f"No one answers correctly!")
-                    
-                    self.close_time = pygame.time.get_ticks() + 1000
-        
-        print(self.bot_action, pygame.time.get_ticks(), "End of on click")

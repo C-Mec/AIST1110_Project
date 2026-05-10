@@ -43,7 +43,7 @@ class Font:
     logo_huge   = make_font(gyparody, 120)
     
 class Color:
-    border = "#FCB7B7"   #"#FFFFFF"
+    border = "#D49E9E"   #"#FFFFFF"
     text = "#f6a53a"   #"#FFFFFF"
     shadow = "#241B0F"
     
@@ -54,6 +54,9 @@ class Color:
     
     correct = "#3CB371"  # green
     wrong = "#DC143C"  # red
+    
+    buzz_light = "#557ABE"
+    buzz_dark = "#2927C4"
     
     timer = "#50C8C8"
     
@@ -74,7 +77,7 @@ class Color:
         for player, color in zip(players, chosen):
             player.color = color
 
-def blit_text(text: str, font: pygame.font.Font, color: Color, screen: Surface, centerPos):
+def blit_text_with_center(text: str, font: pygame.font.Font, color: Color, screen: Surface, centerPos):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(center=centerPos)
     screen.blit(text_surface, text_rect)
