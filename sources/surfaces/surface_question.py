@@ -124,12 +124,13 @@ class Question_Surface(Base_Surface):
         # Random delay 0.75–1.5s
         delay_ms = int(random.uniform(750, 1500))
         buzz_time = pygame.time.get_ticks() + delay_ms
+        delay_ms = int(random.uniform(750, 1500))
+        answer_time = delay_ms
 
         # Queue only this bot
-        self.bot_pending = (buzz_time, bot, choice)
+        self.bot_pending = (buzz_time, bot, choice, answer_time)
 
     def bot_try_answer(self, bot: Player, choice: int):
-        manager.add_surface(BorderFlash(bot))
         self.submitted_answers.append((bot, choice))
 
         if choice == self.question.answer_index:
@@ -166,7 +167,7 @@ class Question_Surface(Base_Surface):
             # Buzz button in player color
             pygame.draw.rect(self.surface, self.player.color, self.buzz_rect)
             pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
-            buzz_text = Font.logo_large.render("BUZZ!", True, Color.black)
+            buzz_text = Font.logo_medium.render("BUZZ!", True, Color.black)
             self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
         
         def draw_timer(remaining_time: float):
@@ -219,7 +220,7 @@ class Question_Surface(Base_Surface):
         if self.stage == "Buzz":
             draw_buzz_button()
         else:
-            if self.stage == "Timed Answering":
+            if self.answer_start_time:
                 draw_timer(self.session_remaining_time())
             # Always show options
             draw_options()
@@ -234,12 +235,17 @@ class Question_Surface(Base_Surface):
 
         # --- Bot buzz resolution ---
         if self.bot_pending:
-            buzz_time, bot, choice = self.bot_pending
-            if now >= buzz_time:
+            buzz_time, bot, choice, answer_time = self.bot_pending
+            if now >= buzz_time + answer_time:
+                self.answer_start_time = None
                 self.bot_try_answer(bot, choice)
 
                 if self.correctly_answered:
                     self.close_time = now + 1000
+            elif now >= buzz_time:
+                if not self.answer_start_time:
+                    manager.add_surface(BorderFlash(bot))
+                    self.answer_start_time = pygame.time.get_ticks()
 
         # --- Close after delay ---
         if self.close_time and now >= self.close_time:
@@ -266,7 +272,6 @@ class Question_Surface(Base_Surface):
         elif self.stage == "Bot Buzzing":
             if (not self.bot_pending
                 and not any(isinstance(s, Cutscene_Surface) for s in manager.layers)):
-                
                 self.schedule_next_bot()
 
     def on_click(self, pos: Vec2, player: Player):

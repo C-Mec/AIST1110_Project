@@ -33,8 +33,9 @@ class Font:
     clue_large  = make_font(korinna, 36)
 
     # Logo / transitions
-    logo_large = make_font(gyparody, 72)
-    logo_huge  = make_font(gyparody, 120)
+    logo_medium = make_font(gyparody, 60)
+    logo_large  = make_font(gyparody, 72)
+    logo_huge   = make_font(gyparody, 120)
     
 class Color:
     border = "#000000"   #"#FFFFFF"
