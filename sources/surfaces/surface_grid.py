@@ -11,6 +11,7 @@ from sources.manager import Surface_Manager, Game_Manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.surface_question import Question_Surface
+from sources.surfaces.surface_dailydouble import DailyDouble_Surface
 from sources.surfaces.surface_final import FinalJeopardy
 from sources.surfaces.visual import Transition_Surface
 
@@ -21,7 +22,7 @@ class Grid_Surface(Base_Surface):
         # Board and player settings
         self.current_player = start_player
         self.current_board = Game_Manager.boards[1 if is_double else 0]
-        self.multiplier = 1
+        self.multiplier = 2 if is_double else 1
         
         ## Runtime variables
         # Bot action (uses rpos instead of pos)
@@ -79,7 +80,17 @@ class Grid_Surface(Base_Surface):
                 board_data[r].append({"clue":"Placeholder","options":["A"],"correct_answer":"A"})
 
         self.grid = [[None for _ in range(g_width)] for _ in range(g_height)]
-
+        rows = range(num_rows)
+        cols = range(num_cols)
+        all_positions = [(r + 1, c) for r in rows for c in cols]
+        daily_double = []
+        if self.multiplier == 2:
+            # Pick two unique positions
+            daily_double = random.sample(all_positions, 2)
+        else: 
+            daily_double = random.sample(all_positions, 1)
+        print(daily_double)
+        
         for row in range(num_rows):
             for col in range(num_cols):
                 rect = pygame.Rect(
@@ -94,7 +105,8 @@ class Grid_Surface(Base_Surface):
                     problem=q_data["clue"],
                     options=q_data["options"],
                     answer_ind=q_data["options"].index(q_data["correct_answer"]),
-                    value=value
+                    value=value,
+                    is_daily=True if (row + 1, col) in daily_double else False
                 )
                 self.grid[row + 1][col] = [rect, q, False, None]
     
@@ -275,11 +287,20 @@ class Grid_Surface(Base_Surface):
             "player": player
         }
         self.grid[row][col][3] = flash
+        print(question.is_daily)
         
-        popup = Question_Surface(
-            question=question,
-            grid_surface=self
-        )
+        if question.is_daily:
+            popup = DailyDouble_Surface(
+                question=question,
+                category=config.game_categories[col],
+                grid_surface=self,
+                player=player
+            )
+        else:
+            popup = Question_Surface(
+                question=question,
+                grid_surface=self
+            )
         popup.alpha = 0
         popup.interactive = False
         
@@ -287,6 +308,8 @@ class Grid_Surface(Base_Surface):
         self.current_cell = (row, col)
         
         Surface_Manager.add_surface(popup)
+        if question.is_daily:
+            Surface_Manager.add_surface(Transition_Surface(mode="dailydouble"))
     
     def draw(self, screen: Surface):
         # Draw full background first
