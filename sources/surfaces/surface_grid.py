@@ -56,8 +56,9 @@ class Grid_Surface(Base_Surface):
         self.question_gen = LLMQuestionGenerator()
         self.multiplier = 1
         num_rows = 5   # row 0 is for categories, so only generate for 1-5
-        self.jeopardy_board = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="easy")
-        self.double_board   = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="hard")
+        index1, index2 = int(random.uniform(0, 5)), int(random.uniform(0, 5))
+        self.jeopardy_board = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="easy", index=index1)
+        self.double_board   = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="hard", index=index2)
         self.current_board = self.jeopardy_board   # use this for normal round, switch to double_board for double jeopardy
         self._grid_init()
 

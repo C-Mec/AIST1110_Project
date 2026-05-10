@@ -96,3 +96,8 @@
 +conda-forge/noarch::typing_extensions-4.15.0-pyhcf101f3_0
 +conda-forge/win-64::pydantic-core-2.46.4-py312hdabe01f_0
 # update specs: ['pydantic', 'pydantic-core']
+==> 2026-05-10 15:50:18 <==
+# cmd: C:\Users\SzeWai\anaconda3\Scripts\conda-script.py install -c conda-forge jiter
+# conda version: 26.1.1
++conda-forge/win-64::jiter-0.13.0-py312hb0142fd_0
+# update specs: ['jiter']

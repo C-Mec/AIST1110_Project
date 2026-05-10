@@ -22,14 +22,14 @@ class LLMQuestionGenerator:
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
 
-    def generate_board(self, categories: List[str], rows: int = 5, difficulty: str = "normal") -> List[List[Dict]]:
+    def generate_board(self, categories: List[str], rows: int = 5, difficulty: str = "normal", index: int = 0) -> List[List[Dict]]:
         """
         Returns a 2D list: shape (rows, len(categories))
         Each element is a dict with keys: clue, correct_answer, options
         difficulty: "easy" or "hard" – used for cache file name and prompt
         """
         # cache file name based on categories and difficulty
-        cache_file = self.cache_dir / f"board_{'_'.join(categories)}_{difficulty}.json"
+        cache_file = self.cache_dir / f"board_{'_'.join(categories)}_{difficulty}_{index}.json"
         if cache_file.exists():
             print(f"Loading {difficulty} board from cache.")
             with open(cache_file) as f:
@@ -104,6 +104,7 @@ class LLMQuestionGenerator:
         except Exception as e:
             print(f"LLM generation failed for {difficulty}: {e}. Using fallback questions.")
             return self._fallback_board(categories, rows)
+
     def _fallback_board(self, categories: List[str], rows: int) -> List[List[Dict]]:
         """Fallback hardcoded questions when API fails."""
         board = []
