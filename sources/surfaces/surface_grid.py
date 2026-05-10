@@ -55,6 +55,10 @@ class Grid_Surface(Base_Surface):
 
         self.question_gen = LLMQuestionGenerator()
         self.multiplier = 1
+        num_rows = 5   # row 0 is for categories, so only generate for 1-5
+        self.jeopardy_board = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="easy")
+        self.double_board   = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="hard")
+        self.current_board = self.jeopardy_board   # use this for normal round, switch to double_board for double jeopardy
         self._grid_init()
 
     def _grid_init(self):
@@ -64,7 +68,7 @@ class Grid_Surface(Base_Surface):
         num_cols = g_width
         num_rows = g_height - 1
 
-        board_data = self.question_gen.generate_board(self.categories, rows=num_rows)
+        board_data = board_data = self.current_board   
         while len(board_data) < num_rows:
             board_data.append([{"clue":"Placeholder","options":["A"],"correct_answer":"A"} for _ in range(num_cols)])
         for r in range(num_rows):
