@@ -1,14 +1,8 @@
 ###### How to activate conda
 conda activate ./.conda
 
-###### Surface Drawing
-Please use portion coordinate, and convert them to relative coordinate just 
-    before drawing.
+###### How to run
+python main.py
 
-！！！！
-cd (change directory) to your project
-folder.  
-Run:  
-$ echo AZURE_API_KEY=<your_api_key> > .env  
-e.g.,
-$ echo AZURE_API_KEY=abcd... > .env 
+###### How to use AI-generated questions in real time
+remove the files inside ./cache
