@@ -32,8 +32,12 @@ class End_Surface(Base_Surface):
         self.start_time = pygame.time.get_ticks()
         self.zoom_scale = 1.0
 
+        # Quit button rect
+        self.quit_button = Rect(self.dimension.x//2 - 60,
+                                self.dimension.y - 80,
+                                120, 40)
+
     def time_update(self):
-        # Zoom in effect: scale grows over time
         elapsed = (pygame.time.get_ticks() - self.start_time) / 1000.0
         self.zoom_scale = min(elapsed, 1.0)
 
@@ -41,44 +45,60 @@ class End_Surface(Base_Surface):
         screen.blit(self.background, (2, 0))
         self.surface.fill(Color.background)
 
-        if not self.winner:
-            return
+        if self.winner:
+            texts = [
+                ("Congratulations!", Font.logo_large),
+                (self.winner.name, Font.logo_large),
+                (f"${self.winner.score}", Font.logo_large)
+            ]
 
-        texts = [
-            ("Congratulations!", Font.logo_large),
-            (self.winner.name, Font.logo_large),
-            (f"${self.winner.score}", Font.logo_large)
-        ]
+            center_x = self.surface.get_width() // 2
+            center_y = self.surface.get_height() // 2
+            y_offset = center_y - (len(texts) * 60) // 2
 
-        center_x = self.surface.get_width() // 2
-        center_y = self.surface.get_height() // 2
-        y_offset = center_y - (len(texts) * 60) // 2
+            for text, font in texts:
+                base_surface = font.render(text, True, Color.text)
+                shadow_surface = font.render(text, True, Color.shadow)
 
-        for text, font in texts:
-            base_surface = font.render(text, True, Color.text)
-            shadow_surface = font.render(text, True, Color.shadow)  # darker shadow color
+                w, h = base_surface.get_size()
+                scaled_surface = pygame.transform.smoothscale(
+                    base_surface, (int(w * self.zoom_scale), int(h * self.zoom_scale))
+                )
+                scaled_shadow = pygame.transform.smoothscale(
+                    shadow_surface, (int(w * self.zoom_scale), int(h * self.zoom_scale))
+                )
 
-            w, h = base_surface.get_size()
+                rect = scaled_surface.get_rect(center=(center_x, y_offset))
+                shadow_rect = rect.copy()
+                shadow_rect.x += 2
+                shadow_rect.y += 2
 
-            # Scale both text and shadow
-            scaled_surface = pygame.transform.smoothscale(
-                base_surface,
-                (int(w * self.zoom_scale), int(h * self.zoom_scale))
-            )
-            scaled_shadow = pygame.transform.smoothscale(
-                shadow_surface,
-                (int(w * self.zoom_scale), int(h * self.zoom_scale))
-            )
+                self.surface.blit(scaled_shadow, shadow_rect)
+                self.surface.blit(scaled_surface, rect)
 
-            rect = scaled_surface.get_rect(center=(center_x, y_offset))
-            shadow_rect = rect.copy()
-            shadow_rect.x += 2   # offset shadow right
-            shadow_rect.y += 2   # offset shadow down
+                y_offset += rect.height + 20
 
-            # Blit shadow first, then text
-            self.surface.blit(scaled_shadow, shadow_rect)
-            self.surface.blit(scaled_surface, rect)
+        # --- Draw Quit button ---
+        pygame.draw.rect(self.surface, Color.white, self.quit_button)
+        pygame.draw.rect(self.surface, Color.border, self.quit_button, 2)
 
-            y_offset += rect.height + 20
+        # Render shadow first
+        quit_shadow = Font.clue_medium.render("Quit", True, Color.shadow)
+        shadow_rect = quit_shadow.get_rect(center=self.quit_button.center)
+        shadow_rect.x += 2
+        shadow_rect.y += 2
+        self.surface.blit(quit_shadow, shadow_rect)
+
+        # Render main text on top
+        quit_text = Font.clue_medium.render("Quit", True, Color.text)
+        quit_rect = quit_text.get_rect(center=self.quit_button.center)
+        self.surface.blit(quit_text, quit_rect)
+
 
         screen.blit(self.surface, self.pos)
+
+    def on_click(self, pos: Vec2, player: Player):
+        # Check if quit button clicked
+        if self.quit_button.collidepoint(pos):
+            pygame.quit()
+            exit()
