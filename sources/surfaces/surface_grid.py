@@ -68,7 +68,7 @@ class Grid_Surface(Base_Surface):
         num_cols = g_width
         num_rows = g_height - 1
 
-        board_data = board_data = self.current_board   
+        board_data = self.current_board   
         while len(board_data) < num_rows:
             board_data.append([{"clue":"Placeholder","options":["A"],"correct_answer":"A"} for _ in range(num_cols)])
         for r in range(num_rows):

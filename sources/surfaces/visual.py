@@ -105,8 +105,10 @@ class Transition_Surface(Base_Surface):
         self.create_time = pygame.time.get_ticks()
 
         # Load the correct image depending on mode
-        if self.mode == "double":
+        if self.mode == "dailydouble":
             self.image = pygame.image.load("assets/Jeopardy-DailyDouble.webp").convert_alpha()
+        elif self.mode == "double":
+            self.image = pygame.image.load("assets/Jeopardy-DoubleJeopardy.png").convert_alpha()
         elif self.mode == "final":
             self.image = pygame.image.load("assets/Jeopardy-FinalJeopardy.webp").convert_alpha()
         else:
@@ -136,7 +138,7 @@ class Transition_Surface(Base_Surface):
             # Drop in
             progress = elapsed / 1.0
             y_offset = -self.rect.height * (1 - progress)
-        elif self.mode in ("jeopardy", "double"):
+        elif self.mode in ("jeopardy", "double", "dailydouble"):
             # Bounce above baseline
             t = elapsed - 1.0
             y_offset = -self._bounce(t)
@@ -153,7 +155,7 @@ class Transition_Surface(Base_Surface):
         self.surface.blit(self.image, rect)
         screen.blit(self.surface, self.pos)
 
-        if elapsed > 4:
+        if elapsed > 3:
             self.fade(128)
     
     def resize(self, new_dimension: Vec2):
@@ -163,8 +165,10 @@ class Transition_Surface(Base_Surface):
         self.rect = self.surface.get_rect(topleft=self.pos)
 
         # Reload and rescale image to new dimension
-        if self.mode == "double":
+        if self.mode == "dailydouble":
             self.image = pygame.image.load("assets/Jeopardy-DailyDouble.webp").convert_alpha()
+        elif self.mode == "double":
+            self.image = pygame.image.load("assets/Jeopardy-DoubleJeopardy.png").convert_alpha()
         elif self.mode == "final":
             self.image = pygame.image.load("assets/Jeopardy-FinalJeopardy.webp").convert_alpha()
         else:
