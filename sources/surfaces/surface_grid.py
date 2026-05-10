@@ -137,16 +137,11 @@ class Grid_Surface(Base_Surface):
                 if self.grid[row][col]:
                     self.grid[row][col][0] = rect
 
-    def advance_turn(self, correct: bool):
+    def advance_turn(self, correct):
         if correct:
-            next_player = self.current_player
-        else:
-            other_players = [p for p in self.players if p is not self.current_player]
-            next_player = random.choice(other_players)
+            self.current_player = correct
 
-        self.current_player = next_player
-
-        if next_player.bot:
+        if self.current_player.bot:
             # The time for cutsence is added here (manually)
             delay_ms = int(random.uniform(3750, 4750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
@@ -168,7 +163,7 @@ class Grid_Surface(Base_Surface):
         # --- Round reset check ---
         def board_all_used() -> bool:
             g_width, g_height = intxy(self.grid_dimension)
-            all_used = all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
+            return all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
             
         if board_all_used():
             if self.multiplier == 1:
@@ -197,13 +192,28 @@ class Grid_Surface(Base_Surface):
                 if available:
                     row, col = random.choice(available)
                     rect, question, used, flash = self.grid[row][col]
-                    self.grid[row][col][3] = {
+                    flash = {
                         "color": self.current_player.color,
                         "start": pygame.time.get_ticks(),
                         "count": 0,
                         "player": self.current_player
                     }
+                    self.grid[row][col][3] = flash
                     self.grid[row][col][2] = True
+                    
+                    popup = Question_Surface(
+                        question=question,
+                        player=flash["player"],
+                        bots=self.players[1:],
+                        grid_surface=self
+                    )
+                    popup.alpha = 0
+                    popup.interactive = False
+
+                    self.current_popup = popup
+                    self.current_cell = (row, col)
+
+                    manager.add_surface(popup)
             self.bot_wait_until = None
         
         if self.current_cell:
