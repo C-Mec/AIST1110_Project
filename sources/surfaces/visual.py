@@ -105,7 +105,6 @@ class Cutscene_Surface(Base_Surface):
         self.surface = Surface(new_dimension, pygame.SRCALPHA)
         self.rect = self.surface.get_rect(topleft=self.pos)
 
-
 class Transition_Surface(Base_Surface):
     def __init__(self, mode: str = "jeopardy"):
         super().__init__(Vec2(*config.screen_dimension), Vec2(0, 0))

@@ -5,7 +5,7 @@ Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
-from sources.util import intxy, blit_text, Font, Color
+from sources.util import intxy, now_is_time, Font, Color
 from sources.manager import manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
@@ -21,6 +21,10 @@ class Grid_Surface(Base_Surface):
 
         self.players = players
         self.current_player = players[0]
+        
+        # Bot action (uses rpos instead of pos)
+        self.bot_action: tuple[Player, Vec2, int] = None # bot, pos, time
+        
         
         # Transition from the end of question to next selection
         self.bot_wait_until = None
@@ -163,15 +167,36 @@ class Grid_Surface(Base_Surface):
                 if self.grid[row][col]:
                     self.grid[row][col][0] = rect
 
-    def advance_turn(self, correct):
-        if correct:
-            self.current_player = correct
-
+    def advance_turn(self, current_player: Player):
+        self.current_player = current_player
+        
         if self.current_player.bot:
-            # The time for cutsence is added here (manually)
-            delay_ms = int(random.uniform(3750, 4750))
-            self.bot_wait_until = pygame.time.get_ticks() + delay_ms
+            
+            def select_grid():
+                g_width, g_height = intxy(self.grid_dimension)
+                available = [
+                    (r, c)
+                    for r in range(1, g_height)
+                    for c in range(g_width)
+                    if not self.grid[r][c][2]
+                ]
+            
+                assert available
+                
+                return random.choice(available)
+            
+            row, col = select_grid()
+            rpos = self._calculate_cell_pos(row, col)
+            
+            click_time = pygame.time.get_ticks() + random.uniform(2000, 4000)
+            self.bot_action = (self.current_player, rpos, click_time)
 
+    # This is most likely inaccurate
+    def _calculate_cell_pos(self, row: int, col: int) -> Vec2:
+        cell_w, cell_h = intxy(self.cell_dimension)
+        
+        return Vec2(col * cell_w, row * cell_h) # Rpos
+        
     def call_lowest_player(self):
         # Find player with least money
         poorest_player = min(self.players, key=lambda p: p.score)
@@ -186,6 +211,15 @@ class Grid_Surface(Base_Surface):
 
     
     def time_update(self):
+        if self.bot_action and now_is_time(self.bot_action[2]):
+            print("triggered")
+             
+            bot, pos, time = self.bot_action
+            self.bot_action = None
+            
+            # Rpos is used
+            self.on_click(pos, bot)
+        
         # --- Round reset check ---
         def board_all_used() -> bool:
             g_width, g_height = intxy(self.grid_dimension)
@@ -204,43 +238,6 @@ class Grid_Surface(Base_Surface):
                 manager.add_surface(Transition_Surface(mode="final"))
                 manager.add_surface(FinalJeopardy(Vec2(self.screen_w, self.screen_h), Vec2(0,0), self.players))
                 manager.remove_surface(self)
-
-        # --- Bot delayed selection ---
-        elif self.bot_wait_until and pygame.time.get_ticks() >= self.bot_wait_until:
-            if self.current_player.bot:
-                g_width, g_height = intxy(self.grid_dimension)
-                available = [
-                    (r, c)
-                    for r in range(1, g_height)
-                    for c in range(g_width)
-                    if not self.grid[r][c][2]
-                ]
-                if available:
-                    row, col = random.choice(available)
-                    rect, question, used, flash = self.grid[row][col]
-                    flash = {
-                        "color": self.current_player.color,
-                        "start": pygame.time.get_ticks(),
-                        "count": 0,
-                        "player": self.current_player
-                    }
-                    self.grid[row][col][3] = flash
-                    self.grid[row][col][2] = True
-                    
-                    popup = Question_Surface(
-                        question=question,
-                        player=flash["player"],
-                        bots=self.players[1:],
-                        grid_surface=self
-                    )
-                    popup.alpha = 0
-                    popup.interactive = False
-
-                    self.current_popup = popup
-                    self.current_cell = (row, col)
-
-                    manager.add_surface(popup)
-            self.bot_wait_until = None
         
         if self.current_cell:
             row, col = self.current_cell
