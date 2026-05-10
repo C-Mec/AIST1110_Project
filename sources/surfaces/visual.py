@@ -95,12 +95,12 @@ class Cutscene_Surface(Base_Surface):
 
         elapsed = (pygame.time.get_ticks() - self.create_time) / 1000
 
-        if elapsed > 4:
+        if elapsed > 3.5:
             self.fade(128)
 
         if elapsed > 1:
-            # Scale factor: grow to full size in 2s
-            scale_factor = min((elapsed - 1) / 2, 1.0)
+            # Scale factor: grow to full size in 1.5s
+            scale_factor = min((elapsed - 1) / 1,5, 1.0)
 
             # Target size is half of the oversampled surface (so final = crisp 72px)
             target_w = int(self.text_surface.get_width() * scale_factor * 0.5)
