@@ -56,6 +56,7 @@ while running:
         
         if event.type == pygame.KEYDOWN:
             print(f"Keydown  {event.unicode}")
+            
             for surface in Surface_Manager.layers:
                 if isinstance(surface, FinalJeopardy):
                     surface.handle_event(event)

@@ -165,8 +165,6 @@ class Surface_Manager:
 class Game_Manager:
     players: list[Player] = []
     boards: list[Board] = []
-    
-    # 
 
     # Time control
     frame_frozen: int = 0

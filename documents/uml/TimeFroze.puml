@@ -1,0 +1,17 @@
+@startuml
+title TimeFroze
+
+skinparam classAttributeIconSize 0
+hide circle
+skinparam linetype ortho
+
+class TimeFroze {
+  +overshade: bool
+  +duration: int
+  ..
+  +__init__(duration: int)
+  +time_update()
+  +on_close()
+}
+
+@enduml

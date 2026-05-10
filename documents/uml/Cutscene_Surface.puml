@@ -1,0 +1,20 @@
+@startuml
+title Cutscene_Surface
+
+skinparam classAttributeIconSize 0
+hide circle
+skinparam linetype ortho
+
+class Cutscene_Surface {
+  +message: str
+  +base_font
+  +text_surface: Surface
+  ..
+  +__init__(message: str)
+  +draw(screen: Surface)
+  +time_update()
+  +on_close()
+  +resize(new_dimension: Vec2)
+}
+
+@enduml
