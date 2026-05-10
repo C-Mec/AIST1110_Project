@@ -8,7 +8,7 @@ Vec2 = pygame.Vector2
 
 import config
 from sources.util import Color, Font
-from sources.manager import manager, Base_Surface
+from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
 
 class BorderFlash(Base_Surface):
@@ -83,6 +83,14 @@ class Cutscene_Surface(Base_Surface):
                 self.surface.blit(scaled, rect)
 
         screen.blit(self.surface, self.pos)
+    
+    def time_update(self):
+        assert not any(isinstance(s, Transition_Surface) for s in manager.layers)
+        
+        Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
+    
+    def on_close(self):
+        Game_Manager.frame_frozen = 0
 
 class Transition_Surface(Base_Surface):
     def __init__(self, mode: str = "jeopardy"):
@@ -141,6 +149,14 @@ class Transition_Surface(Base_Surface):
 
         if elapsed > 4:
             self.fade(128)
+    
+    def time_update(self):
+        assert not any(isinstance(s, Cutscene_Surface) for s in manager.layers)
+        
+        Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
+    
+    def on_close(self):
+        Game_Manager.frame_frozen = 0
 
 class FloatingText:
     def __init__(self, player: Player, amount: int):

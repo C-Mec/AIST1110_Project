@@ -82,7 +82,7 @@ class Surface_Manager:
         
         self.layers.remove(base_surface)
     
-    def get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
+    def _get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
         for base_surface in reversed(self.layers):
             if base_surface.rect.collidepoint(pos):
                 rpos = pos - base_surface.pos
@@ -93,6 +93,16 @@ class Surface_Manager:
                 return None, None
         
         return None, None
+
+    def click_at(self, pos: Vec2, player: Player):
+        surface, rpos = self._get_top_collision(pos)
+        
+        print("-------")
+        print(f"Pos: {pos}, Surface: {surface}, Rpos: {rpos}")
+        print(manager.layers)
+        
+        if surface:
+            surface.on_click(rpos, player)
     
     def render(self) -> None:
         # fill the screen with a color to wipe away anything from last frame
@@ -109,6 +119,7 @@ class Surface_Manager:
 
 class Game_Manager:
     players: list[Player] = []
+    frame_frozen: int = 0
     
     @classmethod
     def init(cls) -> list[Player]:
