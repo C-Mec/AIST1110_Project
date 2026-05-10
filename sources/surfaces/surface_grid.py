@@ -35,6 +35,7 @@ class Grid_Surface(Base_Surface):
         self._background_init()
         self._dimension_init()
         self._grid_init()
+        self._daily_init()
     
     def _dimension_init(self):
         
@@ -97,6 +98,9 @@ class Grid_Surface(Base_Surface):
                     value=value
                 )
                 self.grid[row + 1][col] = [rect, q, False, None]
+    
+    def _daily_init():
+        row = random.randint(1, 6)
     
     def squeeze_text(self, text, font, color, target_rect, padding=5):
         # Render text normally
