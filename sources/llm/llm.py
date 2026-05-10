@@ -3,11 +3,10 @@ import os
 
 import config
 from pathlib import Path
-from typing import List, Dict, Any
 from dotenv import load_dotenv
 from openai import OpenAI
 
-Board = List[List[Dict]]
+
 
 load_dotenv()
 AZURE_API_KEY = os.getenv("AZURE_API_KEY")
@@ -26,7 +25,7 @@ class LLMQuestionGenerator:
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
 
-    def generate_board(self, rows: int = 5, difficulty: str = "normal", index: int = 0) -> List[List[Dict]]:
+    def generate_board(self, rows: int = 5, difficulty: str = "normal", index: int = 0):
         """
         Returns a 2D list: shape (rows, len(categories))
         Each element is a dict with keys: clue, correct_answer, options
@@ -34,20 +33,20 @@ class LLMQuestionGenerator:
         """
         categories = config.game_categories
         
-        # cache file name based on categories and difficulty
+        # cache file name based on difficulty
         cache_file = self.cache_dir / f"board_{'_'.join(categories)}_{difficulty}_{index}.json"
         if cache_file.exists():
             print(f"Loading {difficulty} board from cache.")
             with open(cache_file) as f:
                 return json.load(f)
 
-        # change the prompt based on difficulty
-        difficulty_instruction = ""
+        # change difficulty
         if difficulty == "easy":
-            difficulty_instruction = "Use common, well‑known facts. Make the questions easy to answer."
-        else:
-            difficulty_instruction = "Use more obscure, challenging facts. Make the questions harder."
-
+            difficulty_instruction = "super easy, common knowledge"
+        elif difficulty == "hard":
+            difficulty_instruction = "hard, tricky facts"
+        else:  # normal
+            difficulty_instruction = "normal difficulty, mix of easy and medium facts"
         prompt = f"""
     You are generating a Jeopardy! game board with {len(categories)} categories:
     {', '.join(categories)}.
@@ -91,7 +90,7 @@ class LLMQuestionGenerator:
             end = content.rfind("}") + 1
             json_str = content[start:end]
             data = json.loads(json_str)
-            # 2dlist [row][col]
+            
             board_2d = []
             for row_idx in range(rows):
                 row_questions = []
@@ -103,7 +102,7 @@ class LLMQuestionGenerator:
                         "options": q_data["options"],
                     })
                 board_2d.append(row_questions)
-            # safe cache
+            # save cache
             with open(cache_file, "w") as f:
                 json.dump(board_2d, f, indent=2)
             return board_2d
@@ -111,7 +110,7 @@ class LLMQuestionGenerator:
             print(f"LLM generation failed for {difficulty}: {e}. Using fallback questions.")
             return self._fallback_board(categories, rows)
 
-    def _fallback_board(self, categories: List[str], rows: int) -> Board:
+    def _fallback_board(self, categories, rows: int):
         """Fallback hardcoded questions when API fails."""
         board = []
         for row in range(rows):
