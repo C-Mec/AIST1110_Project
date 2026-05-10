@@ -11,11 +11,11 @@ import math
 from typing import Literal, TYPE_CHECKING
 
 import config
-from sources.util import intxy, now_is_time, Color, Font
+from sources.util import intxy, now_is_time, blit_text_with_center, Color, Font
 from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.question import Question
 from sources.datatype.player import Player
-from sources.surfaces.visual import notify, BorderFlash, Cutscene_Surface
+from sources.surfaces.visual import notify, time_froze, BorderFlash, Cutscene_Surface
 
 if TYPE_CHECKING:
     from sources.surfaces.surface_grid import Grid_Surface
@@ -134,11 +134,11 @@ class Question_Surface(Base_Surface):
         self.surface.blit(text, (30, 30))
         
         def draw_buzz_button():
-            # Buzz button in player color
             pygame.draw.rect(self.surface, Color.timer, self.buzz_rect)
-            pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
-            buzz_text = Font.logo_medium.render("BUZZ!", True, Color.black)
-            self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
+            pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 4)
+            
+            
+            blit_text_with_center("BUZZ", Font.logo_medium, Color.black, self.surface, self.buzz_rect.center)
         
         def draw_timer(remaining_time: float):
             # Circle depletion in degrees
@@ -260,6 +260,8 @@ class Question_Surface(Base_Surface):
             
             # Delay for cutsence
             notify(f"{player.name} buzzed!")
+            
+            # buzz_flash()
             
             self.session_time = pygame.time.get_ticks() + 100
             print("Session Time Setup", self.session_time)

@@ -59,6 +59,28 @@ class BorderFlash(Base_Surface):
         self.surface = Surface(new_dimension, pygame.SRCALPHA)
         self.rect = self.surface.get_rect(topleft=self.pos)
 
+class TimeFroze(Base_Surface):
+    def __init__(self, duration: int):
+        super().__init__()
+        
+        self.overshade = True
+        
+        # Duration in ms
+        self.duration = duration
+        
+    def time_update(self):
+        assert not any(isinstance(s, Transition_Surface) for s in manager.layers)
+        
+        Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
+        
+        if pygame.time.get_ticks() - self.create_time > self.duration:
+            manager.remove_surface(self)
+    
+    def on_close(self):
+        Game_Manager.frame_frozen = 0
+
+def time_froze(time: int):
+    manager.add_surface(TimeFroze(time))
 
 class Cutscene_Surface(Base_Surface):
     def __init__(self, message: str):
