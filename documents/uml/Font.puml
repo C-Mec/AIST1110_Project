@@ -1,0 +1,23 @@
+@startuml
+title Font
+
+skinparam classAttributeIconSize 0
+hide circle
+skinparam linetype ortho
+
+class Font {
+  {static} +swiss911: str
+  {static} +korinna: str
+  {static} +gyparody: str
+  {static} +category_small
+  {static} +category_medium
+  {static} +category_large
+  {static} +clue_small
+  {static} +clue_medium
+  {static} +clue_large
+  {static} +logo_medium
+  {static} +logo_large
+  {static} +logo_huge
+}
+
+@enduml

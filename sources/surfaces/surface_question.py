@@ -91,7 +91,7 @@ class Question_Surface(Base_Surface):
             wrong_indexes = [i for i in range(3) if i != correct_index and i not in used_indexes]
 
             if random.random() < config.bot_skill:
-                return random.choice(wrong_indexes)
+                return random.choice(wrong_indexes + [correct_index])
             else:
                 return correct_index
         

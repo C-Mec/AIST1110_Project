@@ -1,0 +1,20 @@
+@startuml
+title Question
+
+skinparam classAttributeIconSize 0
+hide circle
+skinparam linetype ortho
+
+class Question {
+  +problem: str
+  +options: list[str]
+  +answer_index: int
+  +value: int
+  +used: bool
+  ..
+  +__init__(problem: str, options: list[str], answer_ind: int, value: int)
+  +listAnswer()
+  {static} +sample(col: int, row: int, value: int): Question
+}
+
+@enduml

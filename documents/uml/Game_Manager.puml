@@ -1,0 +1,17 @@
+@startuml
+title Game_Manager
+
+skinparam classAttributeIconSize 0
+hide circle
+skinparam linetype ortho
+
+class Game_Manager {
+  {static} +players: list<Player>
+  {static} +boards: list[Board]
+  {static} +frame_frozen: int
+  {static} +clock: pygame.time.Clock
+  ..
+  {static} +init()
+}
+
+@enduml
