@@ -11,6 +11,11 @@ import config
 def intxy(vec: Vec2) -> tuple[int, int]:
     return round(vec.x), round(vec.y)
 
+def now_is_time(time: int):
+    from sources.manager import Game_Manager
+    
+    return pygame.time.get_ticks() - time - Game_Manager.frame_frozen > 0
+
 def make_font(path: str, size: int) -> pygame.font.Font:
     """Load a font file and auto-scale based on screen width."""
     scaled_size = round(size * (config.screen_dimension.x / 1280))
@@ -38,7 +43,7 @@ class Font:
     logo_huge   = make_font(gyparody, 120)
     
 class Color:
-    border = "#000000"   #"#FFFFFF"
+    border = "#FCB7B7"   #"#FFFFFF"
     text = "#f6a53a"   #"#FFFFFF"
     shadow = "#241B0F"
     

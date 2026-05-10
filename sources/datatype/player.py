@@ -15,7 +15,7 @@ class Player:
             self.overlay.spawn_floating_text(self, amount)
         
         
-def init_players():
+def generate_players():
     # Create a human player
     player = Player("Human", None, False)
 

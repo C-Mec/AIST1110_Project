@@ -8,7 +8,7 @@ Vec2 = pygame.Vector2
 
 import config
 from sources.util import Color, Font
-from sources.manager import manager, Base_Surface
+from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
 
 class BorderFlash(Base_Surface):
@@ -91,6 +91,14 @@ class Cutscene_Surface(Base_Surface):
 
         screen.blit(self.surface, self.pos)
     
+    def time_update(self):
+        assert not any(isinstance(s, Transition_Surface) for s in manager.layers)
+        
+        Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
+    
+    def on_close(self):
+        Game_Manager.frame_frozen = 0
+        
     def resize(self, new_dimension: Vec2):
         # Resize cutscene overlay to new window size
         self.dimension = new_dimension
@@ -158,6 +166,14 @@ class Transition_Surface(Base_Surface):
         if elapsed > 3:
             self.fade(128)
     
+    def time_update(self):
+        assert not any(isinstance(s, Cutscene_Surface) for s in manager.layers)
+        
+        Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
+    
+    def on_close(self):
+        Game_Manager.frame_frozen = 0
+        
     def resize(self, new_dimension: Vec2):
         # Resize transition screen and rescale image
         self.dimension = new_dimension
