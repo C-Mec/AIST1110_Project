@@ -135,7 +135,7 @@ class Question_Surface(Base_Surface):
         if choice == self.question.answer_index:
             bot.add_score(self.question.value)
             notify(f"{bot.name} answered correctly! +${self.question.value}")
-            self.correctly_answered = True
+            self.correctly_answered = bot
             self.close_time = pygame.time.get_ticks() + 1000
         else:
             bot.add_score(-self.question.value)
@@ -243,6 +243,7 @@ class Question_Surface(Base_Surface):
 
         # --- Close after delay ---
         if self.close_time and now >= self.close_time:
+            self.grid_surface.advance_turn(correct=self.correctly_answered)
             manager.remove_surface(self)
 
         # --- Timeout handling ---
@@ -284,7 +285,7 @@ class Question_Surface(Base_Surface):
                 if rect.collidepoint(pos):
                     if self.question.answer_index == i:
                         # Correct answer
-                        self.correctly_answered = True
+                        self.correctly_answered = player
                         player.add_score(self.question.value)
                         notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
                         self.close_time = pygame.time.get_ticks() + 1000
