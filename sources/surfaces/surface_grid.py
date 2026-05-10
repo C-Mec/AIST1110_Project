@@ -26,7 +26,7 @@ class Grid_Surface(Base_Surface):
         self.bot_wait_until = None
 
         self.grid_dimension = grid_dimension
-        self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
+        self.categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]
         
         # Manage the related question surface
         self.current_popup: Question_Surface = None
