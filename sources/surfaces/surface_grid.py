@@ -177,11 +177,25 @@ class Grid_Surface(Base_Surface):
                 if self.grid[row][col]:
                     self.grid[row][col][0] = rect
 
-    # This is most likely inaccurate
     def _calculate_cell_pos(self, row: int, col: int) -> Vec2:
+        """Return an on-screen position within the given cell.
+
+        Used for bot clicks; must be in the same coordinate space as mouse positions.
+        """
+        g_width, g_height = intxy(self.grid_dimension)
+        if not (0 <= row < g_height and 0 <= col < g_width):
+            return Vec2(-1, -1)
+
+        cell = self.grid[row][col]
+        if cell and cell[0]:
+            rect = cell[0]
+            return Vec2(rect.centerx, rect.centery)
+
         cell_w, cell_h = intxy(self.cell_dimension)
-        
-        return Vec2(col * cell_w, row * cell_h) # Rpos
+        return Vec2(
+            self.grid_area.left + (col + 0.5) * cell_w,
+            self.grid_area.top + (row + 0.5) * cell_h,
+        )
     
     def _get_rowcol(self, rpos: Vec2):
         x, y = intxy(rpos)
@@ -195,14 +209,20 @@ class Grid_Surface(Base_Surface):
         category_offset = -20   # same value you used in draw
         rel_y -= category_offset
 
-        # If click is outside the grid area, return invalid
-        if rel_x < 0 or rel_y < 0:
+        g_width, g_height = intxy(self.grid_dimension)
+
+        # If click is outside the grid's horizontal span or above the category row, return invalid
+        if rel_x < 0 or rel_x >= self.grid_area.width or rel_y < 0:
             return -1, -1
 
         col = rel_x // c_width
-        row = rel_y // c_height # Just use the grid indexes
+        row = rel_y // c_height  # grid index (0 = categories)
 
-        return row, col
+        # Clamp to valid indexes (clicks on borders / outside should be ignored)
+        if not (0 <= col < g_width and 0 <= row < g_height):
+            return -1, -1
+
+        return int(row), int(col)
     
     def advance_turn(self, current_player: Player):
         self.current_player = current_player
@@ -268,6 +288,13 @@ class Grid_Surface(Base_Surface):
             return
         
         row, col = self._get_rowcol(pos)
+
+        if row < 0 or col < 0:
+            return
+
+        g_width, g_height = intxy(self.grid_dimension)
+        if row >= g_height or col >= g_width:
+            return
         
         if row == 0:
             print("Category row – not clickable.")

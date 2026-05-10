@@ -2,6 +2,7 @@ import pygame, random, config, json
 from sources.manager import Surface_Manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
 from sources.util import Font, Color, intxy
+from sources.surfaces.surface_end import End_Surface
 from pathlib import Path
 
 Surface = pygame.Surface
@@ -185,8 +186,8 @@ class FinalJeopardy(Base_Surface):
         if self.end_countdown and pygame.time.get_ticks() - 6000 > self.end_countdown:
             # Call end surface
             end_surface = End_Surface(Vec2(self.screen_w, self.screen_h), Vec2(0,0))
-            manager.add_surface(end_surface)
-            manager.remove_surface(self)
+            Surface_Manager.add_surface(end_surface)
+            Surface_Manager.remove_surface(self)
         
         screen.blit(self.background, (2, 0))
         self.surface.fill(Color.background)

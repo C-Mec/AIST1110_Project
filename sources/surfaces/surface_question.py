@@ -20,7 +20,7 @@ from sources.surfaces.visual import notify, time_froze, BorderFlash, Cutscene_Su
 if TYPE_CHECKING:
     from sources.surfaces.surface_grid import Grid_Surface
 
-warn = print # For now
+warn = notify
 
 # ----- Question_Surface: a modal window showing question and options -----
 class Question_Surface(Base_Surface):
