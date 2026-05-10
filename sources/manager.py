@@ -136,6 +136,19 @@ class Surface_Manager:
             if hasattr(surface, "resize"):
                 surface.resize(Vec2(*new_dimension))
                 
+    def play_sound(self, filename: str, volume: float = 0.5):
+        """Play a sound effect from assets/sounds folder."""
+        if filename not in self.sounds:
+            try:
+                sound = pygame.mixer.Sound(f"assets/SFX/{filename}")
+                self.sounds[filename] = sound
+            except pygame.error as e:
+                print(f"Error loading sound {filename}: {e}")
+                return
+        sound = self.sounds[filename]
+        sound.set_volume(volume)
+        sound.play()
+                
 class Game_Manager:
     players: list[Player] = []
     frame_frozen: int = 0
