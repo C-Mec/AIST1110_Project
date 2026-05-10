@@ -1,6 +1,6 @@
 import pygame, config
 from sources.util import Font, Color, intxy
-from sources.manager import manager, Base_Surface, Game_Manager
+from sources.manager import Base_Surface, Game_Manager
 from sources.datatype.player import Player
 
 Surface = pygame.Surface

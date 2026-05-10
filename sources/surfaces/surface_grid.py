@@ -178,10 +178,6 @@ class Grid_Surface(Base_Surface):
                     self.grid[row][col][0] = rect
 
     def _calculate_cell_pos(self, row: int, col: int) -> Vec2:
-        """Return an on-screen position within the given cell.
-
-        Used for bot clicks; must be in the same coordinate space as mouse positions.
-        """
         g_width, g_height = intxy(self.grid_dimension)
         if not (0 <= row < g_height and 0 <= col < g_width):
             return Vec2(-1, -1)
@@ -211,14 +207,12 @@ class Grid_Surface(Base_Surface):
 
         g_width, g_height = intxy(self.grid_dimension)
 
-        # If click is outside the grid's horizontal span or above the category row, return invalid
         if rel_x < 0 or rel_x >= self.grid_area.width or rel_y < 0:
             return -1, -1
 
         col = rel_x // c_width
-        row = rel_y // c_height  # grid index (0 = categories)
-
-        # Clamp to valid indexes (clicks on borders / outside should be ignored)
+        row = rel_y // c_height  
+        
         if not (0 <= col < g_width and 0 <= row < g_height):
             return -1, -1
 
