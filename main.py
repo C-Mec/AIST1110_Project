@@ -22,8 +22,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import config
-from sources.manager import manager
-from sources.datatype.player import init_players
+from sources.manager import manager, Game_Manager
+from sources.datatype.player import generate_players
 from sources.surfaces.surface_start import StartScreen
 from sources.surfaces.surface_grid import Grid_Surface
 from sources.surfaces.overlay import ScoreOverlay
@@ -36,7 +36,7 @@ main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
 manager.init(main_screen)
 
 # Init players
-players = init_players()
+players = Game_Manager.init()
 player = players[0]
 
 # Add start screen before grid
@@ -68,22 +68,15 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left Click
             pos = Vec2(event.pos)
-
-            surface, rpos = manager.get_top_collision(pos)
             
-            print("-------")
-            print(f"Pos: {pos}, Surface: {surface}, Rpos: {rpos}")
-            print(manager.layers)
-            
-            if surface is not None:
-                surface.on_click(rpos, player)
+            manager.click_at(pos, player)
         
         if event.type == pygame.KEYDOWN:
             print(f"Keydown  {event.unicode}")
             for surface in manager.layers:
                 if isinstance(surface, FinalJeopardy):
                     surface.handle_event(event)
-                
+    
     if not any(isinstance(s, StartScreen) for s in manager.layers):
         if jeopardy_grid is None and not any(isinstance(s, Transition_Surface) for s in manager.layers):
             screen_w, screen_h = config.screen_dimension
@@ -107,9 +100,7 @@ while running:
     
     if (
         jeopardy_grid
-        and not any(isinstance(s, Question_Surface) for s in manager.layers)
-        and not any(isinstance(s, Cutscene_Surface) for s in manager.layers)
-        and not any(isinstance(s, Transition_Surface) for s in manager.layers)
+        and not any(map(lambda surface_type: isinstance(s, surface_type), [Question_Surface, Cutscene_Surface, Transition_Surface]) for s in manager.layers)
         and not jeopardy_grid.is_flashing()
     ):
         if jeopardy_grid.multiplier == 2 and not jeopardy_grid.bot_wait_until:

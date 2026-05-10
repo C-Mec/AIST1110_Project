@@ -6,7 +6,7 @@ Vec2 = pygame.Vector2
 
 import config
 from sources.util import intxy
-from sources.datatype.player import Player
+from sources.datatype.player import generate_players, Player
 from sources.util import Color
 
 class Base_Surface:
@@ -87,7 +87,7 @@ class Surface_Manager:
         
         self.layers.remove(base_surface)
     
-    def get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
+    def _get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
         for base_surface in reversed(self.layers):
             if base_surface.rect.collidepoint(pos):
                 rpos = pos - base_surface.pos
@@ -98,6 +98,16 @@ class Surface_Manager:
                 return None, None
         
         return None, None
+
+    def click_at(self, pos: Vec2, player: Player):
+        surface, rpos = self._get_top_collision(pos)
+        
+        print("-------")
+        print(f"Pos: {pos}, Surface: {surface}, Rpos: {rpos}")
+        print(manager.layers)
+        
+        if surface:
+            surface.on_click(rpos, player)
     
     def render(self) -> None:
         # fill the screen with a color to wipe away anything from last frame
@@ -116,7 +126,7 @@ class Surface_Manager:
     def update(self) -> None:
         for base_surface in self.layers:
             base_surface.time_update()
-
+            
     def resize(self, new_dimension: tuple[int, int]):
         # Update screen reference and propagate resize to all surfaces
         self.main_screen = pygame.display.set_mode(new_dimension, pygame.RESIZABLE)
@@ -124,6 +134,15 @@ class Surface_Manager:
         for surface in self.layers:
             if hasattr(surface, "resize"):
                 surface.resize(Vec2(*new_dimension))
+                
+class Game_Manager:
+    players: list[Player] = []
+    frame_frozen: int = 0
+    
+    @classmethod
+    def init(cls) -> list[Player]:
+        cls.players = generate_players()
+        return cls.players
                 
 # The project-wise global instance of surface manager
 # Needs to be set in main.py
