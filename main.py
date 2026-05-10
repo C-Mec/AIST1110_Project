@@ -81,22 +81,22 @@ while running:
         if jeopardy_grid is None and not any(isinstance(s, Transition_Surface) for s in manager.layers):
             screen_w, screen_h = config.screen_dimension
 
-            # Grid should cover the whole window, aligned with background
-            grid_w, grid_h = screen_w, screen_h
-            grid_pos = Vec2(0, 0)
+            # # Grid should cover the whole window, aligned with background
+            # grid_w, grid_h = screen_w, screen_h
+            # grid_pos = Vec2(0, 0)
 
-            jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
-            manager.add_surface(jeopardy_grid)
+            # jeopardy_grid = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Vec2(6, 6), players)
+            # manager.add_surface(jeopardy_grid)
 
-            score_overlay = ScoreOverlay(players, jeopardy_grid)
-            manager.add_surface(score_overlay)
+            # score_overlay = ScoreOverlay(players, jeopardy_grid)
+            # manager.add_surface(score_overlay)
 
-            manager.add_surface(Transition_Surface(mode="jeopardy"))
+            # manager.add_surface(Transition_Surface(mode="jeopardy"))
             
-            # # testing only
-            # if final_surface is None:
-            #     final_surface = FinalJeopardy(Vec2(screen_w, screen_h), Vec2(0, 0), players)
-            #     manager.add_surface(final_surface)
+            # testing only
+            if final_surface is None:
+                final_surface = FinalJeopardy(Vec2(screen_w, screen_h), Vec2(0, 0), players, 0)
+                manager.add_surface(final_surface)
     
     if (
         jeopardy_grid

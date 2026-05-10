@@ -1,14 +1,15 @@
-import pygame, random, config
-from sources.manager import manager, Base_Surface
+import pygame, random, config, json
+from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
 from sources.util import Font, Color, intxy
+from pathlib import Path
 
 Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
 class FinalJeopardy(Base_Surface):
-    def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player]):
+    def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player], used_index: int):
         screen_w, screen_h = config.screen_dimension
         margin_x = int(screen_w * 0.18)
         margin_y = int(screen_h * 0.195)
@@ -21,15 +22,32 @@ class FinalJeopardy(Base_Surface):
 
         super().__init__(dimension, pos)
 
-        self.players = players
-        self.category = "PlaceHolder"
-        self.clue = "Type answer"
+        categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]
+        cache_file = Path("cache") / f"board_{'_'.join(categories)}_easy_{used_index}.json"
+        if cache_file.exists():
+            with open(cache_file) as f:
+                board_data = json.load(f)
+            # bottom row is the last index
+            final_row = board_data[-1]
+            # pick a random column
+            col_idx = random.randrange(len(final_row))
+            q_data = final_row[col_idx]
+
+            self.category = categories[col_idx]
+            self.clue = q_data["clue"]
+            self.option = q_data["options"]
+            self.correct_option = q_data["correct_answer"]
+        else:
+            # fallback if file missing
+            self.category = "Final Jeopardy"
+            self.clue = "Sample final clue"
+            self.option = ["Option A", "Option B", "Option C"]
+            self.correct_option = "Option A"
+        
         self.confirmed = False
         self.input_text = ""
         self.active_box = False
         self.phase = "wager"
-        self.option = ["answer", "Answer", "anwer"]
-        self.correct_option = "What is answer?"
         
         self.screen_w, self.screen_h = intxy(config.screen_dimension)
         self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
@@ -88,7 +106,7 @@ class FinalJeopardy(Base_Surface):
         
     def _confirm_wager(self):
         try:
-            human = next(p for p in self.players if not p.bot)
+            human = next(p for p in Game_Manager.players if not p.bot)
             human.wager = max(0, min(int(self.input_text), human.score))
             print(f"{human.name} wagered ${human.wager}")
             self.phase = "answer"
@@ -101,12 +119,12 @@ class FinalJeopardy(Base_Surface):
 
 
     def _lock_answer(self):
-        human = next(p for p in self.players if not p.bot)
+        human = next(p for p in Game_Manager.players if not p.bot)
         human.final_answer = f"What is {self.input_text.strip()}?"
         self.confirmed = True
         print(f"{human.name} answered: {human.final_answer}")
 
-        for p in self.players:
+        for p in Game_Manager.players:
             if p.bot:
                 # Assign weights: 0.5 for correct, 0.25 for each wrong
                 weights = []
@@ -120,7 +138,7 @@ class FinalJeopardy(Base_Surface):
                 print(f"{p.name} answered: {p.final_answer}")
 
         # --- Scoring ---
-        for p in self.players:
+        for p in Game_Manager.players:
             if p.bot:
                 if p.final_answer == self.correct_option:
                     p.score += p.wager
@@ -154,7 +172,7 @@ class FinalJeopardy(Base_Surface):
         clue_rect = clue_text.get_rect(topleft=(40, 120))
         self.surface.blit(clue_text, clue_rect)
 
-        human = self.players[0]
+        human = Game_Manager.players[0]
         if self.phase == "wager":
             prompt = Font.clue_medium.render(f"{human.name}, enter your wager (0–{human.score}):", True, Color.text)
             self.surface.blit(prompt, (40, 180))
