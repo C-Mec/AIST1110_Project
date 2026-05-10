@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "He was the first President of the United States.",
+      "correct_answer": "Who is George Washington?",
+      "options": [
+        "Who is George Washington?",
+        "Who is Thomas Jefferson?",
+        "Who is Abraham Lincoln?"
+      ]
+    },
+    {
+      "clue": "This is the chemical symbol for water.",
+      "correct_answer": "What is H2O?",
+      "options": [
+        "What is O2?",
+        "What is CO2?",
+        "What is H2O?"
+      ]
+    },
+    {
+      "clue": "This author wrote 'Romeo and Juliet'.",
+      "correct_answer": "Who is William Shakespeare?",
+      "options": [
+        "Who is Charles Dickens?",
+        "Who is Mark Twain?",
+        "Who is William Shakespeare?"
+      ]
+    },
+    {
+      "clue": "This sport is played with a round ball and two goals.",
+      "correct_answer": "What is soccer?",
+      "options": [
+        "What is baseball?",
+        "What is basketball?",
+        "What is soccer?"
+      ]
+    },
+    {
+      "clue": "This instrument has 88 keys.",
+      "correct_answer": "What is a piano?",
+      "options": [
+        "What is a guitar?",
+        "What is a violin?",
+        "What is a piano?"
+      ]
+    },
+    {
+      "clue": "This is the capital city of France.",
+      "correct_answer": "What is Paris?",
+      "options": [
+        "What is London?",
+        "What is Berlin?",
+        "What is Paris?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This ancient civilization built the pyramids.",
+      "correct_answer": "What is Ancient Egypt?",
+      "options": [
+        "What is Ancient Greece?",
+        "What is Ancient Egypt?",
+        "What is Ancient Rome?"
+      ]
+    },
+    {
+      "clue": "This organ is responsible for pumping blood throughout the body.",
+      "correct_answer": "What is the heart?",
+      "options": [
+        "What is the brain?",
+        "What is the lung?",
+        "What is the heart?"
+      ]
+    },
+    {
+      "clue": "This book features a character named Holden Caulfield.",
+      "correct_answer": "What is 'The Catcher in the Rye'?",
+      "options": [
+        "What is 'To Kill a Mockingbird'?",
+        "What is '1984'?",
+        "What is 'The Catcher in the Rye'?"
+      ]
+    },
+    {
+      "clue": "This sport is known for the Super Bowl.",
+      "correct_answer": "What is American football?",
+      "options": [
+        "What is baseball?",
+        "What is rugby?",
+        "What is American football?"
+      ]
+    },
+    {
+      "clue": "This genre of music is known for its heavy use of guitars and drums.",
+      "correct_answer": "What is rock?",
+      "options": [
+        "What is jazz?",
+        "What is classical?",
+        "What is rock?"
+      ]
+    },
+    {
+      "clue": "This is the largest ocean on Earth.",
+      "correct_answer": "What is the Pacific Ocean?",
+      "options": [
+        "What is the Atlantic Ocean?",
+        "What is the Indian Ocean?",
+        "What is the Pacific Ocean?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This document declared American independence in 1776.",
+      "correct_answer": "What is the Declaration of Independence?",
+      "options": [
+        "What is the Constitution?",
+        "What is the Bill of Rights?",
+        "What is the Declaration of Independence?"
+      ]
+    },
+    {
+      "clue": "This planet is known as the Red Planet.",
+      "correct_answer": "What is Mars?",
+      "options": [
+        "What is Venus?",
+        "What is Earth?",
+        "What is Mars?"
+      ]
+    },
+    {
+      "clue": "This character is known for saying 'Elementary, my dear Watson'.",
+      "correct_answer": "Who is Sherlock Holmes?",
+      "options": [
+        "Who is Hercule Poirot?",
+        "Who is Sherlock Holmes?",
+        "Who is Philip Marlowe?"
+      ]
+    },
+    {
+      "clue": "This athlete is known as 'The Greatest' and was a boxer.",
+      "correct_answer": "Who is Muhammad Ali?",
+      "options": [
+        "Who is Mike Tyson?",
+        "Who is Floyd Mayweather?",
+        "Who is Muhammad Ali?"
+      ]
+    },
+    {
+      "clue": "This famous band was known for the song 'Hey Jude'.",
+      "correct_answer": "Who are The Beatles?",
+      "options": [
+        "Who are The Rolling Stones?",
+        "Who are The Beatles?",
+        "Who are Led Zeppelin?"
+      ]
+    },
+    {
+      "clue": "This color is a mix of blue and yellow.",
+      "correct_answer": "What is green?",
+      "options": [
+        "What is orange?",
+        "What is purple?",
+        "What is green?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "The Great Wall is located in this country.",
+      "correct_answer": "What is China?",
+      "options": [
+        "What is Japan?",
+        "What is India?",
+        "What is China?"
+      ]
+    },
+    {
+      "clue": "This force pulls objects toward each other.",
+      "correct_answer": "What is gravity?",
+      "options": [
+        "What is friction?",
+        "What is magnetism?",
+        "What is gravity?"
+      ]
+    },
+    {
+      "clue": "This dystopian novel features Big Brother.",
+      "correct_answer": "What is '1984'?",
+      "options": [
+        "What is 'Fahrenheit 451'?",
+        "What is 'Brave New World'?",
+        "What is '1984'?"
+      ]
+    },
+    {
+      "clue": "This Olympic sport involves swimming, running, and cycling.",
+      "correct_answer": "What is triathlon?",
+      "options": [
+        "What is decathlon?",
+        "What is heptathlon?",
+        "What is triathlon?"
+      ]
+    },
+    {
+      "clue": "This artist is known for the song 'Like a Rolling Stone'.",
+      "correct_answer": "Who is Bob Dylan?",
+      "options": [
+        "Who is Bruce Springsteen?",
+        "Who is Bob Dylan?",
+        "Who is Elvis Presley?"
+      ]
+    },
+    {
+      "clue": "This device is used to make phone calls.",
+      "correct_answer": "What is a telephone?",
+      "options": [
+        "What is a computer?",
+        "What is a tablet?",
+        "What is a telephone?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "He was the leader of the Civil Rights Movement in the 1960s.",
+      "correct_answer": "Who is Martin Luther King Jr.?",
+      "options": [
+        "Who is Malcolm X?",
+        "Who is Nelson Mandela?",
+        "Who is Martin Luther King Jr.?"
+      ]
+    },
+    {
+      "clue": "This scientist developed the theory of relativity.",
+      "correct_answer": "Who is Albert Einstein?",
+      "options": [
+        "Who is Isaac Newton?",
+        "Who is Nikola Tesla?",
+        "Who is Albert Einstein?"
+      ]
+    },
+    {
+      "clue": "This author wrote 'Pride and Prejudice'.",
+      "correct_answer": "Who is Jane Austen?",
+      "options": [
+        "Who is Emily Bront\u00eb?",
+        "Who is Jane Austen?",
+        "Who is Mary Shelley?"
+      ]
+    },
+    {
+      "clue": "This player is known for his famous 'Air Jordan' shoes.",
+      "correct_answer": "Who is Michael Jordan?",
+      "options": [
+        "Who is Kobe Bryant?",
+        "Who is LeBron James?",
+        "Who is Michael Jordan?"
+      ]
+    },
+    {
+      "clue": "This pop star is known as the 'Queen of Pop'.",
+      "correct_answer": "Who is Madonna?",
+      "options": [
+        "Who is Britney Spears?",
+        "Who is Beyonc\u00e9?",
+        "Who is Madonna?"
+      ]
+    },
+    {
+      "clue": "This is the primary ingredient in guacamole.",
+      "correct_answer": "What is avocado?",
+      "options": [
+        "What is tomato?",
+        "What is avocado?",
+        "What is onion?"
+      ]
+    }
+  ]
+]

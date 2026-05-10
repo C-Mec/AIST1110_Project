@@ -26,7 +26,7 @@ class Grid_Surface(Base_Surface):
         self.bot_wait_until = None
 
         self.grid_dimension = grid_dimension
-        self.categories = ["History", "Science", "Literature", "Sports", "Music", "IDK"]
+        self.categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]
         
         # Manage the related question surface
         self.current_popup: Question_Surface = None
@@ -55,6 +55,11 @@ class Grid_Surface(Base_Surface):
 
         self.question_gen = LLMQuestionGenerator()
         self.multiplier = 1
+        num_rows = 5   # row 0 is for categories, so only generate for 1-5
+        index1, index2 = int(random.uniform(0, 5)), int(random.uniform(0, 5))
+        self.jeopardy_board = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="easy", index=index1)
+        self.double_board   = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="hard", index=index2)
+        self.current_board = self.jeopardy_board   # use this for normal round, switch to double_board for double jeopardy
         self._grid_init()
 
     def _grid_init(self):
@@ -64,7 +69,7 @@ class Grid_Surface(Base_Surface):
         num_cols = g_width
         num_rows = g_height - 1
 
-        board_data = self.question_gen.generate_board(self.categories, rows=num_rows)
+        board_data = self.current_board   
         while len(board_data) < num_rows:
             board_data.append([{"clue":"Placeholder","options":["A"],"correct_answer":"A"} for _ in range(num_cols)])
         for r in range(num_rows):
@@ -91,16 +96,78 @@ class Grid_Surface(Base_Surface):
                 )
                 self.grid[row + 1][col] = [rect, q, False, None]
     
-    def advance_turn(self, correct: bool):
-        if correct:
-            next_player = self.current_player
+    def squeeze_text(self, text, font, color, target_rect, padding=5):
+        # Render text normally
+        rendered = font.render(text, True, color)
+
+        # Compute max allowed size
+        max_w = target_rect.width - 2 * padding
+        max_h = target_rect.height - 2 * padding
+
+        # Scale if needed
+        if rendered.get_width() > max_w or rendered.get_height() > max_h:
+            scaled = pygame.transform.smoothscale(
+                rendered,
+                (max_w, min(max_h, rendered.get_height()))
+            )
         else:
-            other_players = [p for p in self.players if p is not self.current_player]
-            next_player = random.choice(other_players)
+            scaled = rendered
 
-        self.current_player = next_player
+        # Center inside target rect
+        rect = scaled.get_rect(center=target_rect.center)
+        self.surface.blit(scaled, rect)
 
-        if next_player.bot:
+    def _setup_background_and_grid(self):
+        # Load and scale background
+        self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
+        self.background = pygame.transform.smoothscale(self.background, (self.screen_w, self.screen_h))
+
+        # Margins and grid area
+        margin_x = int(self.screen_w * 0.175)
+        margin_y = int(self.screen_h * 0.19)
+        grid_w = self.screen_w - 2 * margin_x
+        grid_h = self.screen_h - 1.75 * margin_y
+        self.grid_area = pygame.Rect(margin_x, margin_y, grid_w, grid_h)
+
+        # Cell dimensions
+        g_width, g_height = intxy(self.grid_dimension)
+        self.cell_dimension = Vec2(
+            round(self.grid_area.width / g_width),
+            round(self.grid_area.height / g_height)
+        )
+    
+    def resize(self, new_dimension: Vec2):
+        # React to change in window dimension.
+        self.dimension = new_dimension
+        self.screen_w, self.screen_h = intxy(new_dimension)
+
+        # Recreate the drawing surface with new size
+        self.surface = Surface(new_dimension, pygame.SRCALPHA)
+        self.rect = self.surface.get_rect(topleft=self.pos)
+
+        # Recompute background and grid area
+        self._setup_background_and_grid()
+
+        # Recompute rects for existing cells
+        g_width, g_height = intxy(self.grid_dimension)
+        c_width, c_height = intxy(self.cell_dimension)
+
+        for row in range(1, g_height):
+            for col in range(g_width):
+                rect = pygame.Rect(
+                    self.grid_area.left + round(col * c_width),
+                    self.grid_area.top + round(row * c_height),
+                    round(c_width),
+                    round(c_height)
+                )
+                if self.grid[row][col]:
+                    self.grid[row][col][0] = rect
+
+    def advance_turn(self, correct):
+        if correct:
+            self.current_player = correct
+
+        if self.current_player.bot:
             # The time for cutsence is added here (manually)
             delay_ms = int(random.uniform(3750, 4750))
             self.bot_wait_until = pygame.time.get_ticks() + delay_ms
@@ -122,7 +189,7 @@ class Grid_Surface(Base_Surface):
         # --- Round reset check ---
         def board_all_used() -> bool:
             g_width, g_height = intxy(self.grid_dimension)
-            all_used = all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
+            return all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
             
         if board_all_used():
             if self.multiplier == 1:
@@ -151,13 +218,28 @@ class Grid_Surface(Base_Surface):
                 if available:
                     row, col = random.choice(available)
                     rect, question, used, flash = self.grid[row][col]
-                    self.grid[row][col][3] = {
+                    flash = {
                         "color": self.current_player.color,
                         "start": pygame.time.get_ticks(),
                         "count": 0,
                         "player": self.current_player
                     }
+                    self.grid[row][col][3] = flash
                     self.grid[row][col][2] = True
+                    
+                    popup = Question_Surface(
+                        question=question,
+                        player=flash["player"],
+                        bots=self.players[1:],
+                        grid_surface=self
+                    )
+                    popup.alpha = 0
+                    popup.interactive = False
+
+                    self.current_popup = popup
+                    self.current_cell = (row, col)
+
+                    manager.add_surface(popup)
             self.bot_wait_until = None
         
         if self.current_cell:
@@ -167,10 +249,10 @@ class Grid_Surface(Base_Surface):
             # When the flashing end, question surface appears
             if not current_cell[3]:
                 self.current_popup.alpha = 255
+                self.current_popup.interactive = True
                 
             # When the popup screen is removed
             if self.current_popup not in manager.layers:
-                
                 # Mark cell as used
                 current_cell[2] = True
                 
@@ -212,6 +294,7 @@ class Grid_Surface(Base_Surface):
             grid_surface=self
         )
         popup.alpha = 0
+        popup.interactive = False
         
         self.current_popup = popup
         self.current_cell = (row, col)
@@ -256,9 +339,7 @@ class Grid_Surface(Base_Surface):
                 )
                 pygame.draw.rect(self.surface, Color.background, rect)
                 pygame.draw.rect(self.surface, Color.border, rect, 2)
-                text = Font.category_medium.render(category, True, Color.white)
-                text_rect = text.get_rect(center=rect.center)
-                self.surface.blit(text, text_rect)
+                self.squeeze_text(category, Font.category_medium, Color.white, rect, padding=10)
 
         draw_categories()
         
@@ -270,7 +351,6 @@ class Grid_Surface(Base_Surface):
 
                 if elapsed < 4:
                     fill_color = flash["color"] if elapsed % 2 == 0 else Color.background
-                
                 if elapsed >= 4:
                     self.grid[row][col][3] = None
                     fill_color = Color.greyed if used else Color.background
@@ -278,11 +358,17 @@ class Grid_Surface(Base_Surface):
                 fill_color = Color.greyed if used else Color.background
 
             pygame.draw.rect(self.surface, fill_color, rect)
-            
+
             if not used or flash:
                 question.value = row * 200 * self.multiplier
-                
-                blit_text(str(question.value), Font.category_large, Color.text, self.surface, rect.center)
+
+                # ✅ Add $ sign and squeeze into cell
+                value_text = f"${question.value}"
+                shadow_rect = rect.copy()
+                shadow_rect.centerx += 2   # slight right
+                shadow_rect.centery += 2   # slight down
+                self.squeeze_text(value_text, Font.category_large, Color.shadow, shadow_rect, padding=10)
+                self.squeeze_text(value_text, Font.category_large, Color.text, rect, padding=10)
 
             pygame.draw.rect(self.surface, Color.border, rect, 2)
         

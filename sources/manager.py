@@ -73,6 +73,11 @@ class Surface_Manager:
 
         # A stash in which index = z-axis
         self.layers: list[Base_Surface] = []
+        
+        # --- Custom pointer setup ---
+        pointer_img = pygame.image.load("assets/pointer.png").convert_alpha()
+        w, h = pointer_img.get_size()
+        self.pointer_img = pygame.transform.smoothscale(pointer_img, (w // 8, h // 8))
     
     def add_surface(self, base_surface: Base_Surface) -> None: 
         self.layers.append(base_surface)
@@ -111,12 +116,25 @@ class Surface_Manager:
         for base_surface in self.layers:
             base_surface.draw(self.main_screen)
         
+        mx, my = pygame.mouse.get_pos()
+        screen_w, screen_h = self.main_screen.get_size()
+        if 0.1 <= mx < screen_w - 0.1 and 0.1 <= my < screen_h - 0.1:
+            self.main_screen.blit(self.pointer_img, (mx, my))
+        
         pygame.display.flip()
         
     def update(self) -> None:
         for base_surface in self.layers:
             base_surface.time_update()
+            
+    def resize(self, new_dimension: tuple[int, int]):
+        # Update screen reference and propagate resize to all surfaces
+        self.main_screen = pygame.display.set_mode(new_dimension, pygame.RESIZABLE)
 
+        for surface in self.layers:
+            if hasattr(surface, "resize"):
+                surface.resize(Vec2(*new_dimension))
+                
 class Game_Manager:
     players: list[Player] = []
     frame_frozen: int = 0
@@ -125,7 +143,7 @@ class Game_Manager:
     def init(cls) -> list[Player]:
         cls.players = generate_players()
         return cls.players
-
+                
 # The project-wise global instance of surface manager
 # Needs to be set in main.py
 manager = Surface_Manager()

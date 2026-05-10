@@ -30,7 +30,7 @@ class Font:
     # Category / board values
     category_small  = make_font(swiss911, 24)
     category_medium = make_font(swiss911, 36)
-    category_large  = make_font(swiss911, 60)
+    category_large  = make_font(swiss911, 48)
 
     # Clue text
     clue_small  = make_font(korinna, 24)
@@ -38,12 +38,15 @@ class Font:
     clue_large  = make_font(korinna, 36)
 
     # Logo / transitions
-    logo_large = make_font(gyparody, 72)
-    logo_huge  = make_font(gyparody, 120)
+    logo_medium = make_font(gyparody, 60)
+    logo_large  = make_font(gyparody, 72)
+    logo_huge   = make_font(gyparody, 120)
     
 class Color:
     border = "#FCB7B7"   #"#FFFFFF"
     text = "#f6a53a"   #"#FFFFFF"
+    shadow = "#241B0F"
+    
     background = "#051c96"   #4682C8"
     black = "#000000"
     white = "#FFFFFF"

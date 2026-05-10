@@ -15,7 +15,7 @@ from sources.util import intxy, now_is_time, Color, Font
 from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.question import Question
 from sources.datatype.player import Player
-from sources.surfaces.visual import notify, BorderFlash
+from sources.surfaces.visual import notify, BorderFlash, Cutscene_Surface
 
 if TYPE_CHECKING:
     from sources.surfaces.surface_grid import Grid_Surface
@@ -33,8 +33,7 @@ class Question_Surface(Base_Surface):
         super().__init__(dimension, pos)
         
         self.grid_surface = grid_surface
-        self.question = question
-        
+        self.question = question        
         
         self.overshade = True
         
@@ -61,6 +60,7 @@ class Question_Surface(Base_Surface):
         # Bot Answering
         self.bot_action: tuple[Player, int, int] = None # Player, choice, time
         self.submitted_answers: list[tuple[Player, int]] = []
+        self.answer_start_time = None
         
         self.schedule_bot_action()
         print(self.bot_action)
@@ -90,12 +90,31 @@ class Question_Surface(Base_Surface):
             bot = random.choice(list(bot_not_answered))
         
         correct_index = self.question.answer_index
-        wrong_index = random.choice(list(set(i for i in range(3)) - set(map(lambda x: x[1], self.submitted_answers))))
+        wrong_pool = [i for i in remaining_indices if i != correct_index]
 
-        if random.random() < config.bot_skill:
+        if len(remaining_indices) == 1:
             choice = correct_index
+        elif len(remaining_indices) == 2:
+            # 70% correct, 30% wrong
+            if random.random() < 0.7:
+                choice = correct_index
+            else:
+                choice = wrong_pool[0]
+        elif len(remaining_indices) == 3:
+            # 50% correct, 25% each wrong
+            r = random.random()
+            if r < 0.5:
+                choice = correct_index
+            elif r < 0.75:
+                choice = wrong_pool[0]
+            else:
+                choice = wrong_pool[1]
         else:
-            choice = wrong_index
+            # Fallback: 50/50 correct vs random wrong
+            if random.random() < 0.5:
+                choice = correct_index
+            else:
+                choice = random.choice(wrong_pool)
 
         # schedule buzz
         delay = random.uniform(2750, 3500)
@@ -105,10 +124,10 @@ class Question_Surface(Base_Surface):
         print(self.bot_action, "SEttttttting")
     
     def session_remaining_time(self) -> float:
+        if not self.answer_start_time:
+            return 0
         elapsed_time = (pygame.time.get_ticks() - self.answer_start_time) / 1000
-        remaining_time = max(0, self.answer_duration - elapsed_time)
-        
-        return remaining_time
+        return max(0, self.answer_duration - elapsed_time)
     
     def draw(self, screen: Surface):
         # Paint background
@@ -126,7 +145,7 @@ class Question_Surface(Base_Surface):
             # Buzz button in player color
             pygame.draw.rect(self.surface, Color.timer, self.buzz_rect)
             pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 2)
-            buzz_text = Font.logo_large.render("BUZZ!", True, Color.black)
+            buzz_text = Font.logo_medium.render("BUZZ!", True, Color.black)
             self.surface.blit(buzz_text, buzz_text.get_rect(center=self.buzz_rect.center))
         
         def draw_timer(remaining_time: float):
@@ -159,7 +178,6 @@ class Question_Surface(Base_Surface):
             self.surface.blit(sec_text, sec_text.get_rect(center=center))
         
         def draw_options():
-            # Draw options
             for i, rect in enumerate(self.option_rects):
                 pygame.draw.rect(self.surface, Color.background, rect)
 
@@ -176,7 +194,7 @@ class Question_Surface(Base_Surface):
                 option_text = f"{chr(65+i)}. {self.question.options[i]}"
                 text = Font.clue_small.render(option_text, True, Color.text)
                 self.surface.blit(text, text.get_rect(center=rect.center))
-            
+
         # Drawing Elements
         if self.stage == "Buzz":
             draw_buzz_button()
@@ -225,7 +243,8 @@ class Question_Surface(Base_Surface):
         # Kill surface after 1s delay
         if self.close_time and pygame.time.get_ticks() >= self.close_time:
             manager.remove_surface(self)
-            
+
+        # --- Timeout handling ---
         if self.stage == "Timed Answering":
             remaining_time = self.session_remaining_time()
             
@@ -271,7 +290,6 @@ class Question_Surface(Base_Surface):
                         
                         player.add_score(self.question.value)
                         notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
-                        
                         self.close_time = pygame.time.get_ticks() + 1000
                     else:
                         self.stage = "Wrong Re-buzz"

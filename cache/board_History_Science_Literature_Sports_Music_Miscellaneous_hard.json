@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "This ancient civilization is known for its pyramids and hieroglyphics.",
+      "correct_answer": "What is Ancient Egypt?",
+      "options": [
+        "What is Ancient Egypt?",
+        "What is Mesopotamia?",
+        "What is the Indus Valley?"
+      ]
+    },
+    {
+      "clue": "This gas makes up about 78% of Earth's atmosphere.",
+      "correct_answer": "What is nitrogen?",
+      "options": [
+        "What is nitrogen?",
+        "What is oxygen?",
+        "What is carbon dioxide?"
+      ]
+    },
+    {
+      "clue": "This author wrote 'Heart of Darkness' and 'The Secret Agent'.",
+      "correct_answer": "Who is Joseph Conrad?",
+      "options": [
+        "Who is Joseph Conrad?",
+        "Who is James Joyce?",
+        "Who is D.H. Lawrence?"
+      ]
+    },
+    {
+      "clue": "This country won the first FIFA World Cup in 1930.",
+      "correct_answer": "What is Uruguay?",
+      "options": [
+        "What is Uruguay?",
+        "What is Brazil?",
+        "What is Italy?"
+      ]
+    },
+    {
+      "clue": "This composer is known for his 'The Four Seasons' concertos.",
+      "correct_answer": "Who is Antonio Vivaldi?",
+      "options": [
+        "Who is Antonio Vivaldi?",
+        "Who is Johann Sebastian Bach?",
+        "Who is Wolfgang Amadeus Mozart?"
+      ]
+    },
+    {
+      "clue": "This element is represented by the symbol 'Au' in the periodic table.",
+      "correct_answer": "What is gold?",
+      "options": [
+        "What is gold?",
+        "What is silver?",
+        "What is copper?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This battle in 1066 was a pivotal event in English history.",
+      "correct_answer": "What is the Battle of Hastings?",
+      "options": [
+        "What is the Battle of Hastings?",
+        "What is the Battle of Agincourt?",
+        "What is the Battle of Waterloo?"
+      ]
+    },
+    {
+      "clue": "This physicist is known for the uncertainty principle.",
+      "correct_answer": "Who is Werner Heisenberg?",
+      "options": [
+        "Who is Werner Heisenberg?",
+        "Who is Niels Bohr?",
+        "Who is Max Planck?"
+      ]
+    },
+    {
+      "clue": "This novel features the character 'Ishmael' and explores whaling.",
+      "correct_answer": "What is Moby Dick?",
+      "options": [
+        "What is Moby Dick?",
+        "What is The Old Man and the Sea?",
+        "What is The Sea Wolf?"
+      ]
+    },
+    {
+      "clue": "This athlete is known as 'The Greatest' and was a heavyweight boxing champion.",
+      "correct_answer": "Who is Muhammad Ali?",
+      "options": [
+        "Who is Muhammad Ali?",
+        "Who is Mike Tyson?",
+        "Who is Joe Frazier?"
+      ]
+    },
+    {
+      "clue": "This musical term refers to a gradual increase in loudness.",
+      "correct_answer": "What is crescendo?",
+      "options": [
+        "What is crescendo?",
+        "What is decrescendo?",
+        "What is staccato?"
+      ]
+    },
+    {
+      "clue": "This country is known as the Land of the Rising Sun.",
+      "correct_answer": "What is Japan?",
+      "options": [
+        "What is Japan?",
+        "What is China?",
+        "What is South Korea?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This treaty ended the Thirty Years' War in 1648.",
+      "correct_answer": "What is the Treaty of Westphalia?",
+      "options": [
+        "What is the Treaty of Westphalia?",
+        "What is the Treaty of Versailles?",
+        "What is the Treaty of Paris?"
+      ]
+    },
+    {
+      "clue": "This element has the highest atomic number that occurs naturally.",
+      "correct_answer": "What is uranium?",
+      "options": [
+        "What is uranium?",
+        "What is plutonium?",
+        "What is thorium?"
+      ]
+    },
+    {
+      "clue": "This poet is known for the line, 'Do not go gentle into that good night.'",
+      "correct_answer": "Who is Dylan Thomas?",
+      "options": [
+        "Who is Dylan Thomas?",
+        "Who is W.H. Auden?",
+        "Who is T.S. Eliot?"
+      ]
+    },
+    {
+      "clue": "This sport is known as 'the king of sports'.",
+      "correct_answer": "What is soccer?",
+      "options": [
+        "What is soccer?",
+        "What is basketball?",
+        "What is cricket?"
+      ]
+    },
+    {
+      "clue": "This band is known for the album 'Dark Side of the Moon'.",
+      "correct_answer": "Who is Pink Floyd?",
+      "options": [
+        "Who is Pink Floyd?",
+        "Who is The Beatles?",
+        "Who is Led Zeppelin?"
+      ]
+    },
+    {
+      "clue": "This natural phenomenon is caused by the interaction of solar wind with Earth's magnetic field.",
+      "correct_answer": "What are auroras?",
+      "options": [
+        "What are auroras?",
+        "What are eclipses?",
+        "What are meteors?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This Russian ruler was known as 'the Terrible' and expanded the empire.",
+      "correct_answer": "Who is Ivan IV?",
+      "options": [
+        "Who is Ivan IV?",
+        "Who is Peter the Great?",
+        "Who is Catherine the Great?"
+      ]
+    },
+    {
+      "clue": "This phenomenon is responsible for the bending of light.",
+      "correct_answer": "What is refraction?",
+      "options": [
+        "What is refraction?",
+        "What is reflection?",
+        "What is diffraction?"
+      ]
+    },
+    {
+      "clue": "This epic poem tells the story of the Trojan War and features Achilles.",
+      "correct_answer": "What is the Iliad?",
+      "options": [
+        "What is the Iliad?",
+        "What is the Odyssey?",
+        "What is the Aeneid?"
+      ]
+    },
+    {
+      "clue": "This tennis tournament is held annually at Wimbledon.",
+      "correct_answer": "What is the Wimbledon Championships?",
+      "options": [
+        "What is the Wimbledon Championships?",
+        "What is the US Open?",
+        "What is the French Open?"
+      ]
+    },
+    {
+      "clue": "This instrument has 88 keys and is a staple in classical music.",
+      "correct_answer": "What is the piano?",
+      "options": [
+        "What is the piano?",
+        "What is the organ?",
+        "What is the harpsichord?"
+      ]
+    },
+    {
+      "clue": "This ancient structure was built as a tomb for the pharaohs.",
+      "correct_answer": "What are the pyramids?",
+      "options": [
+        "What are the pyramids?",
+        "What are ziggurats?",
+        "What are temples?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This event, occurring in 1917, led to the rise of the Soviet Union.",
+      "correct_answer": "What is the Russian Revolution?",
+      "options": [
+        "What is the Russian Revolution?",
+        "What is the October Revolution?",
+        "What is the Bolshevik Revolution?"
+      ]
+    },
+    {
+      "clue": "This branch of biology focuses on the interactions between organisms and their environment.",
+      "correct_answer": "What is ecology?",
+      "options": [
+        "What is ecology?",
+        "What is genetics?",
+        "What is evolution?"
+      ]
+    },
+    {
+      "clue": "This dystopian novel portrays a society under constant surveillance.",
+      "correct_answer": "What is 1984?",
+      "options": [
+        "What is 1984?",
+        "What is Brave New World?",
+        "What is Fahrenheit 451?"
+      ]
+    },
+    {
+      "clue": "This Olympic event combines cross-country skiing and rifle shooting.",
+      "correct_answer": "What is biathlon?",
+      "options": [
+        "What is biathlon?",
+        "What is decathlon?",
+        "What is pentathlon?"
+      ]
+    },
+    {
+      "clue": "This genre of music originated in Jamaica and is characterized by a strong backbeat.",
+      "correct_answer": "What is reggae?",
+      "options": [
+        "What is reggae?",
+        "What is ska?",
+        "What is dubstep?"
+      ]
+    },
+    {
+      "clue": "This process describes the conversion of a solid directly into a gas.",
+      "correct_answer": "What is sublimation?",
+      "options": [
+        "What is sublimation?",
+        "What is evaporation?",
+        "What is condensation?"
+      ]
+    }
+  ]
+]

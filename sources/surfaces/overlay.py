@@ -5,7 +5,7 @@ Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
 import config
-from sources.util import Font
+from sources.util import Font, intxy
 from sources.manager import Base_Surface
 from sources.datatype.player import Player
 from sources.surfaces.visual import FloatingText
@@ -43,6 +43,16 @@ class ScoreOverlay(Base_Surface):
         score_rect.top = name_top
         score_rect.right = self.surface.get_rect().right - 10
         return score_rect
+    
+    def resize(self, new_dimension: Vec2):
+        screen_w, screen_h = intxy(new_dimension)
+
+        # Keep same overlay size, but move to new top-right
+        self.pos = Vec2(screen_w - self.dimension.x - 10, 10)
+
+        # Recreate surface buffer
+        self.surface = Surface(self.dimension, pygame.SRCALPHA)
+        self.rect = self.surface.get_rect(topleft=self.pos)
     
     def draw(self, screen: Surface):
         self.surface.fill((0, 0, 0, 0))
