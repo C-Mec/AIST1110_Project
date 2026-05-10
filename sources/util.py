@@ -25,7 +25,7 @@ class Font:
     # Category / board values
     category_small  = make_font(swiss911, 24)
     category_medium = make_font(swiss911, 36)
-    category_large  = make_font(swiss911, 60)
+    category_large  = make_font(swiss911, 48)
 
     # Clue text
     clue_small  = make_font(korinna, 24)
@@ -40,6 +40,8 @@ class Font:
 class Color:
     border = "#000000"   #"#FFFFFF"
     text = "#f6a53a"   #"#FFFFFF"
+    shadow = "#241B0F"
+    
     background = "#051c96"   #4682C8"
     black = "#000000"
     white = "#FFFFFF"

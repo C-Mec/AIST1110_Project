@@ -95,6 +95,27 @@ class Grid_Surface(Base_Surface):
                 )
                 self.grid[row + 1][col] = [rect, q, False, None]
     
+    def squeeze_text(self, text, font, color, target_rect, padding=5):
+        # Render text normally
+        rendered = font.render(text, True, color)
+
+        # Compute max allowed size
+        max_w = target_rect.width - 2 * padding
+        max_h = target_rect.height - 2 * padding
+
+        # Scale if needed
+        if rendered.get_width() > max_w or rendered.get_height() > max_h:
+            scaled = pygame.transform.smoothscale(
+                rendered,
+                (max_w, min(max_h, rendered.get_height()))
+            )
+        else:
+            scaled = rendered
+
+        # Center inside target rect
+        rect = scaled.get_rect(center=target_rect.center)
+        self.surface.blit(scaled, rect)
+
     def _setup_background_and_grid(self):
         # Load and scale background
         self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
@@ -319,9 +340,7 @@ class Grid_Surface(Base_Surface):
                 )
                 pygame.draw.rect(self.surface, Color.background, rect)
                 pygame.draw.rect(self.surface, Color.border, rect, 2)
-                text = Font.category_medium.render(category, True, Color.white)
-                text_rect = text.get_rect(center=rect.center)
-                self.surface.blit(text, text_rect)
+                self.squeeze_text(category, Font.category_medium, Color.white, rect, padding=10)
 
         draw_categories()
         
@@ -333,7 +352,6 @@ class Grid_Surface(Base_Surface):
 
                 if elapsed < 4:
                     fill_color = flash["color"] if elapsed % 2 == 0 else Color.background
-                
                 if elapsed >= 4:
                     self.grid[row][col][3] = None
                     fill_color = Color.greyed if used else Color.background
@@ -341,11 +359,17 @@ class Grid_Surface(Base_Surface):
                 fill_color = Color.greyed if used else Color.background
 
             pygame.draw.rect(self.surface, fill_color, rect)
-            
+
             if not used or flash:
                 question.value = row * 200 * self.multiplier
-                
-                blit_text(str(question.value), Font.category_large, Color.text, self.surface, rect.center)
+
+                # ✅ Add $ sign and squeeze into cell
+                value_text = f"${question.value}"
+                shadow_rect = rect.copy()
+                shadow_rect.centerx += 2   # slight right
+                shadow_rect.centery += 2   # slight down
+                self.squeeze_text(value_text, Font.category_large, Color.shadow, shadow_rect, padding=10)
+                self.squeeze_text(value_text, Font.category_large, Color.text, rect, padding=10)
 
             pygame.draw.rect(self.surface, Color.border, rect, 2)
         
