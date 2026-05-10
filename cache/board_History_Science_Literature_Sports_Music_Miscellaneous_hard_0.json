@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "This ancient civilization is known for its pyramids and hieroglyphs.",
+      "correct_answer": "What is Ancient Egypt?",
+      "options": [
+        "What is Ancient Egypt?",
+        "What is Mesopotamia?",
+        "What is the Indus Valley?"
+      ]
+    },
+    {
+      "clue": "This particle is known as the 'God particle' in physics.",
+      "correct_answer": "What is the Higgs boson?",
+      "options": [
+        "What is the Higgs boson?",
+        "What is the neutron?",
+        "What is the photon?"
+      ]
+    },
+    {
+      "clue": "This author created the character Holden Caulfield.",
+      "correct_answer": "Who is J.D. Salinger?",
+      "options": [
+        "Who is Mark Twain?",
+        "Who is J.D. Salinger?",
+        "Who is F. Scott Fitzgerald?"
+      ]
+    },
+    {
+      "clue": "This country won the first FIFA World Cup in 1930.",
+      "correct_answer": "What is Uruguay?",
+      "options": [
+        "What is Brazil?",
+        "What is Italy?",
+        "What is Uruguay?"
+      ]
+    },
+    {
+      "clue": "This composer is known for his symphonies and is often referred to as the 'father of the symphony'.",
+      "correct_answer": "Who is Franz Joseph Haydn?",
+      "options": [
+        "Who is Ludwig van Beethoven?",
+        "Who is Wolfgang Amadeus Mozart?",
+        "Who is Franz Joseph Haydn?"
+      ]
+    },
+    {
+      "clue": "This country is the largest by land area.",
+      "correct_answer": "What is Russia?",
+      "options": [
+        "What is Canada?",
+        "What is China?",
+        "What is Russia?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This treaty ended the Thirty Years' War in 1648.",
+      "correct_answer": "What is the Peace of Westphalia?",
+      "options": [
+        "What is the Treaty of Versailles?",
+        "What is the Peace of Westphalia?",
+        "What is the Treaty of Utrecht?"
+      ]
+    },
+    {
+      "clue": "This law states that energy cannot be created or destroyed.",
+      "correct_answer": "What is the Law of Conservation of Energy?",
+      "options": [
+        "What is Newton's First Law?",
+        "What is the Law of Conservation of Energy?",
+        "What is the Law of Thermodynamics?"
+      ]
+    },
+    {
+      "clue": "This novel is set in a dystopian future where the government surveils its citizens.",
+      "correct_answer": "What is 1984?",
+      "options": [
+        "What is Brave New World?",
+        "What is 1984?",
+        "What is Fahrenheit 451?"
+      ]
+    },
+    {
+      "clue": "This athlete is known for setting the world record in the 100m sprint.",
+      "correct_answer": "Who is Usain Bolt?",
+      "options": [
+        "Who is Carl Lewis?",
+        "Who is Usain Bolt?",
+        "Who is Jesse Owens?"
+      ]
+    },
+    {
+      "clue": "This genre of music originated in the African American communities in the 1940s.",
+      "correct_answer": "What is bebop?",
+      "options": [
+        "What is swing?",
+        "What is bebop?",
+        "What is jazz?"
+      ]
+    },
+    {
+      "clue": "This philosopher is known for the quote 'I think, therefore I am.'",
+      "correct_answer": "Who is Ren\u00e9 Descartes?",
+      "options": [
+        "Who is Immanuel Kant?",
+        "Who is John Locke?",
+        "Who is Ren\u00e9 Descartes?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This revolutionary figure is known for leading the Haitian Revolution.",
+      "correct_answer": "Who is Toussaint Louverture?",
+      "options": [
+        "Who is Simon Bolivar?",
+        "Who is Toussaint Louverture?",
+        "Who is Emiliano Zapata?"
+      ]
+    },
+    {
+      "clue": "This scientist developed the theory of general relativity.",
+      "correct_answer": "Who is Albert Einstein?",
+      "options": [
+        "Who is Isaac Newton?",
+        "Who is Albert Einstein?",
+        "Who is Niels Bohr?"
+      ]
+    },
+    {
+      "clue": "This poet is known for his work 'The Raven'.",
+      "correct_answer": "Who is Edgar Allan Poe?",
+      "options": [
+        "Who is Walt Whitman?",
+        "Who is Edgar Allan Poe?",
+        "Who is Emily Dickinson?"
+      ]
+    },
+    {
+      "clue": "This sport is often referred to as 'the beautiful game'.",
+      "correct_answer": "What is soccer?",
+      "options": [
+        "What is rugby?",
+        "What is cricket?",
+        "What is soccer?"
+      ]
+    },
+    {
+      "clue": "This famous opera features the character of Don Giovanni.",
+      "correct_answer": "What is Don Giovanni?",
+      "options": [
+        "What is La Traviata?",
+        "What is Tosca?",
+        "What is Don Giovanni?"
+      ]
+    },
+    {
+      "clue": "This natural phenomenon is measured on the Richter scale.",
+      "correct_answer": "What is an earthquake?",
+      "options": [
+        "What is a tornado?",
+        "What is a hurricane?",
+        "What is an earthquake?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This battle marked the turning point in the American Civil War.",
+      "correct_answer": "What is the Battle of Gettysburg?",
+      "options": [
+        "What is the Battle of Antietam?",
+        "What is the Battle of Gettysburg?",
+        "What is the Battle of Vicksburg?"
+      ]
+    },
+    {
+      "clue": "This chemical element has the highest electronegativity.",
+      "correct_answer": "What is fluorine?",
+      "options": [
+        "What is chlorine?",
+        "What is oxygen?",
+        "What is fluorine?"
+      ]
+    },
+    {
+      "clue": "This literary device involves giving human traits to non-human entities.",
+      "correct_answer": "What is personification?",
+      "options": [
+        "What is metaphor?",
+        "What is simile?",
+        "What is personification?"
+      ]
+    },
+    {
+      "clue": "This Olympic event includes fencing, swimming, equestrian, and running.",
+      "correct_answer": "What is the modern pentathlon?",
+      "options": [
+        "What is the heptathlon?",
+        "What is the decathlon?",
+        "What is the modern pentathlon?"
+      ]
+    },
+    {
+      "clue": "This musical term indicates a gradual increase in loudness.",
+      "correct_answer": "What is crescendo?",
+      "options": [
+        "What is decrescendo?",
+        "What is forte?",
+        "What is crescendo?"
+      ]
+    },
+    {
+      "clue": "This element has the chemical symbol 'Au'.",
+      "correct_answer": "What is gold?",
+      "options": [
+        "What is silver?",
+        "What is copper?",
+        "What is gold?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This politician famously said, 'Give me liberty, or give me death!'",
+      "correct_answer": "Who is Patrick Henry?",
+      "options": [
+        "Who is Thomas Jefferson?",
+        "Who is George Washington?",
+        "Who is Patrick Henry?"
+      ]
+    },
+    {
+      "clue": "This branch of biology focuses on the relationships between organisms and their environment.",
+      "correct_answer": "What is ecology?",
+      "options": [
+        "What is genetics?",
+        "What is ecology?",
+        "What is evolution?"
+      ]
+    },
+    {
+      "clue": "This 18th-century novel features the character Elizabeth Bennet.",
+      "correct_answer": "What is Pride and Prejudice?",
+      "options": [
+        "What is Sense and Sensibility?",
+        "What is Pride and Prejudice?",
+        "What is Emma?"
+      ]
+    },
+    {
+      "clue": "This American football team is known as the 'Packers'.",
+      "correct_answer": "What is the Green Bay Packers?",
+      "options": [
+        "What is the Chicago Bears?",
+        "What is the Green Bay Packers?",
+        "What is the Dallas Cowboys?"
+      ]
+    },
+    {
+      "clue": "This band is known for their 1973 album 'The Dark Side of the Moon'.",
+      "correct_answer": "What is Pink Floyd?",
+      "options": [
+        "What is The Beatles?",
+        "What is Led Zeppelin?",
+        "What is Pink Floyd?"
+      ]
+    },
+    {
+      "clue": "This ancient wonder was located in the city of Babylon.",
+      "correct_answer": "What are the Hanging Gardens?",
+      "options": [
+        "What are the Pyramids of Giza?",
+        "What are the Colossus of Rhodes?",
+        "What are the Hanging Gardens?"
+      ]
+    }
+  ]
+]

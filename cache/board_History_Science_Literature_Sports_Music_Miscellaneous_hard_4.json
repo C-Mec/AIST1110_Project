@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "This ancient city was known for its hanging gardens, one of the Seven Wonders of the Ancient World.",
+      "correct_answer": "What is Babylon?",
+      "options": [
+        "What is Babylon?",
+        "What is Nineveh?",
+        "What is Thebes?"
+      ]
+    },
+    {
+      "clue": "This gas makes up about 78% of the Earth's atmosphere.",
+      "correct_answer": "What is nitrogen?",
+      "options": [
+        "What is oxygen?",
+        "What is carbon dioxide?",
+        "What is nitrogen?"
+      ]
+    },
+    {
+      "clue": "This author is known for the dystopian novel 'Fahrenheit 451'.",
+      "correct_answer": "Who is Ray Bradbury?",
+      "options": [
+        "Who is H.G. Wells?",
+        "Who is Ray Bradbury?",
+        "Who is George Orwell?"
+      ]
+    },
+    {
+      "clue": "This country has won the most FIFA World Cup titles.",
+      "correct_answer": "What is Brazil?",
+      "options": [
+        "What is Italy?",
+        "What is Germany?",
+        "What is Brazil?"
+      ]
+    },
+    {
+      "clue": "This composer is known for the 'Four Seasons', a set of violin concertos.",
+      "correct_answer": "Who is Antonio Vivaldi?",
+      "options": [
+        "Who is Johann Sebastian Bach?",
+        "Who is Antonio Vivaldi?",
+        "Who is Ludwig van Beethoven?"
+      ]
+    },
+    {
+      "clue": "This term refers to a fear of spiders.",
+      "correct_answer": "What is arachnophobia?",
+      "options": [
+        "What is acrophobia?",
+        "What is claustrophobia?",
+        "What is arachnophobia?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This treaty ended the Thirty Years' War in 1648.",
+      "correct_answer": "What is the Treaty of Westphalia?",
+      "options": [
+        "What is the Treaty of Versailles?",
+        "What is the Treaty of Utrecht?",
+        "What is the Treaty of Westphalia?"
+      ]
+    },
+    {
+      "clue": "This law states that the pressure of a gas tends to decrease as the volume of the gas increases.",
+      "correct_answer": "What is Boyle's Law?",
+      "options": [
+        "What is Charles's Law?",
+        "What is Pascal's Law?",
+        "What is Boyle's Law?"
+      ]
+    },
+    {
+      "clue": "This novel features a character named Ishmael who narrates his experiences on a whaling ship.",
+      "correct_answer": "What is Moby-Dick?",
+      "options": [
+        "What is The Old Man and the Sea?",
+        "What is Moby-Dick?",
+        "What is The Call of the Wild?"
+      ]
+    },
+    {
+      "clue": "This sport involves the use of a shuttlecock.",
+      "correct_answer": "What is badminton?",
+      "options": [
+        "What is tennis?",
+        "What is squash?",
+        "What is badminton?"
+      ]
+    },
+    {
+      "clue": "This genre of music originated in the African American communities in the early 20th century.",
+      "correct_answer": "What is jazz?",
+      "options": [
+        "What is blues?",
+        "What is rock?",
+        "What is jazz?"
+      ]
+    },
+    {
+      "clue": "This city is known for its iconic canals and gondola rides.",
+      "correct_answer": "What is Venice?",
+      "options": [
+        "What is Florence?",
+        "What is Venice?",
+        "What is Rome?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This empire was known for its extensive road network and the use of a postal system in the ancient world.",
+      "correct_answer": "What is the Persian Empire?",
+      "options": [
+        "What is the Roman Empire?",
+        "What is the Byzantine Empire?",
+        "What is the Persian Empire?"
+      ]
+    },
+    {
+      "clue": "This element has the atomic number 79 and is often used in jewelry.",
+      "correct_answer": "What is gold?",
+      "options": [
+        "What is silver?",
+        "What is platinum?",
+        "What is gold?"
+      ]
+    },
+    {
+      "clue": "This Russian author wrote 'Crime and Punishment' and is known for exploring psychological themes.",
+      "correct_answer": "Who is Fyodor Dostoevsky?",
+      "options": [
+        "Who is Leo Tolstoy?",
+        "Who is Anton Chekhov?",
+        "Who is Fyodor Dostoevsky?"
+      ]
+    },
+    {
+      "clue": "This athlete is known as 'The Greatest' and was a three-time world heavyweight boxing champion.",
+      "correct_answer": "Who is Muhammad Ali?",
+      "options": [
+        "Who is Mike Tyson?",
+        "Who is Joe Frazier?",
+        "Who is Muhammad Ali?"
+      ]
+    },
+    {
+      "clue": "This British band is known for their iconic album 'The Dark Side of the Moon'.",
+      "correct_answer": "What is Pink Floyd?",
+      "options": [
+        "What is The Beatles?",
+        "What is Led Zeppelin?",
+        "What is Pink Floyd?"
+      ]
+    },
+    {
+      "clue": "This element has the chemical symbol Hg and is known for its liquid state at room temperature.",
+      "correct_answer": "What is mercury?",
+      "options": [
+        "What is lead?",
+        "What is mercury?",
+        "What is silver?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This event, sparked by the Boston Tea Party, led to the American Revolutionary War.",
+      "correct_answer": "What is the Intolerable Acts?",
+      "options": [
+        "What are the Townshend Acts?",
+        "What are the Intolerable Acts?",
+        "What are the Stamp Acts?"
+      ]
+    },
+    {
+      "clue": "This process describes the splitting of an atomic nucleus to release energy.",
+      "correct_answer": "What is nuclear fission?",
+      "options": [
+        "What is nuclear fusion?",
+        "What is radioactive decay?",
+        "What is nuclear fission?"
+      ]
+    },
+    {
+      "clue": "This work is a satirical novel that critiques the concept of utopia through its portrayal of a perfect society.",
+      "correct_answer": "What is Erewhon?",
+      "options": [
+        "What is Brave New World?",
+        "What is Erewhon?",
+        "What is Utopia?"
+      ]
+    },
+    {
+      "clue": "This Olympic sport is known for its events such as the decathlon and heptathlon.",
+      "correct_answer": "What is athletics?",
+      "options": [
+        "What is gymnastics?",
+        "What is swimming?",
+        "What is athletics?"
+      ]
+    },
+    {
+      "clue": "This instrument is known as the 'king of instruments' and is often used in churches.",
+      "correct_answer": "What is the pipe organ?",
+      "options": [
+        "What is the piano?",
+        "What is the pipe organ?",
+        "What is the harpsichord?"
+      ]
+    },
+    {
+      "clue": "This term describes the study of ancient artifacts and human history.",
+      "correct_answer": "What is archaeology?",
+      "options": [
+        "What is anthropology?",
+        "What is history?",
+        "What is archaeology?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This figure was the first female pharaoh of Ancient Egypt, known for her trade expeditions.",
+      "correct_answer": "Who is Hatshepsut?",
+      "options": [
+        "Who is Nefertiti?",
+        "Who is Cleopatra?",
+        "Who is Hatshepsut?"
+      ]
+    },
+    {
+      "clue": "This type of bond involves the sharing of electron pairs between atoms.",
+      "correct_answer": "What is a covalent bond?",
+      "options": [
+        "What is an ionic bond?",
+        "What is a metallic bond?",
+        "What is a covalent bond?"
+      ]
+    },
+    {
+      "clue": "This poet is famously associated with the phrase 'Because I could not stop for Death'.",
+      "correct_answer": "Who is Emily Dickinson?",
+      "options": [
+        "Who is Robert Frost?",
+        "Who is Walt Whitman?",
+        "Who is Emily Dickinson?"
+      ]
+    },
+    {
+      "clue": "This team sport originated in Canada and is played on ice with skates and sticks.",
+      "correct_answer": "What is ice hockey?",
+      "options": [
+        "What is field hockey?",
+        "What is ice hockey?",
+        "What is lacrosse?"
+      ]
+    },
+    {
+      "clue": "This type of music blends traditional folk and modern pop, often featuring storytelling lyrics.",
+      "correct_answer": "What is Americana?",
+      "options": [
+        "What is country?",
+        "What is folk?",
+        "What is Americana?"
+      ]
+    },
+    {
+      "clue": "This word describes the practice of planting trees to combat deforestation.",
+      "correct_answer": "What is reforestation?",
+      "options": [
+        "What is deforestation?",
+        "What is afforestation?",
+        "What is reforestation?"
+      ]
+    }
+  ]
+]
