@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "This ancient civilization is known for its pyramids and hieroglyphs.",
+      "correct_answer": "What is Ancient Egypt?",
+      "options": [
+        "What is Ancient Egypt?",
+        "What is Mesopotamia?",
+        "What is the Indus Valley?"
+      ]
+    },
+    {
+      "clue": "This element has the highest boiling point of all the elements.",
+      "correct_answer": "What is Tungsten?",
+      "options": [
+        "What is Osmium?",
+        "What is Tungsten?",
+        "What is Rhenium?"
+      ]
+    },
+    {
+      "clue": "This novel features a dystopian society ruled by Big Brother.",
+      "correct_answer": "What is 1984?",
+      "options": [
+        "What is Brave New World?",
+        "What is 1984?",
+        "What is Fahrenheit 451?"
+      ]
+    },
+    {
+      "clue": "This country hosted the first modern Olympics in 1896.",
+      "correct_answer": "What is Greece?",
+      "options": [
+        "What is France?",
+        "What is Greece?",
+        "What is Italy?"
+      ]
+    },
+    {
+      "clue": "This instrument is known as the 'king of instruments'.",
+      "correct_answer": "What is the Organ?",
+      "options": [
+        "What is the Piano?",
+        "What is the Organ?",
+        "What is the Guitar?"
+      ]
+    },
+    {
+      "clue": "This celestial phenomenon is known for its beautiful tails and orbits the sun.",
+      "correct_answer": "What is a Comet?",
+      "options": [
+        "What is an Asteroid?",
+        "What is a Comet?",
+        "What is a Meteor?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This treaty ended the Thirty Years' War in 1648.",
+      "correct_answer": "What is the Peace of Westphalia?",
+      "options": [
+        "What is the Treaty of Versailles?",
+        "What is the Peace of Westphalia?",
+        "What is the Treaty of Utrecht?"
+      ]
+    },
+    {
+      "clue": "This type of radiation has the shortest wavelength in the electromagnetic spectrum.",
+      "correct_answer": "What is Gamma radiation?",
+      "options": [
+        "What is Ultraviolet radiation?",
+        "What is X-ray radiation?",
+        "What is Gamma radiation?"
+      ]
+    },
+    {
+      "clue": "This author wrote 'The Metamorphosis,' about a man who turns into a giant insect.",
+      "correct_answer": "Who is Franz Kafka?",
+      "options": [
+        "Who is Hermann Hesse?",
+        "Who is Franz Kafka?",
+        "Who is Thomas Mann?"
+      ]
+    },
+    {
+      "clue": "This sport is known as the 'king of sports'.",
+      "correct_answer": "What is Soccer?",
+      "options": [
+        "What is Cricket?",
+        "What is Basketball?",
+        "What is Soccer?"
+      ]
+    },
+    {
+      "clue": "This composer wrote the famous 'Symphony No. 5 in C Minor'.",
+      "correct_answer": "Who is Ludwig van Beethoven?",
+      "options": [
+        "Who is Johann Sebastian Bach?",
+        "Who is Ludwig van Beethoven?",
+        "Who is Wolfgang Amadeus Mozart?"
+      ]
+    },
+    {
+      "clue": "This country is both the smallest in land area and population.",
+      "correct_answer": "What is Vatican City?",
+      "options": [
+        "What is Monaco?",
+        "What is Vatican City?",
+        "What is San Marino?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "He was the first emperor of a unified China in 221 BC.",
+      "correct_answer": "Who is Qin Shi Huang?",
+      "options": [
+        "Who is Han Wudi?",
+        "Who is Qin Shi Huang?",
+        "Who is Sun Yat-sen?"
+      ]
+    },
+    {
+      "clue": "This organelle is known as the powerhouse of the cell.",
+      "correct_answer": "What is the Mitochondrion?",
+      "options": [
+        "What is the Nucleus?",
+        "What is the Mitochondrion?",
+        "What is the Ribosome?"
+      ]
+    },
+    {
+      "clue": "This epic poem tells the story of the hero Beowulf.",
+      "correct_answer": "What is Beowulf?",
+      "options": [
+        "What is The Iliad?",
+        "What is Beowulf?",
+        "What is The Odyssey?"
+      ]
+    },
+    {
+      "clue": "This athlete is known for winning eight gold medals at the 2008 Beijing Olympics.",
+      "correct_answer": "Who is Michael Phelps?",
+      "options": [
+        "Who is Usain Bolt?",
+        "Who is Michael Phelps?",
+        "Who is Carl Lewis?"
+      ]
+    },
+    {
+      "clue": "This genre of music originated in Jamaica and is characterized by a strong backbeat.",
+      "correct_answer": "What is Reggae?",
+      "options": [
+        "What is Ska?",
+        "What is Reggae?",
+        "What is Dubstep?"
+      ]
+    },
+    {
+      "clue": "This is the most widely spoken language in the world.",
+      "correct_answer": "What is Mandarin Chinese?",
+      "options": [
+        "What is Spanish?",
+        "What is English?",
+        "What is Mandarin Chinese?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This battle in 1066 marked the beginning of Norman rule in England.",
+      "correct_answer": "What is the Battle of Hastings?",
+      "options": [
+        "What is the Battle of Agincourt?",
+        "What is the Battle of Hastings?",
+        "What is the Battle of Waterloo?"
+      ]
+    },
+    {
+      "clue": "This phenomenon explains the bending of light as it passes through different mediums.",
+      "correct_answer": "What is Refraction?",
+      "options": [
+        "What is Reflection?",
+        "What is Diffraction?",
+        "What is Refraction?"
+      ]
+    },
+    {
+      "clue": "This author is known for the concept of the 'stream of consciousness' in literature.",
+      "correct_answer": "Who is Virginia Woolf?",
+      "options": [
+        "Who is James Joyce?",
+        "Who is Virginia Woolf?",
+        "Who is William Faulkner?"
+      ]
+    },
+    {
+      "clue": "This term refers to a perfect score in bowling.",
+      "correct_answer": "What is a 300?",
+      "options": [
+        "What is a 200?",
+        "What is a 300?",
+        "What is a strike?"
+      ]
+    },
+    {
+      "clue": "This musical form features a dialogue between a soloist and orchestra.",
+      "correct_answer": "What is a Concerto?",
+      "options": [
+        "What is a Sonata?",
+        "What is a Symphony?",
+        "What is a Concerto?"
+      ]
+    },
+    {
+      "clue": "This ancient structure is one of the Seven Wonders of the Ancient World.",
+      "correct_answer": "What is the Great Pyramid of Giza?",
+      "options": [
+        "What is the Hanging Gardens of Babylon?",
+        "What is the Great Pyramid of Giza?",
+        "What is the Colossus of Rhodes?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This figure was the last ruler of the Inca Empire before Spanish conquest.",
+      "correct_answer": "Who is Atahualpa?",
+      "options": [
+        "Who is Hu\u00e1scar?",
+        "Who is Atahualpa?",
+        "Who is Manco Inca Yupanqui?"
+      ]
+    },
+    {
+      "clue": "This scientist is known for the uncertainty principle in quantum mechanics.",
+      "correct_answer": "Who is Werner Heisenberg?",
+      "options": [
+        "Who is Niels Bohr?",
+        "Who is Albert Einstein?",
+        "Who is Werner Heisenberg?"
+      ]
+    },
+    {
+      "clue": "This novel features the character Jay Gatsby and is set in the 1920s.",
+      "correct_answer": "What is The Great Gatsby?",
+      "options": [
+        "What is The Catcher in the Rye?",
+        "What is The Great Gatsby?",
+        "What is To Kill a Mockingbird?"
+      ]
+    },
+    {
+      "clue": "This tennis player has won the most Grand Slam titles in men's singles.",
+      "correct_answer": "Who is Rafael Nadal?",
+      "options": [
+        "Who is Roger Federer?",
+        "Who is Rafael Nadal?",
+        "Who is Novak Djokovic?"
+      ]
+    },
+    {
+      "clue": "This artist is known for the album 'The Dark Side of the Moon'.",
+      "correct_answer": "Who is Pink Floyd?",
+      "options": [
+        "Who is The Beatles?",
+        "Who is Pink Floyd?",
+        "Who is Led Zeppelin?"
+      ]
+    },
+    {
+      "clue": "This element's atomic number is 1 and it is the lightest of all elements.",
+      "correct_answer": "What is Hydrogen?",
+      "options": [
+        "What is Helium?",
+        "What is Lithium?",
+        "What is Hydrogen?"
+      ]
+    }
+  ]
+]

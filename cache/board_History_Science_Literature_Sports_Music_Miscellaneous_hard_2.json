@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "This ancient city was known for its hanging gardens, one of the Seven Wonders of the Ancient World.",
+      "correct_answer": "What is Babylon?",
+      "options": [
+        "What is Babylon?",
+        "What is Nineveh?",
+        "What is Thebes?"
+      ]
+    },
+    {
+      "clue": "This particle is known as the fundamental carrier of the electromagnetic force.",
+      "correct_answer": "What is the photon?",
+      "options": [
+        "What is the photon?",
+        "What is the electron?",
+        "What is the neutron?"
+      ]
+    },
+    {
+      "clue": "This novel features a character named Holden Caulfield.",
+      "correct_answer": "What is The Catcher in the Rye?",
+      "options": [
+        "What is To Kill a Mockingbird?",
+        "What is The Great Gatsby?",
+        "What is The Catcher in the Rye?"
+      ]
+    },
+    {
+      "clue": "This country won the first FIFA World Cup in 1930.",
+      "correct_answer": "What is Uruguay?",
+      "options": [
+        "What is Brazil?",
+        "What is Germany?",
+        "What is Uruguay?"
+      ]
+    },
+    {
+      "clue": "This composer is known for his symphony No. 9, which includes the 'Ode to Joy'.",
+      "correct_answer": "Who is Ludwig van Beethoven?",
+      "options": [
+        "Who is Johann Sebastian Bach?",
+        "Who is Wolfgang Amadeus Mozart?",
+        "Who is Ludwig van Beethoven?"
+      ]
+    },
+    {
+      "clue": "This Asian country is known for its cherry blossoms and samurai culture.",
+      "correct_answer": "What is Japan?",
+      "options": [
+        "What is China?",
+        "What is Korea?",
+        "What is Japan?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This treaty ended the Thirty Years' War in 1648.",
+      "correct_answer": "What is the Peace of Westphalia?",
+      "options": [
+        "What is the Treaty of Versailles?",
+        "What is the Peace of Westphalia?",
+        "What is the Treaty of Paris?"
+      ]
+    },
+    {
+      "clue": "This law states that the total energy in a closed system remains constant.",
+      "correct_answer": "What is the law of conservation of energy?",
+      "options": [
+        "What is Newton's First Law?",
+        "What is the law of conservation of mass?",
+        "What is the law of conservation of energy?"
+      ]
+    },
+    {
+      "clue": "This author created the character Sherlock Holmes.",
+      "correct_answer": "Who is Arthur Conan Doyle?",
+      "options": [
+        "Who is Agatha Christie?",
+        "Who is Arthur Conan Doyle?",
+        "Who is Edgar Allan Poe?"
+      ]
+    },
+    {
+      "clue": "This athlete is known as 'The Greatest' and was a three-time heavyweight boxing champion.",
+      "correct_answer": "Who is Muhammad Ali?",
+      "options": [
+        "Who is Joe Frazier?",
+        "Who is Mike Tyson?",
+        "Who is Muhammad Ali?"
+      ]
+    },
+    {
+      "clue": "This genre of music originated in Jamaica in the late 1960s.",
+      "correct_answer": "What is reggae?",
+      "options": [
+        "What is ska?",
+        "What is reggae?",
+        "What is calypso?"
+      ]
+    },
+    {
+      "clue": "This ancient structure is located in Egypt and is one of the Seven Wonders of the Ancient World.",
+      "correct_answer": "What is the Great Pyramid of Giza?",
+      "options": [
+        "What is the Hanging Gardens?",
+        "What is the Great Pyramid of Giza?",
+        "What is the Colossus of Rhodes?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This famous battle took place in 1066 and marked the beginning of Norman rule in England.",
+      "correct_answer": "What is the Battle of Hastings?",
+      "options": [
+        "What is the Battle of Bosworth?",
+        "What is the Battle of Hastings?",
+        "What is the Battle of Agincourt?"
+      ]
+    },
+    {
+      "clue": "This process involves the conversion of light energy into chemical energy in plants.",
+      "correct_answer": "What is photosynthesis?",
+      "options": [
+        "What is cellular respiration?",
+        "What is photolysis?",
+        "What is photosynthesis?"
+      ]
+    },
+    {
+      "clue": "This work by James Joyce is known for its stream of consciousness style.",
+      "correct_answer": "What is Ulysses?",
+      "options": [
+        "What is A Portrait of the Artist as a Young Man?",
+        "What is Dubliners?",
+        "What is Ulysses?"
+      ]
+    },
+    {
+      "clue": "This sport features a term called 'the double fault'.",
+      "correct_answer": "What is tennis?",
+      "options": [
+        "What is badminton?",
+        "What is tennis?",
+        "What is squash?"
+      ]
+    },
+    {
+      "clue": "This instrument is known as the 'king of instruments' and is commonly used in orchestras.",
+      "correct_answer": "What is the organ?",
+      "options": [
+        "What is the piano?",
+        "What is the organ?",
+        "What is the violin?"
+      ]
+    },
+    {
+      "clue": "This term describes a word that has the same meaning as another word.",
+      "correct_answer": "What is a synonym?",
+      "options": [
+        "What is an antonym?",
+        "What is a homonym?",
+        "What is a synonym?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This Russian leader was known for his role in the October Revolution of 1917.",
+      "correct_answer": "Who is Vladimir Lenin?",
+      "options": [
+        "Who is Leon Trotsky?",
+        "Who is Joseph Stalin?",
+        "Who is Vladimir Lenin?"
+      ]
+    },
+    {
+      "clue": "This scientist is known for his work in the field of genetics and the laws of inheritance.",
+      "correct_answer": "Who is Gregor Mendel?",
+      "options": [
+        "Who is Charles Darwin?",
+        "Who is Gregor Mendel?",
+        "Who is Louis Pasteur?"
+      ]
+    },
+    {
+      "clue": "This poet is famous for his work 'The Raven'.",
+      "correct_answer": "Who is Edgar Allan Poe?",
+      "options": [
+        "Who is Walt Whitman?",
+        "Who is Emily Dickinson?",
+        "Who is Edgar Allan Poe?"
+      ]
+    },
+    {
+      "clue": "This extreme sport involves descending a snow-covered slope on a small board.",
+      "correct_answer": "What is snowboarding?",
+      "options": [
+        "What is skiing?",
+        "What is snowboarding?",
+        "What is tobogganing?"
+      ]
+    },
+    {
+      "clue": "This band released the album 'Dark Side of the Moon' in 1973.",
+      "correct_answer": "What is Pink Floyd?",
+      "options": [
+        "What is The Beatles?",
+        "What is Led Zeppelin?",
+        "What is Pink Floyd?"
+      ]
+    },
+    {
+      "clue": "This phenomenon occurs when water vapor turns into liquid water droplets in the atmosphere.",
+      "correct_answer": "What is condensation?",
+      "options": [
+        "What is evaporation?",
+        "What is precipitation?",
+        "What is condensation?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This ancient civilization is credited with the invention of writing around 3200 BC.",
+      "correct_answer": "What is Sumer?",
+      "options": [
+        "What is Akkad?",
+        "What is Egypt?",
+        "What is Sumer?"
+      ]
+    },
+    {
+      "clue": "This element, with atomic number 6, is the basis for organic life.",
+      "correct_answer": "What is carbon?",
+      "options": [
+        "What is oxygen?",
+        "What is nitrogen?",
+        "What is carbon?"
+      ]
+    },
+    {
+      "clue": "This dystopian novel depicts a totalitarian regime that uses surveillance and propaganda.",
+      "correct_answer": "What is 1984?",
+      "options": [
+        "What is Brave New World?",
+        "What is Fahrenheit 451?",
+        "What is 1984?"
+      ]
+    },
+    {
+      "clue": "This Olympic sport involves wrestling with a partner while trying to pin them to the mat.",
+      "correct_answer": "What is Greco-Roman wrestling?",
+      "options": [
+        "What is freestyle wrestling?",
+        "What is judo?",
+        "What is Greco-Roman wrestling?"
+      ]
+    },
+    {
+      "clue": "This composer is famous for his 'Four Seasons' violin concertos.",
+      "correct_answer": "Who is Antonio Vivaldi?",
+      "options": [
+        "Who is Franz Schubert?",
+        "Who is Antonio Vivaldi?",
+        "Who is Gustav Mahler?"
+      ]
+    },
+    {
+      "clue": "This mathematical constant represents the ratio of a circle's circumference to its diameter.",
+      "correct_answer": "What is pi?",
+      "options": [
+        "What is e?",
+        "What is phi?",
+        "What is pi?"
+      ]
+    }
+  ]
+]

@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "This ancient civilization is known for its pyramids and hieroglyphs.",
+      "correct_answer": "What is Ancient Egypt?",
+      "options": [
+        "What is Ancient Egypt?",
+        "What is Mesopotamia?",
+        "What is the Indus Valley?"
+      ]
+    },
+    {
+      "clue": "This is the only planet in our solar system that rotates on its side.",
+      "correct_answer": "What is Uranus?",
+      "options": [
+        "What is Neptune?",
+        "What is Jupiter?",
+        "What is Uranus?"
+      ]
+    },
+    {
+      "clue": "This author wrote 'The Metamorphosis,' where a man turns into an insect.",
+      "correct_answer": "Who is Franz Kafka?",
+      "options": [
+        "Who is Hermann Hesse?",
+        "Who is Franz Kafka?",
+        "Who is Rainer Maria Rilke?"
+      ]
+    },
+    {
+      "clue": "This sport is known for its use of a shuttlecock.",
+      "correct_answer": "What is badminton?",
+      "options": [
+        "What is tennis?",
+        "What is badminton?",
+        "What is squash?"
+      ]
+    },
+    {
+      "clue": "This composer is known for his 'Moonlight Sonata.'",
+      "correct_answer": "Who is Ludwig van Beethoven?",
+      "options": [
+        "Who is Johann Sebastian Bach?",
+        "Who is Ludwig van Beethoven?",
+        "Who is Wolfgang Amadeus Mozart?"
+      ]
+    },
+    {
+      "clue": "This is the term for a fear of spiders.",
+      "correct_answer": "What is arachnophobia?",
+      "options": [
+        "What is claustrophobia?",
+        "What is acrophobia?",
+        "What is arachnophobia?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This treaty ended the Thirty Years' War in 1648.",
+      "correct_answer": "What is the Peace of Westphalia?",
+      "options": [
+        "What is the Treaty of Tordesillas?",
+        "What is the Peace of Westphalia?",
+        "What is the Treaty of Versailles?"
+      ]
+    },
+    {
+      "clue": "This particle is known as the 'God particle' and is associated with the Higgs field.",
+      "correct_answer": "What is the Higgs boson?",
+      "options": [
+        "What is a photon?",
+        "What is the Higgs boson?",
+        "What is a neutron?"
+      ]
+    },
+    {
+      "clue": "This epic poem details the adventures of Odysseus returning home.",
+      "correct_answer": "What is the Odyssey?",
+      "options": [
+        "What is the Iliad?",
+        "What is the Odyssey?",
+        "What is the Aeneid?"
+      ]
+    },
+    {
+      "clue": "This athlete is known as the fastest man in the world, holding multiple world records.",
+      "correct_answer": "Who is Usain Bolt?",
+      "options": [
+        "Who is Carl Lewis?",
+        "Who is Usain Bolt?",
+        "Who is Jesse Owens?"
+      ]
+    },
+    {
+      "clue": "This genre of music originated in the African American communities in the late 19th century.",
+      "correct_answer": "What is jazz?",
+      "options": [
+        "What is blues?",
+        "What is jazz?",
+        "What is rock?"
+      ]
+    },
+    {
+      "clue": "This country is known as the Land of the Rising Sun.",
+      "correct_answer": "What is Japan?",
+      "options": [
+        "What is China?",
+        "What is Japan?",
+        "What is South Korea?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This event, occurring in 476 AD, is often cited as the fall of the Western Roman Empire.",
+      "correct_answer": "What is the deposition of Romulus Augustulus?",
+      "options": [
+        "What is the sack of Rome?",
+        "What is the deposition of Romulus Augustulus?",
+        "What is the Battle of Actium?"
+      ]
+    },
+    {
+      "clue": "This law states that the entropy of an isolated system never decreases.",
+      "correct_answer": "What is the second law of thermodynamics?",
+      "options": [
+        "What is the first law of thermodynamics?",
+        "What is the second law of thermodynamics?",
+        "What is the law of conservation of mass?"
+      ]
+    },
+    {
+      "clue": "This novel features the character of Jay Gatsby and is set in the 1920s.",
+      "correct_answer": "What is The Great Gatsby?",
+      "options": [
+        "What is To Kill a Mockingbird?",
+        "What is The Great Gatsby?",
+        "What is Brave New World?"
+      ]
+    },
+    {
+      "clue": "This sport originated in England and is played with 15 players on each side.",
+      "correct_answer": "What is rugby?",
+      "options": [
+        "What is soccer?",
+        "What is rugby?",
+        "What is cricket?"
+      ]
+    },
+    {
+      "clue": "This instrument is known as the 'king of instruments' and is often found in churches.",
+      "correct_answer": "What is the organ?",
+      "options": [
+        "What is the piano?",
+        "What is the organ?",
+        "What is the violin?"
+      ]
+    },
+    {
+      "clue": "This is the largest desert in the world.",
+      "correct_answer": "What is the Antarctic Desert?",
+      "options": [
+        "What is the Sahara Desert?",
+        "What is the Arabian Desert?",
+        "What is the Antarctic Desert?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This leader was known as the Sun King and ruled France from 1643 to 1715.",
+      "correct_answer": "Who is Louis XIV?",
+      "options": [
+        "Who is Charles V?",
+        "Who is Louis XIV?",
+        "Who is Henry VIII?"
+      ]
+    },
+    {
+      "clue": "This branch of biology deals with the study of fungi.",
+      "correct_answer": "What is mycology?",
+      "options": [
+        "What is botany?",
+        "What is zoology?",
+        "What is mycology?"
+      ]
+    },
+    {
+      "clue": "This Russian author is known for his works 'Crime and Punishment' and 'The Brothers Karamazov.'",
+      "correct_answer": "Who is Fyodor Dostoevsky?",
+      "options": [
+        "Who is Leo Tolstoy?",
+        "Who is Anton Chekhov?",
+        "Who is Fyodor Dostoevsky?"
+      ]
+    },
+    {
+      "clue": "This event occurs every four years and features athletes from around the world.",
+      "correct_answer": "What are the Olympic Games?",
+      "options": [
+        "What are the Pan American Games?",
+        "What are the Commonwealth Games?",
+        "What are the Olympic Games?"
+      ]
+    },
+    {
+      "clue": "This famous band was known for the song 'Bohemian Rhapsody.'",
+      "correct_answer": "What is Queen?",
+      "options": [
+        "What is The Beatles?",
+        "What is Led Zeppelin?",
+        "What is Queen?"
+      ]
+    },
+    {
+      "clue": "This term refers to a word that has the opposite meaning of another word.",
+      "correct_answer": "What is an antonym?",
+      "options": [
+        "What is a synonym?",
+        "What is a homonym?",
+        "What is an antonym?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This revolution began in 1917 and led to the rise of the Soviet Union.",
+      "correct_answer": "What is the Russian Revolution?",
+      "options": [
+        "What is the French Revolution?",
+        "What is the American Revolution?",
+        "What is the Russian Revolution?"
+      ]
+    },
+    {
+      "clue": "This term refers to the phenomenon where light bends as it passes through different mediums.",
+      "correct_answer": "What is refraction?",
+      "options": [
+        "What is reflection?",
+        "What is diffraction?",
+        "What is refraction?"
+      ]
+    },
+    {
+      "clue": "This literary device involves a discrepancy between what is said and what is meant.",
+      "correct_answer": "What is irony?",
+      "options": [
+        "What is metaphor?",
+        "What is symbolism?",
+        "What is irony?"
+      ]
+    },
+    {
+      "clue": "This term refers to a perfect game in bowling.",
+      "correct_answer": "What is a 300?",
+      "options": [
+        "What is a turkey?",
+        "What is a strike?",
+        "What is a 300?"
+      ]
+    },
+    {
+      "clue": "This music scale consists of five notes and is often used in folk music.",
+      "correct_answer": "What is the pentatonic scale?",
+      "options": [
+        "What is the major scale?",
+        "What is the harmonic scale?",
+        "What is the pentatonic scale?"
+      ]
+    },
+    {
+      "clue": "This is the smallest unit of measurement in the metric system.",
+      "correct_answer": "What is a millimeter?",
+      "options": [
+        "What is a centimeter?",
+        "What is a millimeter?",
+        "What is a meter?"
+      ]
+    }
+  ]
+]

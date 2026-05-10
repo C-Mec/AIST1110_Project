@@ -60,9 +60,9 @@ class Grid_Surface(Base_Surface):
         self.question_gen = LLMQuestionGenerator()
         self.multiplier = 1
         num_rows = 5   # row 0 is for categories, so only generate for 1-5
-        index1, index2 = int(random.uniform(0, 5)), int(random.uniform(0, 5))
-        self.jeopardy_board = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="easy", index=index1)
-        self.double_board   = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="hard", index=index2)
+        self.index1, self.index2 = int(random.uniform(0, 5)), int(random.uniform(0, 5))
+        self.jeopardy_board = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="easy", index=self.index1)
+        self.double_board   = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="hard", index=self.index2)
         self.current_board = self.jeopardy_board   # use this for normal round, switch to double_board for double jeopardy
         self._grid_init()
 
@@ -236,7 +236,7 @@ class Grid_Surface(Base_Surface):
                         q.value = row * 200 * self.multiplier
             elif self.multiplier == 2:
                 manager.add_surface(Transition_Surface(mode="final"))
-                manager.add_surface(FinalJeopardy(Vec2(self.screen_w, self.screen_h), Vec2(0,0), self.players))
+                manager.add_surface(FinalJeopardy(Vec2(self.screen_w, self.screen_h), Vec2(0,0), self.players, self.index2))
                 manager.remove_surface(self)
         
         if self.current_cell:
@@ -359,7 +359,7 @@ class Grid_Surface(Base_Surface):
             if not used or flash:
                 question.value = row * 200 * self.multiplier
 
-                # ✅ Add $ sign and squeeze into cell
+                # Add $ sign and squeeze into cell
                 value_text = f"${question.value}"
                 shadow_rect = rect.copy()
                 shadow_rect.centerx += 2   # slight right

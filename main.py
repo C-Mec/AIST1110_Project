@@ -95,7 +95,7 @@ while running:
             
             # # testing only
             # if final_surface is None:
-            #     final_surface = FinalJeopardy(Vec2(screen_w, screen_h), Vec2(0, 0), players)
+            #     final_surface = FinalJeopardy(Vec2(screen_w, screen_h), Vec2(0, 0), players, 0)
             #     manager.add_surface(final_surface)
     
     if (

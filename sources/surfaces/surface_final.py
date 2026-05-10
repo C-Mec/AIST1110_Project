@@ -1,14 +1,15 @@
-import pygame, random, config
-from sources.manager import manager, Base_Surface
+import pygame, random, config, json
+from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
 from sources.util import Font, Color, intxy
+from pathlib import Path
 
 Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
 class FinalJeopardy(Base_Surface):
-    def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player]):
+    def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player], used_index: int):
         screen_w, screen_h = config.screen_dimension
         margin_x = int(screen_w * 0.18)
         margin_y = int(screen_h * 0.195)
@@ -21,15 +22,33 @@ class FinalJeopardy(Base_Surface):
 
         super().__init__(dimension, pos)
 
-        self.players = players
-        self.category = "PlaceHolder"
-        self.clue = "Type answer"
+        categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]
+        cache_file = Path("cache") / f"board_{'_'.join(categories)}_easy_{used_index}.json"
+        if cache_file.exists():
+            with open(cache_file) as f:
+                board_data = json.load(f)
+            # bottom row is the last index
+            final_row = board_data[-1]
+            # pick a random column
+            col_idx = random.randrange(len(final_row))
+            q_data = final_row[col_idx]
+
+            self.category = categories[col_idx]
+            self.clue = q_data["clue"]
+            self.option = q_data["options"]
+            self.correct_option = q_data["correct_answer"]
+        else:
+            # fallback if file missing
+            self.category = "Final Jeopardy"
+            self.clue = "Sample final clue"
+            self.option = ["Option A", "Option B", "Option C"]
+            self.correct_option = "Option A"
+        
         self.confirmed = False
         self.input_text = ""
         self.active_box = False
         self.phase = "wager"
-        self.option = ["answer", "Answer", "anwer"]
-        self.correct_option = "What is answer?"
+        self.no_wager_start = None
         
         self.screen_w, self.screen_h = intxy(config.screen_dimension)
         self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
@@ -85,10 +104,30 @@ class FinalJeopardy(Base_Surface):
             
             if self.confirm_button.collidepoint(pos):
                 self._lock_answer()
-        
+    
+    def wrap_text(self, text: str, font, max_width: int) -> list[str]:
+        words = text.split()
+        lines, current = [], []
+
+        for word in words:
+            test_line = " ".join(current + [word])
+            if font.size(test_line)[0] <= max_width:
+                current.append(word)
+            else:
+                lines.append(" ".join(current))
+                current = [word]
+        if current:
+            lines.append(" ".join(current))
+
+        return lines
+    
     def _confirm_wager(self):
         try:
-            human = next(p for p in self.players if not p.bot)
+            human = next(p for p in Game_Manager.players if not p.bot)
+            if human.score < 1:
+                # Start timer for "Cannot wager" message
+                self.no_wager_start = pygame.time.get_ticks()
+                return
             human.wager = max(0, min(int(self.input_text), human.score))
             print(f"{human.name} wagered ${human.wager}")
             self.phase = "answer"
@@ -101,12 +140,12 @@ class FinalJeopardy(Base_Surface):
 
 
     def _lock_answer(self):
-        human = next(p for p in self.players if not p.bot)
+        human = next(p for p in Game_Manager.players if not p.bot)
         human.final_answer = f"What is {self.input_text.strip()}?"
         self.confirmed = True
         print(f"{human.name} answered: {human.final_answer}")
 
-        for p in self.players:
+        for p in Game_Manager.players:
             if p.bot:
                 # Assign weights: 0.5 for correct, 0.25 for each wrong
                 weights = []
@@ -120,7 +159,7 @@ class FinalJeopardy(Base_Surface):
                 print(f"{p.name} answered: {p.final_answer}")
 
         # --- Scoring ---
-        for p in self.players:
+        for p in Game_Manager.players:
             if p.bot:
                 if p.final_answer == self.correct_option:
                     p.score += p.wager
@@ -145,77 +184,177 @@ class FinalJeopardy(Base_Surface):
         title = Font.logo_large.render("Final Jeopardy!", True, Color.text)
         self.surface.blit(title, (self.surface.get_width()//2 - title.get_width()//2, 20))
 
-        # Category
-        cat_text = Font.category_medium.render(f"Category: {self.category}", True, Color.white)
-        self.surface.blit(cat_text, (40, 80))
+        human = Game_Manager.players[0]
 
-        # Clue
-        clue_text = Font.clue_medium.render(self.clue, True, Color.text)
-        clue_rect = clue_text.get_rect(topleft=(40, 120))
-        self.surface.blit(clue_text, clue_rect)
+        # --- Always show wagers at bottom ---
+        y = self.surface.get_height() - 100
+        x_positions = [self.surface.get_width()//5,
+                    self.surface.get_width()//2,
+                    4*self.surface.get_width()//5]
 
-        human = self.players[0]
+        for i, p in enumerate(Game_Manager.players):
+            if self.phase == "wager":
+                if p.score < 1:
+                    # Cannot wager
+                    line1 = Font.clue_medium.render(f"{p.name}", True, Color.text)
+                    line2 = Font.clue_medium.render("Cannot wager", True, Color.text)
+                    rect1 = line1.get_rect(center=(x_positions[i], y))
+                    rect2 = line2.get_rect(center=(x_positions[i], y+25))
+                    self.surface.blit(line1, rect1)
+                    self.surface.blit(line2, rect2)
+                else:
+                    line1 = Font.clue_medium.render(f"{p.name}", True, Color.text)
+                    line2 = Font.clue_medium.render(f"wagering...", True, Color.text)
+                    rect1 = line1.get_rect(center=(x_positions[i], y))
+                    rect2 = line2.get_rect(center=(x_positions[i], y+25))
+                    self.surface.blit(line1, rect1)
+                    self.surface.blit(line2, rect2)
+            else:
+                if p.wager == 0:
+                    line1 = Font.clue_medium.render(f"{p.name}", True, Color.text)
+                    line2 = Font.clue_medium.render(f"Did not wager", True, Color.text)
+                    rect1 = line1.get_rect(center=(x_positions[i], y))
+                    rect2 = line2.get_rect(center=(x_positions[i], y+25))
+                    self.surface.blit(line1, rect1)
+                    self.surface.blit(line2, rect2)
+                else:
+                    line1 = Font.clue_medium.render(f"{p.name}", True, Color.text)
+                    line2 = Font.clue_medium.render(f"Wager: ${p.wager}", True, Color.text)
+                    rect1 = line1.get_rect(center=(x_positions[i], y))
+                    rect2 = line2.get_rect(center=(x_positions[i], y+25))
+                    self.surface.blit(line1, rect1)
+                    self.surface.blit(line2, rect2)
+
+            # Show answer under wager if exists
+            if hasattr(p, "final_answer"):
+                ans_text = p.final_answer
+                ans_rendered = Font.clue_small.render(ans_text, True, Color.text)
+                ans_rect = ans_rendered.get_rect(center=(x_positions[i], y+55))
+                self.surface.blit(ans_rendered, ans_rect)
+
+        # --- PHASE 1: WAGER ---
         if self.phase == "wager":
-            prompt = Font.clue_medium.render(f"{human.name}, enter your wager (0–{human.score}):", True, Color.text)
-            self.surface.blit(prompt, (40, 180))
+            if human.score < 1:
+                # Centered two-line message
+                msg1 = Font.clue_medium.render("Cannot wager", True, Color.text)
+                msg2 = Font.clue_medium.render(f"Your ${human.score} < Min Wager $1", True, Color.text)
 
-            color = Color.white if not self.active_box else Color.greyed
-            pygame.draw.rect(self.surface, color, self.box_rect, 0)
-            pygame.draw.rect(self.surface, Color.border, self.box_rect, 2)
+                rect1 = msg1.get_rect(center=(self.surface.get_width()//2,
+                                            self.surface.get_height()//2 - 20))
+                rect2 = msg2.get_rect(center=(self.surface.get_width()//2,
+                                            self.surface.get_height()//2 + 20))
 
-            text_surface = Font.clue_medium.render(self.input_text, True, Color.text)
-            self.surface.blit(text_surface, (self.box_rect.x+5, self.box_rect.y+5))
+                self.surface.blit(msg1, rect1)
+                self.surface.blit(msg2, rect2)
 
-            if self.active_box and not self.confirmed:
-                # Blink every ~500ms
-                if (pygame.time.get_ticks() // 500) % 2 == 0:
-                    caret_x = self.box_rect.x + 5 + text_surface.get_width() + 2
-                    caret_y = self.box_rect.y + 5
-                    caret_height = text_surface.get_height() - 3
-                    pygame.draw.line(self.surface, Color.text,
-                                    (caret_x, caret_y),
-                                    (caret_x, caret_y + caret_height), 2)
-            
-            # Confirm button
-            self.confirm_button = Rect(260, 220, 120, 40)
-            pygame.draw.rect(self.surface, Color.greyed if self.confirmed else Color.white, self.confirm_button)
-            pygame.draw.rect(self.surface, Color.border, self.confirm_button, 2)
-            btn_text = Font.clue_medium.render("Confirm", True, Color.text)
-            btn_rect = btn_text.get_rect(center=self.confirm_button.center)
-            self.surface.blit(btn_text, btn_rect)
-            
+                # After 2 seconds, move to answer phase
+                if self.no_wager_start:
+                    elapsed = pygame.time.get_ticks() - self.no_wager_start
+                    if elapsed >= 3000:
+                        self.phase = "answer"
+                else:
+                    self.no_wager_start = pygame.time.get_ticks()
+            else:
+                # Normal wager input centered
+                prompt = Font.clue_medium.render(f"{human.name}, enter your wager (0–{human.score}):", True, Color.text)
+                rect = prompt.get_rect(center=(self.surface.get_width()//2,
+                                            self.surface.get_height()//2 - 60))
+                self.surface.blit(prompt, rect)
+
+                box_w, box_h = 200, 40
+                self.box_rect = Rect(self.surface.get_width()//2 - box_w//2,
+                                    self.surface.get_height()//2 - box_h//2,
+                                    box_w, box_h)
+                color = Color.white if not self.active_box else Color.greyed
+                pygame.draw.rect(self.surface, color, self.box_rect, 0)
+                pygame.draw.rect(self.surface, Color.border, self.box_rect, 2)
+
+                text_surface = Font.clue_medium.render(self.input_text, True, Color.text)
+                self.surface.blit(text_surface, (self.box_rect.x+5, self.box_rect.y+5))
+
+                # Caret blinking
+                if self.active_box and not self.confirmed:
+                    if (pygame.time.get_ticks() // 500) % 2 == 0:
+                        caret_x = self.box_rect.x + 5 + text_surface.get_width() + 2
+                        caret_y = self.box_rect.y + 5
+                        caret_height = text_surface.get_height() - 3
+                        pygame.draw.line(self.surface, Color.text,
+                                        (caret_x, caret_y),
+                                        (caret_x, caret_y + caret_height), 2)
+
+                # Confirm button centered
+                self.confirm_button = Rect(self.surface.get_width()//2 - 60,
+                                        self.surface.get_height()//2 + 30,
+                                        120, 40)
+                pygame.draw.rect(self.surface, Color.greyed if self.confirmed else Color.white, self.confirm_button)
+                pygame.draw.rect(self.surface, Color.border, self.confirm_button, 2)
+                btn_text = Font.clue_medium.render("Confirm", True, Color.text)
+                btn_rect = btn_text.get_rect(center=self.confirm_button.center)
+                self.surface.blit(btn_text, btn_rect)
+
+        # --- PHASE 2: ANSWER ---
         elif self.phase == "answer":
-            prompt = Font.clue_medium.render(f"{human.name}, enter your answer:", True, Color.text)
-            self.surface.blit(prompt, (40, 180))
-            
-            # draw answer input box
+            # Show clue where wager input was
+            max_width = self.surface.get_width() - 80
+            lines = self.wrap_text(self.clue, Font.clue_medium, max_width)
+            y = self.surface.get_height()//2 - 100
+            for line in lines:
+                rendered = Font.clue_medium.render(line, True, Color.text)
+                rect = rendered.get_rect(center=(self.surface.get_width()//2, y))
+                self.surface.blit(rendered, rect)
+                y += rendered.get_height()
+
+            # --- Answer input centered in 3 parts ---
+            prefix = "Who is" if "person" in self.clue.lower() else "What is"
+
+            # Line 1: "What/Who is"
+            line1 = Font.clue_medium.render(prefix, True, Color.text)
+            rect1 = line1.get_rect(center=(self.surface.get_width()//2,
+                                        self.surface.get_height()//2 - 40))
+            self.surface.blit(line1, rect1)
+
+            # Line 2: input box
+            box_w, box_h = 400, 40
+            self.answer_box = Rect(self.surface.get_width()//2 - box_w//2,
+                                self.surface.get_height()//2 - 25,
+                                box_w, box_h)
             color = Color.white if not self.active_box else Color.greyed
             pygame.draw.rect(self.surface, color, self.answer_box, 0)
             pygame.draw.rect(self.surface, Color.border, self.answer_box, 2)
-            
-            answer_display = f"What is {self.input_text}?"
-            text_surface = Font.clue_medium.render(answer_display, True, Color.text)
-            self.surface.blit(text_surface, (self.answer_box.x+5, self.answer_box.y+5))
-            
-            # Caret blinking (answer phase)
+
+            text_surface = Font.clue_medium.render(self.input_text, True, Color.text)
+            text_rect = text_surface.get_rect(center=self.answer_box.center)
+            self.surface.blit(text_surface, text_rect)
+
+            # Caret blinking inside input box
             if self.active_box and not self.confirmed:
                 if (pygame.time.get_ticks() // 500) % 2 == 0:
-                    caret_x = self.answer_box.x + Font.clue_medium.size(answer_display)[0] - 7
-                    caret_y = self.answer_box.y + 5
+                    caret_x = text_rect.right + 2
+                    caret_y = text_rect.top
                     caret_height = text_surface.get_height()
                     pygame.draw.line(self.surface, Color.text,
                                     (caret_x, caret_y),
                                     (caret_x, caret_y + caret_height), 2)
-            
-            # Confirm button
-            self.confirm_button = Rect(520, 320, 120, 40)
+
+            # Line 3: "?"
+            line3 = Font.clue_medium.render("?", True, Color.text)
+            rect3 = line3.get_rect(center=(self.surface.get_width()//2,
+                                        self.surface.get_height()//2 + 30))
+            self.surface.blit(line3, rect3)
+
+            # Confirm button below
+            self.confirm_button = Rect(self.surface.get_width()//2 - 60,
+                                    self.surface.get_height()//2 + 50,
+                                    120, 40)
             pygame.draw.rect(self.surface, Color.greyed if self.confirmed else Color.white, self.confirm_button)
             pygame.draw.rect(self.surface, Color.border, self.confirm_button, 2)
             btn_text = Font.clue_medium.render("Confirm", True, Color.text)
             btn_rect = btn_text.get_rect(center=self.confirm_button.center)
             self.surface.blit(btn_text, btn_rect)
-
+        
         screen.blit(self.surface, self.pos)
+
+
         
     def resize(self, new_dimension: Vec2):
         screen_w, screen_h = intxy(new_dimension)

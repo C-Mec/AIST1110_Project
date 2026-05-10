@@ -1,0 +1,282 @@
+[
+  [
+    {
+      "clue": "This ancient civilization built the pyramids.",
+      "correct_answer": "What is Ancient Egypt?",
+      "options": [
+        "What is Ancient Egypt?",
+        "What is Ancient Greece?",
+        "What is Rome?"
+      ]
+    },
+    {
+      "clue": "This gas is essential for human respiration.",
+      "correct_answer": "What is oxygen?",
+      "options": [
+        "What is carbon dioxide?",
+        "What is nitrogen?",
+        "What is oxygen?"
+      ]
+    },
+    {
+      "clue": "This is the author of 'Romeo and Juliet.'",
+      "correct_answer": "Who is William Shakespeare?",
+      "options": [
+        "Who is Charles Dickens?",
+        "Who is William Shakespeare?",
+        "Who is Mark Twain?"
+      ]
+    },
+    {
+      "clue": "This sport is known as 'the beautiful game.'",
+      "correct_answer": "What is soccer?",
+      "options": [
+        "What is basketball?",
+        "What is baseball?",
+        "What is soccer?"
+      ]
+    },
+    {
+      "clue": "This instrument has 88 keys.",
+      "correct_answer": "What is a piano?",
+      "options": [
+        "What is a guitar?",
+        "What is a violin?",
+        "What is a piano?"
+      ]
+    },
+    {
+      "clue": "This is the capital of France.",
+      "correct_answer": "What is Paris?",
+      "options": [
+        "What is London?",
+        "What is Berlin?",
+        "What is Paris?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This document declared the independence of the United States.",
+      "correct_answer": "What is the Declaration of Independence?",
+      "options": [
+        "What is the Constitution?",
+        "What is the Declaration of Independence?",
+        "What is the Bill of Rights?"
+      ]
+    },
+    {
+      "clue": "This planet is known as the Blue Planet.",
+      "correct_answer": "What is Earth?",
+      "options": [
+        "What is Mars?",
+        "What is Venus?",
+        "What is Earth?"
+      ]
+    },
+    {
+      "clue": "This novel features a character named Atticus Finch.",
+      "correct_answer": "What is 'To Kill a Mockingbird'?",
+      "options": [
+        "What is '1984'?",
+        "What is 'To Kill a Mockingbird'?",
+        "What is 'The Great Gatsby'?"
+      ]
+    },
+    {
+      "clue": "This athlete is known as 'The Greatest of All Time' in boxing.",
+      "correct_answer": "Who is Muhammad Ali?",
+      "options": [
+        "Who is Mike Tyson?",
+        "Who is Muhammad Ali?",
+        "Who is Floyd Mayweather?"
+      ]
+    },
+    {
+      "clue": "This pop star is known for the hit song 'Thriller.'",
+      "correct_answer": "Who is Michael Jackson?",
+      "options": [
+        "Who is Elvis Presley?",
+        "Who is Michael Jackson?",
+        "Who is Justin Bieber?"
+      ]
+    },
+    {
+      "clue": "This planet is known for its rings.",
+      "correct_answer": "What is Saturn?",
+      "options": [
+        "What is Jupiter?",
+        "What is Mars?",
+        "What is Saturn?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This British monarch was known as the 'Virgin Queen.'",
+      "correct_answer": "Who is Queen Elizabeth I?",
+      "options": [
+        "Who is Queen Victoria?",
+        "Who is Queen Elizabeth I?",
+        "Who is Mary I?"
+      ]
+    },
+    {
+      "clue": "This part of the cell contains the genetic material.",
+      "correct_answer": "What is the nucleus?",
+      "options": [
+        "What is the mitochondria?",
+        "What is the nucleus?",
+        "What is the ribosome?"
+      ]
+    },
+    {
+      "clue": "This classic novel begins with 'Call me Ishmael.'",
+      "correct_answer": "What is 'Moby Dick'?",
+      "options": [
+        "What is 'The Odyssey'?",
+        "What is 'Moby Dick'?",
+        "What is 'Pride and Prejudice'?"
+      ]
+    },
+    {
+      "clue": "This Olympic sport involves gymnastics and acrobatics.",
+      "correct_answer": "What is diving?",
+      "options": [
+        "What is swimming?",
+        "What is diving?",
+        "What is running?"
+      ]
+    },
+    {
+      "clue": "This genre of music is known for its improvisation and swing.",
+      "correct_answer": "What is jazz?",
+      "options": [
+        "What is rock?",
+        "What is jazz?",
+        "What is classical?"
+      ]
+    },
+    {
+      "clue": "This animal is known as ' man's best friend.'",
+      "correct_answer": "What is a dog?",
+      "options": [
+        "What is a cat?",
+        "What is a dog?",
+        "What is a rabbit?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "He was the first President of the United States.",
+      "correct_answer": "Who is George Washington?",
+      "options": [
+        "Who is Thomas Jefferson?",
+        "Who is George Washington?",
+        "Who is Abraham Lincoln?"
+      ]
+    },
+    {
+      "clue": "This force keeps us grounded on Earth.",
+      "correct_answer": "What is gravity?",
+      "options": [
+        "What is magnetism?",
+        "What is friction?",
+        "What is gravity?"
+      ]
+    },
+    {
+      "clue": "This character is known for his adventures in 'The Adventures of Huckleberry Finn.'",
+      "correct_answer": "Who is Huck Finn?",
+      "options": [
+        "Who is Tom Sawyer?",
+        "Who is Huck Finn?",
+        "Who is Jim?"
+      ]
+    },
+    {
+      "clue": "This sport uses a bat and a ball and is played on a diamond.",
+      "correct_answer": "What is baseball?",
+      "options": [
+        "What is cricket?",
+        "What is baseball?",
+        "What is softball?"
+      ]
+    },
+    {
+      "clue": "This band is known for the song 'Hey Jude.'",
+      "correct_answer": "Who are The Beatles?",
+      "options": [
+        "Who are The Rolling Stones?",
+        "Who are The Beatles?",
+        "Who are Pink Floyd?"
+      ]
+    },
+    {
+      "clue": "This common beverage is made from leaves.",
+      "correct_answer": "What is tea?",
+      "options": [
+        "What is coffee?",
+        "What is soda?",
+        "What is tea?"
+      ]
+    }
+  ],
+  [
+    {
+      "clue": "This war was fought between the North and South in the United States.",
+      "correct_answer": "What is the Civil War?",
+      "options": [
+        "What is the Revolutionary War?",
+        "What is the Civil War?",
+        "What is World War I?"
+      ]
+    },
+    {
+      "clue": "This is the boiling point of water in Celsius.",
+      "correct_answer": "What is 100 degrees?",
+      "options": [
+        "What is 50 degrees?",
+        "What is 100 degrees?",
+        "What is 150 degrees?"
+      ]
+    },
+    {
+      "clue": "This famous dystopian novel was written by George Orwell.",
+      "correct_answer": "What is 1984?",
+      "options": [
+        "What is Brave New World?",
+        "What is Fahrenheit 451?",
+        "What is 1984?"
+      ]
+    },
+    {
+      "clue": "This country won the FIFA World Cup in 2018.",
+      "correct_answer": "What is France?",
+      "options": [
+        "What is Brazil?",
+        "What is Germany?",
+        "What is France?"
+      ]
+    },
+    {
+      "clue": "This famous composer created 'The Four Seasons.'",
+      "correct_answer": "Who is Vivaldi?",
+      "options": [
+        "Who is Bach?",
+        "Who is Mozart?",
+        "Who is Vivaldi?"
+      ]
+    },
+    {
+      "clue": "This sweet treat is made from cocoa beans.",
+      "correct_answer": "What is chocolate?",
+      "options": [
+        "What is vanilla?",
+        "What is caramel?",
+        "What is chocolate?"
+      ]
+    }
+  ]
+]

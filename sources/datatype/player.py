@@ -3,7 +3,7 @@ from sources.util import Color
 class Player:
     def __init__(self, name: str, color: tuple[int, int, int], bot: bool):
         self.name = name
-        self.score = 0
+        self.score = 1
         self.color = color  # RGB tuple
         self.bot = bot
         self.overlay = None
