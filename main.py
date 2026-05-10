@@ -32,6 +32,8 @@ Game_Manager.init()
 Surface_Manager.init()
 Surface_Manager.add_surface(StartScreen())
 
+Surface_Manager.play_sound("jeopardy-intro_loop.mp3")
+
 running = True
 while running:
     for event in pygame.event.get():

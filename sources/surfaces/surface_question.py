@@ -251,6 +251,7 @@ class Question_Surface(Base_Surface):
 
         # --- Timeout handling ---
         if self.stage == "Answering" and self.session_remaining_time() <= 0:
+            Surface_Manager.play_sound("times-up.mp3", 0.25)
             self.stage = "Timeout Re-buzz"
             self.schedule_bot_action()
 
@@ -296,6 +297,7 @@ class Question_Surface(Base_Surface):
                         player.add_score(self.question.value)
                         
                         notify(f"Correct! {player.name} gains ${self.question.value}. Total: ${player.score}")
+                        Surface_Manager.play_sound("rightanswer.mp3")
                         
                         self.close_time = pygame.time.get_ticks() + 1000
                     else:
@@ -304,5 +306,6 @@ class Question_Surface(Base_Surface):
                         player.add_score(-self.question.value)
                         
                         notify(f"Wrong! {player.name} loses ${self.question.value}. Total: ${player.score}")
+                        Surface_Manager.play_sound("jeopardy-incorrect-answer.mp3", 0.25)
 
                         self.schedule_bot_action()

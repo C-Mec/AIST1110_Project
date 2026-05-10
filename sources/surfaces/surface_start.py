@@ -61,5 +61,8 @@ class StartScreen(Base_Surface):
         jeopardy = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Game_Manager.players[0])
         
         Surface_Manager.add_surface(jeopardy)
+        pygame.mixer.stop()
+
         Surface_Manager.add_surface(ScoreOverlay(jeopardy))
         Surface_Manager.add_surface(Transition_Surface(mode="jeopardy"))
+        Surface_Manager.play_sound("jeopardy-themelq_loop.mp3", 0.2)
