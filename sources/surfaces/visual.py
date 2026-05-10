@@ -69,7 +69,7 @@ class TimeFroze(Base_Surface):
         self.duration = duration
         
     def time_update(self):
-        assert not any(isinstance(s, Transition_Surface) for s in manager.layers)
+        assert not any(map(lambda type: isinstance(s, type), [Cutscene_Surface, Transition_Surface]) for s in manager.layers)
         
         Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
         

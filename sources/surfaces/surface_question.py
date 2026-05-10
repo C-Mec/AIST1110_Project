@@ -11,7 +11,7 @@ import math
 from typing import Literal, TYPE_CHECKING
 
 import config
-from sources.util import intxy, now_is_time, blit_text_with_center, Color, Font
+from sources.util import intxy, now, now_is_time, blit_text_with_center, Color, Font
 from sources.manager import manager, Base_Surface, Game_Manager
 from sources.datatype.question import Question
 from sources.datatype.player import Player
@@ -50,12 +50,13 @@ class Question_Surface(Base_Surface):
         self.close_time = None
 
         # Buzz button in upper third
-        self.buzz_rect = pygame.Rect(dimension.x//2 - 100, dimension.y//3, 200, 60)
+        self.buzz_rect = pygame.Rect(dimension.x//2 - 100, dimension.y//3 + 40, 200, 60)
 
         # Timer
         self.session_time = None
         self.timer_time = None
         self.answer_duration = 5
+        self.buzz_flash_start_time = None
         
         # Bot Answering
         self.bot_action: tuple[Player, Vec2, int] = None # bot, pos, time
@@ -94,7 +95,7 @@ class Question_Surface(Base_Surface):
             else:
                 return correct_index
         
-        buzz_point = Vec2(640, 310)
+        buzz_point = Vec2(640, 340)
         option_points = [Vec2(640, 400), Vec2(640, 475), Vec2(640, 540)]
         
         # Schedule bot answer
@@ -134,9 +135,18 @@ class Question_Surface(Base_Surface):
         self.surface.blit(text, (30, 30))
         
         def draw_buzz_button():
-            pygame.draw.rect(self.surface, Color.timer, self.buzz_rect)
-            pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 4)
+            if self.buzz_flash_start_time and now_is_time(self.buzz_flash_start_time):
+                flashing = ((now() - self.buzz_flash_start_time) // 500 ) % 2
+                
+                center_color = Color.buzz_light if flashing else Color.buzz_dark
+                
+                if (now() - self.buzz_flash_start_time) > 2000:
+                    self.buzz_flash_start_time = None
+            else:
+                center_color = Color.buzz_dark
             
+            pygame.draw.rect(self.surface, center_color, self.buzz_rect)
+            pygame.draw.rect(self.surface, Color.border, self.buzz_rect, 4)
             
             blit_text_with_center("BUZZ", Font.logo_medium, Color.black, self.surface, self.buzz_rect.center)
         
@@ -144,7 +154,7 @@ class Question_Surface(Base_Surface):
             # Circle depletion in degrees
             center = (int(self.dimension.x//2), int(self.dimension.y//3))
             radius = 50
-            pygame.draw.circle(self.surface, Color.border, center, radius, 2)
+            pygame.draw.circle(self.surface, Color.border, center, radius+4, 4)
 
             # Filled pie slice shrinking
 
@@ -162,7 +172,8 @@ class Question_Surface(Base_Surface):
                     y = center[1] + radius * math.sin(rad)
                     points.append((x, y))
 
-                pygame.draw.polygon(self.surface, Color.timer, points)
+                center_color = Color.timer if remaining_time > 1 else Color.wrong
+                pygame.draw.polygon(self.surface, center_color, points)
             pygame.draw.circle(self.surface, Color.border, center, radius, 2)
 
             # Seconds remaining in middle
@@ -258,12 +269,9 @@ class Question_Surface(Base_Surface):
             self.current_player = player
             self.bot_action = None # Clear all bot actions
             
-            # Delay for cutsence
             notify(f"{player.name} buzzed!")
             
-            # buzz_flash()
-            
-            self.session_time = pygame.time.get_ticks() + 100
+            self.session_time = now() + 100
             print("Session Time Setup", self.session_time)
         
         if self.stage == "Answering" or self.stage == "Timeout Re-buzz":
