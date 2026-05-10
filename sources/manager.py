@@ -153,17 +153,14 @@ class Surface_Manager:
     
     @classmethod
     def play_sound(self, filename: str, volume: float = 0.5):
-        """Play a sound effect from assets/sounds folder."""
-        if filename not in self.sounds:
-            try:
-                sound = pygame.mixer.Sound(f"assets/SFX/{filename}")
-                self.sounds[filename] = sound
-            except pygame.error as e:
-                print(f"Error loading sound {filename}: {e}")
-                return
-        sound = self.sounds[filename]
-        sound.set_volume(volume)
-        sound.play()
+        # Play a sound effect from assets/SFX folder
+        try:
+            sound = pygame.mixer.Sound(f"assets/SFX/{filename}")
+            sound.set_volume(volume)
+            sound.play()
+        except pygame.error as e:
+            print(f"Error loading sound {filename}: {e}")
+            return
                 
 class Game_Manager:
     players: list[Player] = []
