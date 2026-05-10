@@ -14,7 +14,6 @@ class Player:
         if self.overlay:
             self.overlay.spawn_floating_text(self, amount)
         
-        
 def generate_players():
     # Create a human player
     player = Player("Human", None, False)

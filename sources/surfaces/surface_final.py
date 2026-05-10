@@ -1,6 +1,5 @@
 import pygame, random, config, json
-from sources.manager import manager, Base_Surface, Game_Manager
-from sources.surfaces.surface_end import End_Surface
+from sources.manager import Surface_Manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
 from sources.util import Font, Color, intxy
 from pathlib import Path
@@ -10,7 +9,7 @@ Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
 class FinalJeopardy(Base_Surface):
-    def __init__(self, dimension: Vec2, pos: Vec2, players: list[Player], used_index: int):
+    def __init__(self, dimension: Vec2, pos: Vec2, used_index: int):
         screen_w, screen_h = config.screen_dimension
         margin_x = int(screen_w * 0.18)
         margin_y = int(screen_h * 0.195)
@@ -59,10 +58,10 @@ class FinalJeopardy(Base_Surface):
         self.background = pygame.transform.smoothscale(self.background, (self.screen_w, self.screen_h))
 
         # Precompute bot wagers (unchanged)
-        sorted_players = sorted(players, key=lambda p: p.score, reverse=True)
+        sorted_players = sorted(Game_Manager.players, key=lambda p: p.score, reverse=True)
         leader = sorted_players[0]
         second = sorted_players[1] if len(sorted_players) > 1 else None
-        for p in players:
+        for p in Game_Manager.players:
             if p.bot:
                 if p == leader and second:
                     p.wager = min(p.score, second.score * 2 + 1)

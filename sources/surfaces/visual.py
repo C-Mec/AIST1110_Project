@@ -8,7 +8,7 @@ Vec2 = pygame.Vector2
 
 import config
 from sources.util import Color, Font
-from sources.manager import manager, Base_Surface, Game_Manager
+from sources.manager import Surface_Manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
 
 class BorderFlash(Base_Surface):
@@ -36,7 +36,7 @@ class BorderFlash(Base_Surface):
             self.alpha = int(255 * (1 - (elapsed - cutoff) / cutoff))
         else:
             # End effect
-            manager.remove_surface(self)
+            Surface_Manager.remove_surface(self)
             return
 
         # Draw border flash
@@ -69,18 +69,18 @@ class TimeFroze(Base_Surface):
         self.duration = duration
         
     def time_update(self):
-        assert not any(map(lambda type: isinstance(s, type), [Cutscene_Surface, Transition_Surface]) for s in manager.layers)
+        assert not any(map(lambda type: isinstance(s, type), [Cutscene_Surface, Transition_Surface]) for s in Surface_Manager.layers)
         
         Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
         
         if pygame.time.get_ticks() - self.create_time > self.duration:
-            manager.remove_surface(self)
+            Surface_Manager.remove_surface(self)
     
     def on_close(self):
         Game_Manager.frame_frozen = 0
 
 def time_froze(time: int):
-    manager.add_surface(TimeFroze(time))
+    Surface_Manager.add_surface(TimeFroze(time))
 
 class Cutscene_Surface(Base_Surface):
     def __init__(self, message: str):
@@ -114,7 +114,7 @@ class Cutscene_Surface(Base_Surface):
         screen.blit(self.surface, self.pos)
     
     def time_update(self):
-        assert not any(isinstance(s, Transition_Surface) for s in manager.layers)
+        assert not any(isinstance(s, Transition_Surface) for s in Surface_Manager.layers)
         
         Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
     
@@ -188,7 +188,7 @@ class Transition_Surface(Base_Surface):
             self.fade(128)
     
     def time_update(self):
-        assert not any(isinstance(s, Cutscene_Surface) for s in manager.layers)
+        assert not any(isinstance(s, Cutscene_Surface) for s in Surface_Manager.layers)
         
         Game_Manager.frame_frozen = pygame.time.get_ticks() - self.create_time
     
@@ -248,4 +248,4 @@ class FloatingText:
         surface.blit(render, rect)
 
 def notify(message: str) -> None:
-    manager.add_surface(Cutscene_Surface(message))
+    Surface_Manager.add_surface(Cutscene_Surface(message))

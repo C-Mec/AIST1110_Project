@@ -6,27 +6,24 @@ Vec2 = pygame.Vector2
 
 import config
 from sources.util import Font, intxy
-from sources.manager import Base_Surface
+from sources.manager import Base_Surface, Game_Manager
 from sources.datatype.player import Player
 from sources.surfaces.visual import FloatingText
 
 class ScoreOverlay(Base_Surface):
-    def __init__(self, players: list[Player], grid):
+    def __init__(self, grid_surface):
         dimension = Vec2(220, 140)
         pos = Vec2(config.screen_dimension[0] - dimension.x - 10, 10)
         super().__init__(dimension, pos)
 
-        self.surface = Surface(dimension, pygame.SRCALPHA)
-        self.pos = pos
-        self.rect = self.surface.get_rect(topleft=pos)
-
-        self.players = players
-        self.grid = grid
         self.font = Font.category_small
         self.floating_texts = []
+        
+        self.grid_surface = grid_surface
+        self.grid_surface.overlay_surface = self # Reference
 
         # give each player a reference back to this overlay
-        for p in self.players:
+        for p in Game_Manager.players:
             p.overlay = self
 
     def spawn_floating_text(self, player, amount):
@@ -34,7 +31,7 @@ class ScoreOverlay(Base_Surface):
         self.floating_texts.append(ft)
     
     def get_score_rect(self, player: Player) -> Rect:
-        idx = self.players.index(player)
+        idx = Game_Manager.players.index(player)
         name_top = 10 + idx * 35
 
         score_text = f"${player.score}"
@@ -57,7 +54,7 @@ class ScoreOverlay(Base_Surface):
     def draw(self, screen: Surface):
         self.surface.fill((0, 0, 0, 0))
 
-        for i, player in enumerate(self.players):
+        for i, player in enumerate(Game_Manager.players):
             # render name
             name_text = f"{player.name}:"
             name_render = self.font.render(name_text, True, player.color)
@@ -86,7 +83,7 @@ class ScoreOverlay(Base_Surface):
             self.surface.blit(score_render, score_rect)
 
             # arrow
-            if self.grid.current_player == player:
+            if self.grid_surface.current_player == player:
                 arrow_tip = (bg_rect.left - 5, bg_rect.centery)
                 arrow_top = (bg_rect.left - 20, bg_rect.top)
                 arrow_bottom = (bg_rect.left - 20, bg_rect.bottom)

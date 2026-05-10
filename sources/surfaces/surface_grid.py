@@ -5,67 +5,65 @@ Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
+import config
 from sources.util import intxy, now_is_time, Font, Color
-from sources.manager import manager, Base_Surface
+from sources.manager import Surface_Manager, Game_Manager, Base_Surface
 from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.surface_question import Question_Surface
 from sources.surfaces.surface_final import FinalJeopardy
 from sources.surfaces.visual import Transition_Surface
 
-from sources.llm.llm import LLMQuestionGenerator
-
 class Grid_Surface(Base_Surface):
-    def __init__(self, dimension: Vec2, pos: Vec2, grid_dimension: Vec2, players: list[Player]):
+    def __init__(self, dimension: Vec2, pos: Vec2, start_player: Player, is_double = False):
         super().__init__(dimension, pos)
-
-        self.players = players
-        self.current_player = players[0]
         
+        # Board and player settings
+        self.current_player = start_player
+        self.current_board = Game_Manager.boards[1 if is_double else 0]
+        self.multiplier = 1
+        
+        ## Runtime variables
         # Bot action (uses rpos instead of pos)
         self.bot_action: tuple[Player, Vec2, int] = None # bot, pos, time
-        
-        
-        # Transition from the end of question to next selection
-        self.bot_wait_until = None
-
-        self.grid_dimension = grid_dimension
-        self.categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]
         
         # Manage the related question surface
         self.current_popup: Question_Surface = None
         self.current_cell: tuple[int, int] = None # row, col
+        self.overlay_surface = None # Reference
 
-        self.screen_w, self.screen_h = intxy(dimension)
-
-        # Load and scale background to full window
-        self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
-        self.background = pygame.transform.smoothscale(self.background, (self.screen_w, self.screen_h))
-
+        self._background_init()
+        self._dimension_init()
+        self._grid_init()
+    
+    def _dimension_init(self):
+        
         # Define margins so grid sits inside the board frame
-        margin_x = int(self.screen_w * 0.175)
-        margin_y = int(self.screen_h * 0.19)
+        def make_grid_area():
+            screen_w, screen_h = intxy(self.dimension)
+            
+            margin_x = int(screen_w * 0.175)
+            margin_y = int(screen_h * 0.19)
 
-        grid_w = self.screen_w - 2 * margin_x
-        grid_h = self.screen_h - 1.75 * margin_y
-        self.grid_area = pygame.Rect(margin_x, margin_y, grid_w, grid_h)
+            grid_w = screen_w - 2 * margin_x
+            grid_h = screen_h - 1.75 * margin_y
+            return pygame.Rect(margin_x, margin_y, grid_w, grid_h)
+        
+        self.grid_dimension = Vec2(6, 6)
+        self.grid_area = make_grid_area()
 
         # Cell dimensions based on inner grid area
-        g_width, g_height = intxy(grid_dimension)
         self.cell_dimension = Vec2(
-            round(self.grid_area.width / g_width),
-            round(self.grid_area.height / g_height)
+            round(self.grid_area.width / self.grid_dimension.x),
+            round(self.grid_area.height / self.grid_dimension.y)
         )
-
-        self.question_gen = LLMQuestionGenerator()
-        self.multiplier = 1
-        num_rows = 5   # row 0 is for categories, so only generate for 1-5
-        self.index1, self.index2 = int(random.uniform(0, 5)), int(random.uniform(0, 5))
-        self.jeopardy_board = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="easy", index=self.index1)
-        self.double_board   = self.question_gen.generate_board(self.categories, rows=num_rows, difficulty="hard", index=self.index2)
-        self.current_board = self.jeopardy_board   # use this for normal round, switch to double_board for double jeopardy
-        self._grid_init()
-
+    
+    def _background_init(self):
+        
+        # Load and scale background to full window
+        self.background = pygame.image.load("assets/Jeopardy-BoardAlt.webp").convert()
+        self.background = pygame.transform.smoothscale(self.background, (self.dimension.x, self.dimension.y))
+        
     def _grid_init(self):
         g_width, g_height = intxy(self.grid_dimension)
         c_width, c_height = intxy(self.cell_dimension)
@@ -167,6 +165,33 @@ class Grid_Surface(Base_Surface):
                 if self.grid[row][col]:
                     self.grid[row][col][0] = rect
 
+    # This is most likely inaccurate
+    def _calculate_cell_pos(self, row: int, col: int) -> Vec2:
+        cell_w, cell_h = intxy(self.cell_dimension)
+        
+        return Vec2(col * cell_w, row * cell_h) # Rpos
+    
+    def _get_rowcol(self, rpos: Vec2):
+        x, y = intxy(rpos)
+        c_width, c_height = intxy(self.cell_dimension)
+
+        # Adjust for grid_area offset
+        rel_x = x - self.grid_area.left
+        rel_y = y - self.grid_area.top
+
+        # Category row was shifted upward, so compensate
+        category_offset = -20   # same value you used in draw
+        rel_y -= category_offset
+
+        # If click is outside the grid area, return invalid
+        if rel_x < 0 or rel_y < 0:
+            return -1, -1
+
+        col = rel_x // c_width
+        row = rel_y // c_height # Just use the grid indexes
+
+        return row, col
+    
     def advance_turn(self, current_player: Player):
         self.current_player = current_player
         
@@ -190,25 +215,6 @@ class Grid_Surface(Base_Surface):
             
             click_time = pygame.time.get_ticks() + random.uniform(2000, 4000)
             self.bot_action = (self.current_player, rpos, click_time)
-
-    # This is most likely inaccurate
-    def _calculate_cell_pos(self, row: int, col: int) -> Vec2:
-        cell_w, cell_h = intxy(self.cell_dimension)
-        
-        return Vec2(col * cell_w, row * cell_h) # Rpos
-        
-    def call_lowest_player(self):
-        # Find player with least money
-        poorest_player = min(self.players, key=lambda p: p.score)
-        self.current_player = poorest_player
-
-        # If it's a bot, schedule delay
-        if poorest_player.bot:
-            delay_ms = int(random.uniform(750, 1750))
-            self.bot_wait_until = pygame.time.get_ticks() + delay_ms
-
-        print(f"Double Jeopardy → {poorest_player.name} starts with ${poorest_player.score}")
-
     
     def time_update(self):
         if self.bot_action and now_is_time(self.bot_action[2]):
@@ -220,61 +226,12 @@ class Grid_Surface(Base_Surface):
             # Rpos is used
             self.on_click(pos, bot)
         
-        # --- Round reset check ---
         def board_all_used() -> bool:
             g_width, g_height = intxy(self.grid_dimension)
             return all(self.grid[r][c][2] for r in range(1, g_height) for c in range(g_width))
             
         if board_all_used():
-            if self.multiplier == 1:
-                manager.add_surface(Transition_Surface(mode="double"))
-                self.multiplier = 2
-                for row in range(1, g_height):
-                    for col in range(g_width):
-                        rect, q, used, flash = self.grid[row][col]
-                        self.grid[row][col][2] = False
-                        q.value = row * 200 * self.multiplier
-            elif self.multiplier == 2:
-                manager.add_surface(Transition_Surface(mode="final"))
-                manager.add_surface(FinalJeopardy(Vec2(self.screen_w, self.screen_h), Vec2(0,0), self.players, self.index2))
-                # manager.remove_surface(self)
-
-        # --- Bot delayed selection ---
-        elif self.bot_wait_until and pygame.time.get_ticks() >= self.bot_wait_until:
-            if self.current_player.bot:
-                g_width, g_height = intxy(self.grid_dimension)
-                available = [
-                    (r, c)
-                    for r in range(1, g_height)
-                    for c in range(g_width)
-                    if not self.grid[r][c][2]
-                ]
-                if available:
-                    row, col = random.choice(available)
-                    rect, question, used, flash = self.grid[row][col]
-                    flash = {
-                        "color": self.current_player.color,
-                        "start": pygame.time.get_ticks(),
-                        "count": 0,
-                        "player": self.current_player
-                    }
-                    self.grid[row][col][3] = flash
-                    self.grid[row][col][2] = True
-                    
-                    popup = Question_Surface(
-                        question=question,
-                        player=flash["player"],
-                        bots=self.players[1:],
-                        grid_surface=self
-                    )
-                    popup.alpha = 0
-                    popup.interactive = False
-
-                    self.current_popup = popup
-                    self.current_cell = (row, col)
-
-                    manager.add_surface(popup)
-            self.bot_wait_until = None
+            Surface_Manager.remove_surface(self)
         
         if self.current_cell:
             row, col = self.current_cell
@@ -286,15 +243,11 @@ class Grid_Surface(Base_Surface):
                 self.current_popup.interactive = True
                 
             # When the popup screen is removed
-            if self.current_popup not in manager.layers:
+            if self.current_popup not in Surface_Manager.layers:
                 # Mark cell as used
                 current_cell[2] = True
                 
                 self.current_cell, self.current_popup = None, None
-            
-    def is_flashing(self) -> bool:
-        g_width, g_height = intxy(self.grid_dimension)
-        return any(self.grid[r][c][3] for r in range(1, g_height) for c in range(g_width))
     
     def on_click(self, pos: Vec2, player: Player):
         # Block if it's not this player's turn
@@ -333,28 +286,7 @@ class Grid_Surface(Base_Surface):
         self.current_popup = popup
         self.current_cell = (row, col)
         
-        manager.add_surface(popup)
-
-    def _get_rowcol(self, rpos: Vec2):
-        x, y = intxy(rpos)
-        c_width, c_height = intxy(self.cell_dimension)
-
-        # Adjust for grid_area offset
-        rel_x = x - self.grid_area.left
-        rel_y = y - self.grid_area.top
-
-        # Category row was shifted upward, so compensate
-        category_offset = -20   # same value you used in draw
-        rel_y -= category_offset
-
-        # If click is outside the grid area, return invalid
-        if rel_x < 0 or rel_y < 0:
-            return -1, -1
-
-        col = rel_x // c_width
-        row = rel_y // c_height # Just use the grid indexes
-
-        return row, col
+        Surface_Manager.add_surface(popup)
     
     def draw(self, screen: Surface):
         # Draw full background first
@@ -364,7 +296,7 @@ class Grid_Surface(Base_Surface):
             c_width, c_height = intxy(self.cell_dimension)
 
             # Category row
-            for col, category in enumerate(self.categories):
+            for col, category in enumerate(config.game_categories):
                 rect = pygame.Rect(
                     self.grid_area.left + round(col * c_width),
                     self.grid_area.top - 5,
@@ -411,3 +343,20 @@ class Grid_Surface(Base_Surface):
                 draw_cell(row, col)
 
         screen.blit(self.surface, self.pos)
+    
+    def on_close(self):
+        if self.multiplier == 1:
+            poorest_score = min(map(lambda x: x.score, Game_Manager.players))
+            poorest_player = random.choice([p for p in Game_Manager.players if p.score == poorest_score])
+            
+            double_jeopardy = Grid_Surface(self.dimension, self.pos, poorest_player, is_double=True)
+            
+            self.overlay_surface.grid_surface = double_jeopardy
+            double_jeopardy.overlay_surface = self.overlay_surface
+            
+            Surface_Manager.add_surface(double_jeopardy)
+            Surface_Manager.add_surface(Transition_Surface(mode="double"))
+
+        elif self.multiplier == 2:
+            Surface_Manager.add_surface(Transition_Surface(mode="final"))
+            Surface_Manager.add_surface(FinalJeopardy(self.dimension, self.pos, random.randint(1, 5)))

@@ -1,13 +1,17 @@
 import pygame
+import random
 
 Surface = pygame.Surface
 Rect = pygame.Rect
 Vec2 = pygame.Vector2
 
+Board = list[list[dict]]
+
 import config
 from sources.util import intxy
 from sources.datatype.player import generate_players, Player
 from sources.util import Color
+from sources.llm.llm import LLMQuestionGenerator
 
 class Base_Surface:
     def __init__(self, dimension: Vec2 = None, pos: Vec2 = Vec2(0, 0), *, isProportion = False):
@@ -48,7 +52,7 @@ class Base_Surface:
         self.surface.set_alpha(self.alpha)
 
         if self.alpha <= 0:
-            manager.remove_surface(self)
+            Surface_Manager.remove_surface(self)
         
     def draw(self, screen: Surface):
         screen.blit(self.surface, self.pos)
@@ -63,32 +67,31 @@ class Base_Surface:
         pass
 
 class Surface_Manager:
-    def __init__(self):
-        pass
+    layers: list[Base_Surface] = []
+    main_screen: Surface = None
     
-    def init(self, main_screen: Surface):
-        '''The runtime init.'''
-        
-        self.main_screen = main_screen
-
-        # A stash in which index = z-axis
-        self.layers: list[Base_Surface] = []
+    @classmethod
+    def init(cls):
+        cls.main_screen = pygame.display.set_mode(config.screen_dimension, pygame.RESIZABLE)
         
         # --- Custom pointer setup ---
         pointer_img = pygame.image.load("assets/pointer.png").convert_alpha()
         w, h = pointer_img.get_size()
-        self.pointer_img = pygame.transform.smoothscale(pointer_img, (w // 8, h // 8))
-    
-    def add_surface(self, base_surface: Base_Surface) -> None: 
-        self.layers.append(base_surface)
-   
-    def remove_surface(self, base_surface: Base_Surface) -> None:
+        cls.pointer_img = pygame.transform.smoothscale(pointer_img, (w // 8, h // 8))
+
+    @classmethod
+    def add_surface(cls, base_surface: Base_Surface) -> None:
+        cls.layers.append(base_surface)
+
+    @classmethod
+    def remove_surface(cls, base_surface: Base_Surface) -> None:
         base_surface.on_close()
         
-        self.layers.remove(base_surface)
-    
-    def _get_top_collision(self, pos: Vec2) -> tuple[Base_Surface, Vec2]:
-        for base_surface in reversed(self.layers):
+        cls.layers.remove(base_surface)
+
+    @classmethod
+    def _get_top_collision(cls, pos: Vec2) -> tuple[Base_Surface, Vec2]:
+        for base_surface in reversed(cls.layers):
             if base_surface.rect.collidepoint(pos):
                 rpos = pos - base_surface.pos
                 return base_surface, rpos
@@ -99,27 +102,29 @@ class Surface_Manager:
         
         return None, None
 
-    def click_at(self, pos: Vec2, player: Player):
-        surface, rpos = self._get_top_collision(pos)
+    @classmethod
+    def click_at(cls, pos: Vec2, player: Player):
+        surface, rpos = cls._get_top_collision(pos)
         
         print("-------")
         print(f"Pos: {pos}, Surface: {surface}, Rpos: {rpos}")
-        print(manager.layers)
+        print(Surface_Manager.layers)
         
         if surface:
             surface.on_click(rpos, player)
-    
-    def render(self) -> None:
-        # fill the screen with a color to wipe away anything from last frame
-        self.main_screen.fill(Color.black)
 
-        for base_surface in self.layers:
-            base_surface.draw(self.main_screen)
+    @classmethod
+    def render(cls) -> None:
+        # fill the screen with a color to wipe away anything from last frame
+        cls.main_screen.fill(Color.black)
+
+        for base_surface in cls.layers:
+            base_surface.draw(cls.main_screen)
         
         mx, my = pygame.mouse.get_pos()
-        screen_w, screen_h = self.main_screen.get_size()
+        screen_w, screen_h = cls.main_screen.get_size()
         if 0.1 <= mx < screen_w - 0.1 and 0.1 <= my < screen_h - 0.1:
-            self.main_screen.blit(self.pointer_img, (mx, my))
+            cls.main_screen.blit(cls.pointer_img, (mx, my))
         
         pygame.display.flip()
         
@@ -132,10 +137,21 @@ class Surface_Manager:
         # Update screen reference and propagate resize to all surfaces
         self.main_screen = pygame.display.set_mode(new_dimension, pygame.RESIZABLE)
 
-        for surface in self.layers:
+    @classmethod
+    def update(cls) -> None:
+        for base_surface in cls.layers:
+            base_surface.time_update()
+
+    @classmethod
+    def resize(cls, new_dimension: tuple[int, int]):
+        # Update screen reference and propagate resize to all surfaces
+        cls.main_screen = pygame.display.set_mode(new_dimension, pygame.RESIZABLE)
+
+        for surface in cls.layers:
             if hasattr(surface, "resize"):
                 surface.resize(Vec2(*new_dimension))
-                
+    
+    @classmethod
     def play_sound(self, filename: str, volume: float = 0.5):
         """Play a sound effect from assets/sounds folder."""
         if filename not in self.sounds:
@@ -151,13 +167,23 @@ class Surface_Manager:
                 
 class Game_Manager:
     players: list[Player] = []
+    boards: list[Board] = []
+    
+    # 
+
+    # Time control
     frame_frozen: int = 0
+    clock = pygame.time.Clock()
     
     @classmethod
-    def init(cls) -> list[Player]:
+    def init(cls):
+        cls.boards.append(LLMQuestionGenerator().generate_board(
+            rows=5, difficulty="easy", index=int(random.uniform(0, 5))
+        ))
+        cls.boards.append(LLMQuestionGenerator().generate_board(
+            rows=5, difficulty="hard", index=int(random.uniform(0, 5))
+        ))
+        
         cls.players = generate_players()
-        return cls.players
-                
-# The project-wise global instance of surface manager
-# Needs to be set in main.py
-manager = Surface_Manager()
+        
+        pygame.mouse.set_visible(False)

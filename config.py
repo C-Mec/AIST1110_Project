@@ -7,3 +7,5 @@ screen_dimension = Vec2(1280, 720)
 screen_rect = Rect(0, 0, 1280, 720)
 
 bot_skill = 0.4
+
+game_categories = ["History", "Science", "Literature", "Sports", "Music", "Miscellaneous"]

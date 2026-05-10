@@ -12,7 +12,7 @@ from typing import Literal, TYPE_CHECKING
 
 import config
 from sources.util import intxy, now, now_is_time, blit_text_with_center, Color, Font
-from sources.manager import manager, Base_Surface, Game_Manager
+from sources.manager import Surface_Manager, Base_Surface, Game_Manager
 from sources.datatype.question import Question
 from sources.datatype.player import Player
 from sources.surfaces.visual import notify, time_froze, BorderFlash, Cutscene_Surface
@@ -152,9 +152,11 @@ class Question_Surface(Base_Surface):
         
         def draw_timer(remaining_time: float):
             # Circle depletion in degrees
-            center = (int(self.dimension.x//2), int(self.dimension.y//3))
+            center = (int(self.dimension.x//2), int(self.dimension.y//3-25))
             radius = 50
-            pygame.draw.circle(self.surface, Color.border, center, radius+4, 4)
+            
+            ring_color = Color.wrong if remaining_time == 0 else Color.border
+            pygame.draw.circle(self.surface, ring_color, center, radius+4, 4)
 
             # Filled pie slice shrinking
 
@@ -228,7 +230,7 @@ class Question_Surface(Base_Surface):
             bot, pos, time = self.bot_action
             self.bot_action = None
             
-            manager.click_at(pos, bot)
+            Surface_Manager.click_at(pos, bot)
             
         if self.session_time and now_is_time(self.session_time):
             self.session_time = None
@@ -239,13 +241,13 @@ class Question_Surface(Base_Surface):
             self.timer_time = pygame.time.get_ticks()
             
             # Screen flash in player color
-            manager.add_surface(BorderFlash(self.current_player))
+            Surface_Manager.add_surface(BorderFlash(self.current_player))
             
             self.schedule_bot_action()
     
         # Kill surface after 1s delay
         if self.close_time and now_is_time(self.close_time):
-            manager.remove_surface(self)
+            Surface_Manager.remove_surface(self)
 
         # --- Timeout handling ---
         if self.stage == "Answering" and self.session_remaining_time() <= 0:

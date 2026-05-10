@@ -6,8 +6,11 @@ Vec2 = pygame.Vector2
 
 import config
 from sources.util import Font, Color
-from sources.manager import manager, Base_Surface
+from sources.manager import Surface_Manager, Base_Surface, Game_Manager
 from sources.datatype.player import Player
+from sources.surfaces.surface_grid import Grid_Surface
+from sources.surfaces.overlay import ScoreOverlay
+from sources.surfaces.visual import Transition_Surface
 
 class StartScreen(Base_Surface):
     def __init__(self):
@@ -46,8 +49,17 @@ class StartScreen(Base_Surface):
 
     def on_click(self, pos: Vec2, player: Player):
         # Remove start screen when clicked
-        manager.remove_surface(self)
+        Surface_Manager.remove_surface(self)
 
-    def handle_key(self, event):
-        # Remove start screen when any key pressed
-        manager.remove_surface(self)
+    def on_close(self):
+        screen_w, screen_h = config.screen_dimension
+
+        # Grid should cover the whole window, aligned with background
+        grid_w, grid_h = screen_w, screen_h
+        grid_pos = Vec2(0, 0)
+
+        jeopardy = Grid_Surface(Vec2(grid_w, grid_h), grid_pos, Game_Manager.players[0])
+        
+        Surface_Manager.add_surface(jeopardy)
+        Surface_Manager.add_surface(ScoreOverlay(jeopardy))
+        Surface_Manager.add_surface(Transition_Surface(mode="jeopardy"))
